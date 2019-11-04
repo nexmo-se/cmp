@@ -8,22 +8,41 @@ export default (container) => {
 
   router.use('/webhook', WebhookRouter(container));
 
-  router.get('/test', async (req, res, next) => {
-    try {
-      L.debug('This is the test route');
+  router.get(
+    '/generate/password',
+    async (req, res, next) => {
+      try {
+        const { password } = req.query;
+        const salt = await container.hashService.generateSalt();
+        const hash = await container.hashService.hash(password, salt);
 
-      // Do whatever test you want here when developing features
-      const username = 'nexmo';
-      const password = 'passwords';
+        const b64Salt = await container.base64Service.encode(salt);
+        const b64Hash = await container.base64Service.encode(hash);
 
-      const ok = await container.authService.authenticate(username, password);
-      console.log(ok);
+        res.status(200).json({
+          hash,
+          salt,
+          b64Hash,
+          b64Salt,
+        });
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
 
-      res.status(200).send('ok');
-    } catch (error) {
-      next(error);
-    }
-  });
+  router.get(
+    '/test',
+    container.authenticator.checkAuthentication,
+    async (req, res, next) => {
+      try {
+        L.debug('This is the test route');
+        res.status(200).send('ok');
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
 
   return router;
 };

@@ -22,6 +22,7 @@ import Base64Service from '../services/base64';
 import AuthService from '../services/auth';
 
 import Logger from '../services/logger';
+import Authenticator from '../services/authenticator';
 import ErrorHandler from '../services/errorHandler';
 
 import config from './config';
@@ -52,6 +53,7 @@ container.NotFoundError = NotFoundError;
 container.ForbiddenError = ForbiddenError;
 
 // Core Service
+container.authenticator = Authenticator(container);
 container.errorHandler = ErrorHandler(container);
 
 // Internal

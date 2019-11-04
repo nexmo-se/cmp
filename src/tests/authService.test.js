@@ -26,7 +26,6 @@ describe('Authentication Service', () => {
 
       await authService.authenticate('username', 'password');
     } catch (error) {
-      console.log(error);
       rejected = true;
     }
 
