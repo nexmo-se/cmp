@@ -14,6 +14,8 @@
     "devTrigger": "NODE_ENV=development babel-node src/runIndex.js",
     "clean": "rm -rf build",
     "debug": "nodemon --inspect --exec babel-node src",
+    "initDb": "sequelize-cli init",
+    "migrate": "sequelize-cli db:migrate",
     "build": "npm run clean && babel src -s -D -d build",
     "test": "mocha \"./{,!(node_modules)/**/}*.test.js\" --require babel-polyfill --require esm",
     "decodePrivateKey": "echo $KEY_PRIVATE_KEY | base64 --decode > private.key",
@@ -29,6 +31,7 @@
     "@babel/polyfill": "^7.2.5",
     "aws-sdk": "^2.531.0",
     "axios": "^0.18.0",
+    "bcrypt": "^3.0.6",
     "body-parser": "^1.18.3",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.4",
@@ -45,9 +48,12 @@
     "mongoose": "^5.6.4",
     "mysql": "^2.17.1",
     "mysql2": "^1.7.0",
+    "pg": "^7.12.1",
+    "pg-hstore": "^2.3.3",
     "pusher": "^3.0.0",
     "sequelize": "^5.19.2",
     "socket.io": "^2.2.0",
+    "uuid": "^3.3.3",
     "winston": "^3.2.1"
   },
   "devDependencies": {
@@ -64,6 +70,7 @@
     "jest": "^24.1.0",
     "mocha": "^6.0.1",
     "nodemon": "^1.18.10",
-    "regenerator-runtime": "^0.13.2"
+    "regenerator-runtime": "^0.13.2",
+    "sequelize-cli": "^5.5.1"
   }
 }

@@ -1,7 +1,8 @@
 export default (container) => {
   const isDevelopment = container.config.environment === 'development';
-  const { L } = container.defaultLogger('Errohandler - Service');
-  const handleGeneric = (err, req, res, next) => {
+  const { L } = container.defaultLogger('Router - ErrorHandler');
+
+  const handleError = (err, req, res, next) => {
     console.error(err);
     const response = {
       code: err.status || 500,
@@ -9,28 +10,18 @@ export default (container) => {
       errors: err.errors,
       stack: err.stack,
     };
+    L.warn(JSON.stringify(response, null, 2));
 
     if (!isDevelopment) {
       // Non-development environment should not save stack
       delete response.stack;
     }
 
-    res.status(err.status);
+    res.status(err.status || 500);
     res.json(response);
   };
 
-  const handleNotFound = (err, req, res, next) => {
-    L.debug(err);
-    if (err.status === 404 || err.type === 'not_found') {
-      res.status(404).send('Not found');
-      return;
-    }
-
-    next();
-  };
-
   return {
-    generic: handleGeneric,
-    notFound: handleNotFound,
+    handleError,
   };
 };

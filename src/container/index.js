@@ -1,13 +1,25 @@
+import fs from 'fs';
+import path from 'path';
 import express from 'express';
 import axios from 'axios';
 import httpStatus from 'http-status';
 import socketIO from 'socket.io';
 import log4js from 'log4js';
 import Sequelize from 'sequelize';
+import joi from 'joi';
+import uuid from 'uuid/v4';
+import bcrypt from 'bcrypt';
+
+import AuthenticationError from '../errors/authError';
+import ForbiddenError from '../errors/forbiddenError';
+import NotFoundError from '../errors/notFoundError';
 
 import NexmoService from '../services/nexmo';
 import SocketIoService from '../services/socketIO';
 import DatabaseService from '../services/database';
+import HashService from '../services/hash';
+import Base64Service from '../services/base64';
+import AuthService from '../services/auth';
 
 import Logger from '../services/logger';
 import ErrorHandler from '../services/errorHandler';
@@ -20,7 +32,10 @@ const container = {};
 container.config = config;
 
 // External
+container.fs = fs;
+container.path = path;
 container.express = express;
+container.joi = joi;
 container.axios = axios;
 container.httpStatus = httpStatus;
 container.socketIO = socketIO;
@@ -28,6 +43,13 @@ container.log4js = log4js;
 container.logger = log4js.getLogger();
 container.defaultLogger = Logger(container);
 container.Sequelize = Sequelize;
+container.uuid = uuid;
+container.bcrypt = bcrypt;
+
+// Errors
+container.AuthenticationError = AuthenticationError;
+container.NotFoundError = NotFoundError;
+container.ForbiddenError = ForbiddenError;
 
 // Core Service
 container.errorHandler = ErrorHandler(container);
@@ -36,5 +58,8 @@ container.errorHandler = ErrorHandler(container);
 container.nexmoService = NexmoService(container);
 container.socketIoService = SocketIoService(container);
 container.databaseService = DatabaseService(container);
+container.hashService = HashService(container);
+container.base64Service = Base64Service(container);
+container.authService = AuthService(container);
 
 export default container;
