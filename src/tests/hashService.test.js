@@ -1,15 +1,15 @@
 import assert from 'assert';
 import bcrypt from 'bcrypt';
+import MockContainer from './mockContainer';
 import HashService from '../services/hash';
 
 describe('HashService', () => {
   it('should generate salt properly', async () => {
-    const container = {
-      bcrypt,
-      config: {
-        hash: {
-          saltRounds: 10,
-        },
+    const container = MockContainer();
+    container.bcrypt = bcrypt;
+    container.config = {
+      hash: {
+        saltRounds: 10,
       },
     };
     const hashService = HashService(container);
@@ -19,12 +19,11 @@ describe('HashService', () => {
   });
 
   it('should generate different salt everytime', async () => {
-    const container = {
-      bcrypt,
-      config: {
-        hash: {
-          saltRounds: 10,
-        },
+    const container = MockContainer();
+    container.bcrypt = bcrypt;
+    container.config = {
+      hash: {
+        saltRounds: 10,
       },
     };
     const hashService = HashService(container);
@@ -35,12 +34,11 @@ describe('HashService', () => {
   });
 
   it('should hash properly', async () => {
-    const container = {
-      bcrypt,
-      config: {
-        hash: {
-          saltRounds: 10,
-        },
+    const container = MockContainer();
+    container.bcrypt = bcrypt;
+    container.config = {
+      hash: {
+        saltRounds: 10,
       },
     };
     const hashService = HashService(container);
