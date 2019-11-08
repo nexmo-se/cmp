@@ -24,6 +24,7 @@ import PersistenceService from '../services/persistence';
 
 import Logger from '../services/logger';
 import Authenticator from '../services/authenticator';
+import Authorizer from '../services/authorizer';
 import ErrorHandler from '../services/errorHandler';
 
 import config from './config';
@@ -55,6 +56,7 @@ container.ForbiddenError = ForbiddenError;
 
 // Core Service
 container.authenticator = Authenticator(container);
+container.authorizer = Authorizer(container);
 container.errorHandler = ErrorHandler(container);
 
 // Internal

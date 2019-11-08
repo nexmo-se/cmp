@@ -65,6 +65,16 @@ export default (container) => {
     }
   };
 
+  const listUserRoles = async (userId) => {
+    try {
+      const { UserRole } = container.databaseService.accessors;
+      const userRoles = await UserRole.findUserRoles({ user: userId });
+      return Promise.resolve(userRoles);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const assignRoleToUser = async (userId, role) => {
     try {
       const { UserRole } = container.databaseService.accessors;
@@ -127,6 +137,7 @@ export default (container) => {
     updateUser,
     deleteUser,
 
+    listUserRoles,
     assignRoleToUser,
     deassignRoleFromUser,
   };
