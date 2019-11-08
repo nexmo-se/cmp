@@ -20,6 +20,7 @@ import DatabaseService from '../services/database';
 import HashService from '../services/hash';
 import Base64Service from '../services/base64';
 import AuthService from '../services/auth';
+import PersistenceService from '../services/persistence';
 
 import Logger from '../services/logger';
 import Authenticator from '../services/authenticator';
@@ -63,5 +64,6 @@ container.databaseService = DatabaseService(container);
 container.hashService = HashService(container);
 container.base64Service = Base64Service(container);
 container.authService = AuthService(container);
+container.persistenceService = PersistenceService(container);
 
 export default container;
