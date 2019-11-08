@@ -1,3 +1,4 @@
+import UserRouter from './user';
 import WebhookRouter from './webhook';
 
 export default (container) => {
@@ -6,6 +7,7 @@ export default (container) => {
 
   router.use('/', container.express.static('src/public'));
 
+  router.use('/users', UserRouter(container));
   router.use('/webhook', WebhookRouter(container));
 
   router.get(
