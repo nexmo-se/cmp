@@ -90,4 +90,22 @@ export default {
       passwordSalt: Joi.string().forbidden(),
     },
   },
+  addUserRole: {
+    query: {},
+    params: {
+      userId: Joi.string().min(1).required(),
+    },
+    body: {
+      role: Joi.string().min(1).required(),
+    },
+  },
+  removeUserRole: {
+    query: {},
+    params: {
+      userId: Joi.string().min(1).required(),
+    },
+    body: {
+      role: Joi.string().min(1).required(),
+    },
+  },
 };

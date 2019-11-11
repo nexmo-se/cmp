@@ -73,6 +73,20 @@ export default (container) => {
       controller.changeUserPassword,
     );
 
+  router.route('/:userId/roles')
+    .post(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.addUserRole),
+      controller.addUserRole,
+    )
+    .delete(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.removeUserRole),
+      controller.removeUserRole,
+    );
+
 
   return router;
 };

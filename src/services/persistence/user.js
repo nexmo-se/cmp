@@ -78,7 +78,9 @@ export default (container) => {
   const assignRoleToUser = async (userId, role) => {
     try {
       const { UserRole } = container.databaseService.accessors;
-      const userRoles = await UserRole.listUserRoles();
+      const userRoles = await UserRole.findUserRoles({
+        user: userId,
+      });
 
       let roleExists = false;
       for (let i = 0; i < userRoles.length; i += 1) {
@@ -105,7 +107,9 @@ export default (container) => {
   const deassignRoleFromUser = async (userId, role) => {
     try {
       const { UserRole } = container.databaseService.accessors;
-      const userRoles = await UserRole.listUserRoles();
+      const userRoles = await UserRole.findUserRoles({
+        user: userId,
+      });
 
       let userRoleId = null;
       for (let i = 0; i < userRoles.length; i += 1) {
