@@ -1,28 +1,89 @@
 export default (container) => {
   const { L } = container.defaultLogger('User Controller');
-  const getUserId = (req) => {
-    const nexmoIni = container.utils.getIniStuff();
-    const bearerToken = container.utils.getBearerToken(req);
-    const userId = container.utils.getIdFromJWT(nexmoIni, bearerToken) || 'demo';
-    return userId;
+
+  const listUsers = async (req, res, next) => {
+    try {
+      res.status(200).json([]);
+    } catch (error) {
+      next(error);
+    }
   };
 
-  const sample = async (req, res, next) => {
+  const deleteAllUsers = async (req, res, next) => {
     try {
-      L.debug('Demo Sample');
+      res.status(200).json([]);
+    } catch (error) {
+      next(error);
+    }
+  };
 
-      // Get User Nexmo Ini
-      const userId = getUserId(req);
-      const userNexmoIni = container.utils.getNexmo(userId);
+  const readMyUser = async (req, res, next) => {
+    try {
+      res.status(200).json([]);
+    } catch (error) {
+      next(error);
+    }
+  };
 
-      L.debug('data', userNexmoIni);
-      res.status(200).json(userNexmoIni);
+  const updateMyUser = async (req, res, next) => {
+    try {
+      res.status(200).json([]);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  const changeMyUserPassword = async (req, res, next) => {
+    try {
+      res.status(200).json([]);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  const readUser = async (req, res, next) => {
+    try {
+      res.status(200).json([]);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  const updateUser = async (req, res, next) => {
+    try {
+      res.status(200).json([]);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  const deleteUser = async (req, res, next) => {
+    try {
+      res.status(200).json([]);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  const changeUserPassword = async (req, res, next) => {
+    try {
+      res.status(200).json([]);
     } catch (error) {
       next(error);
     }
   };
 
   return {
-    sample,
+    listUsers,
+    deleteAllUsers,
+
+    readMyUser,
+    updateMyUser,
+    changeMyUserPassword,
+
+    readUser,
+    updateUser,
+    deleteUser,
+    changeUserPassword,
   };
 };

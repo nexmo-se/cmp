@@ -9,15 +9,70 @@ export default (container) => {
   const { authorize } = container.authorizer;
   const { checkAuthentication } = container.authenticator;
 
-  router.get('/', (_, res) => res.send('You have reached the user route'));
+  router.route('/')
+    .get(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.listUsers),
+      controller.listUsers,
+    )
+    .delete(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.deleteAllUsers),
+      controller.deleteAllUsers,
+    );
 
-  router.get(
-    '/sample',
-    checkAuthentication,
-    authorize(['user']),
-    validate(validator.sample),
-    controller.sample,
-  );
+  router.route('/me')
+    .get(
+      checkAuthentication,
+      authorize(['user', 'admin']),
+      validate(validator.readMyUser),
+      controller.readMyUser,
+    )
+    .put(
+      checkAuthentication,
+      authorize(['user', 'admin']),
+      validate(validator.updateMyUser),
+      controller.updateMyUser,
+    );
+
+  router.route('/me/password')
+    .post(
+      checkAuthentication,
+      authorize(['user']),
+      validate(validator.changeMyUserPassword),
+      controller.changeMyUserPassword,
+    );
+
+  router.route('/:userId')
+    .get(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.readUser),
+      controller.readUser,
+    )
+    .put(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.updateUser),
+      controller.updateUser,
+    )
+    .delete(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.deleteUser),
+      controller.deleteUser,
+    );
+
+  router.route('/:userId/password')
+    .post(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.changeUserPassword),
+      controller.changeUserPassword,
+    );
+
 
   return router;
 };
