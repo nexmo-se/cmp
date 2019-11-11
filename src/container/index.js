@@ -9,6 +9,7 @@ import Sequelize from 'sequelize';
 import joi from 'joi';
 import uuid from 'uuid/v4';
 import bcrypt from 'bcrypt';
+import jsonwebtoken from 'jsonwebtoken';
 
 import AuthenticationError from '../errors/authError';
 import ForbiddenError from '../errors/forbiddenError';
@@ -21,6 +22,7 @@ import HashService from '../services/hash';
 import Base64Service from '../services/base64';
 import AuthService from '../services/auth';
 import PersistenceService from '../services/persistence';
+import JwtService from '../services/jwt';
 
 import Logger from '../services/logger';
 import Authenticator from '../services/authenticator';
@@ -48,6 +50,7 @@ container.defaultLogger = Logger(container);
 container.Sequelize = Sequelize;
 container.uuid = uuid;
 container.bcrypt = bcrypt;
+container.jsonwebtoken = jsonwebtoken;
 
 // Errors
 container.AuthenticationError = AuthenticationError;
@@ -64,6 +67,7 @@ container.nexmoService = NexmoService(container);
 container.socketIoService = SocketIoService(container);
 container.databaseService = DatabaseService(container);
 container.hashService = HashService(container);
+container.jwtService = JwtService(container);
 container.base64Service = Base64Service(container);
 container.authService = AuthService(container);
 container.persistenceService = PersistenceService(container);

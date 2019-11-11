@@ -11,6 +11,21 @@ export default (container) => {
     }
   };
 
+  const getUserByUsername = async (username, excludePassword = true) => {
+    try {
+      const { User } = container.databaseService.accessors;
+      const criteria = { username };
+      const users = await User.findUsers(criteria, excludePassword);
+      if (users == null || users.length === 0) {
+        return Promise.resolve(null);
+      }
+
+      return Promise.resolve(users[0]);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createUser = async (
     username,
     passwordHash,
@@ -135,6 +150,7 @@ export default (container) => {
 
   return {
     listUsers,
+    getUserByUsername,
 
     createUser,
     readUser,
