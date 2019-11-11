@@ -12,6 +12,7 @@ export default (container) => {
         throw new container.AuthenticationError('Invalid Username or Password');
       }
 
+      // Check Password Hash
       const { passwordHash, passwordSalt } = user;
       const currentHash = await container.hashService.hash(password, passwordSalt);
 
@@ -20,6 +21,7 @@ export default (container) => {
         throw new container.AuthenticationError('Invalid Username or Password');
       }
 
+      // Generate JWT
       const { id } = user;
       const payload = { userId: id };
       const token = await container.jwtService.encode(payload);
@@ -39,9 +41,11 @@ export default (container) => {
         lastName,
       } = req.body;
 
+      // Generate Salt and Hash
       const passwordSalt = await container.hashService.generateSalt();
       const passwordHash = await container.hashService.hash(password, passwordSalt);
 
+      // Create User
       const { User } = container.persistenceService;
       const user = await User.createUser(username, passwordHash, passwordSalt, firstName, lastName);
       res.status(200).json(user);
