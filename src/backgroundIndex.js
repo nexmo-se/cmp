@@ -14,8 +14,8 @@ process.on('uncaughtException', (err) => {
 });
 
 process.on('SIGTERM', () => {
-  console.error('SIGTERM received, someone is trying to kill Run');
-  console.error('Killing myself (Run)');
+  console.error('SIGTERM received, someone is trying to kill Background Process');
+  console.error('Killing myself (Background Process)');
   process.exit(1);
 });
 
@@ -27,4 +27,5 @@ console.log('VERSION:', packageJson.version);
 console.log('NODEJS VERSION:', process.version);
 
 // Start of Script
-console.log('This is the Trigger Script');
+console.log('Starting Background Process');
+require('./background');

@@ -13,6 +13,12 @@ process.on('uncaughtException', (err) => {
   console.error(err);
 });
 
+process.on('SIGTERM', () => {
+  console.error('SIGTERM received, someone is trying to kill App');
+  console.error('Killing myself (App)');
+  process.exit(1);
+});
+
 // Set default node environment to development
 const env = process.env.NODE_ENV || 'development';
 
@@ -20,4 +26,5 @@ console.log('ENVIRONMENT:', env);
 console.log('VERSION:', packageJson.version);
 console.log('NODEJS VERSION:', process.version);
 
+console.log('Starting Web Application');
 require('./app');
