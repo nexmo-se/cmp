@@ -13,11 +13,21 @@ export default (container) => {
 
   const listUsers = async (excludePassword = true) => {
     try {
-      const { User } = container.databaseService.models;
+      const { User, UserRole } = container.databaseService.models;
       const users = await User.findAll({
         where: {
           deleted: false,
         },
+        include: [
+          {
+            model: UserRole,
+            as: 'roles',
+            where: {
+              active: true,
+            },
+            required: false,
+          },
+        ],
       });
 
       const mappedUser = users.map(rawUser => rawUser.dataValues)
@@ -57,9 +67,21 @@ export default (container) => {
 
   const readUser = async (userId, excludePassword = true) => {
     try {
-      const { User } = container.databaseService.models;
+      const { User, UserRole } = container.databaseService.models;
       const rawUser = await User.findOne({
-        id: userId,
+        where: {
+          id: userId,
+        },
+        include: [
+          {
+            model: UserRole,
+            as: 'roles',
+            where: {
+              active: true,
+            },
+            required: false,
+          },
+        ],
       });
 
       const jsonUser = rawUser.dataValues;
@@ -72,7 +94,7 @@ export default (container) => {
 
   const updateUser = async (userId, changes, excludePassword = true) => {
     try {
-      const { User } = container.databaseService.models;
+      const { User, UserRole } = container.databaseService.models;
 
       const query = {
         where: {
@@ -86,6 +108,16 @@ export default (container) => {
         where: {
           id: userId,
         },
+        include: [
+          {
+            model: UserRole,
+            as: 'roles',
+            where: {
+              active: true,
+            },
+            required: false,
+          },
+        ],
       });
 
       const jsonUser = user.dataValues;
@@ -98,7 +130,7 @@ export default (container) => {
 
   const deleteUser = async (userId, excludePassword = true) => {
     try {
-      const { User } = container.databaseService.models;
+      const { User, UserRole } = container.databaseService.models;
 
       const changes = {
         deleted: true,
@@ -115,6 +147,16 @@ export default (container) => {
         where: {
           id: userId,
         },
+        include: [
+          {
+            model: UserRole,
+            as: 'roles',
+            where: {
+              active: true,
+            },
+            required: false,
+          },
+        ],
       });
 
       const jsonUser = user.dataValues;
@@ -127,10 +169,20 @@ export default (container) => {
 
   const findUsers = async (criteria, excludePassword = true) => {
     try {
-      const { User } = container.databaseService.models;
+      const { User, UserRole } = container.databaseService.models;
 
       const user = await User.findAll({
         where: criteria,
+        include: [
+          {
+            model: UserRole,
+            as: 'roles',
+            where: {
+              active: true,
+            },
+            required: false,
+          },
+        ],
       });
 
       const jsonUser = user.dataValues;
