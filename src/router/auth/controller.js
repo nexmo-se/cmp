@@ -5,7 +5,7 @@ export default (container) => {
     try {
       const { username, password } = req.body;
       const { User } = container.persistenceService;
-      const user = await User.getUserByUsername(username, false);
+      const user = await User.getUserByUsername(username, false, true);
 
       if (user == null) {
         L.warn('Invalid username');

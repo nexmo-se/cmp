@@ -11,11 +11,11 @@ export default (container) => {
     }
   };
 
-  const getUserByUsername = async (username, excludePassword = true) => {
+  const getUserByUsername = async (username, excludePassword = true, excludeDeleted = true) => {
     try {
       const { User } = container.databaseService.accessors;
       const criteria = { username };
-      const users = await User.findUsers(criteria, excludePassword);
+      const users = await User.findUsers(criteria, excludePassword, excludeDeleted);
       if (users == null || users.length === 0) {
         return Promise.resolve(null);
       }

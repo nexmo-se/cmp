@@ -191,18 +191,18 @@ export default (container) => {
     }
   };
 
-  const findUserRole = async (criteria = {}) => {
+  const findUserRole = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const userRole = await getOneByCriteria(criteria, true);
+      const userRole = await getOneByCriteria(criteria, excludeDeleted);
       return Promise.resolve(userRole);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findUserRoles = async (criteria = {}) => {
+  const findUserRoles = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const userRoles = await getByCriteria(criteria, true);
+      const userRoles = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(userRoles);
     } catch (error) {
       return Promise.reject(error);

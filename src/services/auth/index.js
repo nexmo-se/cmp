@@ -31,7 +31,7 @@ export default (container) => {
   const authenticateBasic = async (username, password) => {
     try {
       const { User } = container.persistenceService;
-      const user = await User.getUserByUsername(username, false);
+      const user = await User.getUserByUsername(username, false, true);
       const { passwordHash, passwordSalt } = user;
 
       const currentHash = await container.hashService.hash(password, passwordSalt);

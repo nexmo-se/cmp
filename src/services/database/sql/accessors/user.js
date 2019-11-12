@@ -238,18 +238,18 @@ export default (container) => {
     }
   };
 
-  const findUser = async (criteria = {}, excludePassword = true) => {
+  const findUser = async (criteria = {}, excludePassword = true, excludeDeleted = true) => {
     try {
-      const user = await getOneByCriteria(criteria, excludePassword, true);
+      const user = await getOneByCriteria(criteria, excludePassword, excludeDeleted);
       return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findUsers = async (criteria = {}, excludePassword = true) => {
+  const findUsers = async (criteria = {}, excludePassword = true, excludeDeleted = true) => {
     try {
-      const users = await getByCriteria(criteria, excludePassword, true);
+      const users = await getByCriteria(criteria, excludePassword, excludeDeleted);
       return Promise.resolve(users);
     } catch (error) {
       return Promise.reject(error);
