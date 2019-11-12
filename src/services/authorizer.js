@@ -11,14 +11,13 @@ export default (container) => {
         throw new container.AuthenticationError('Invalid user');
       }
 
-      const { User } = container.persistenceService;
-      const userRoles = await User.listUserRoles();
+      const userRoles = user.roles;
 
       let hasRole = false;
       for (let i = 0; i < allowedRoles.length; i += 1) {
         const allowedRole = allowedRoles[i];
         for (let j = 0; j < userRoles.length; j += 1) {
-          const userRole = userRoles[j];
+          const userRole = userRoles[j].role;
 
           if (allowedRole === userRole) {
             hasRole = true;

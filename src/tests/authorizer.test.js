@@ -82,16 +82,12 @@ describe('Authorizer', () => {
     let rejected = false;
     try {
       const container = MockContainer();
-      container.persistenceService = {
-        User: {
-          listUserRoles: async () => Promise.resolve([]),
-        },
-      };
       const authorizer = Authorizer(container);
 
       const req = {
         user: {
           id: 'a',
+          roles: [],
         },
       };
 
@@ -114,16 +110,15 @@ describe('Authorizer', () => {
     let rejected = false;
     try {
       const container = MockContainer();
-      container.persistenceService = {
-        User: {
-          listUserRoles: async () => Promise.resolve(['admin']),
-        },
-      };
       const authorizer = Authorizer(container);
 
       const req = {
         user: {
           id: 'a',
+          roles: [{
+            id: 'rid',
+            role: 'admin',
+          }],
         },
       };
 
@@ -146,16 +141,15 @@ describe('Authorizer', () => {
     let rejected = false;
     try {
       const container = MockContainer();
-      container.persistenceService = {
-        User: {
-          listUserRoles: async () => Promise.resolve(['user']),
-        },
-      };
       const authorizer = Authorizer(container);
 
       const req = {
         user: {
           id: 'a',
+          roles: [{
+            id: 'rid',
+            role: 'user',
+          }],
         },
       };
 
@@ -178,16 +172,15 @@ describe('Authorizer', () => {
     let rejected = false;
     try {
       const container = MockContainer();
-      container.persistenceService = {
-        User: {
-          listUserRoles: async () => Promise.resolve(['user']),
-        },
-      };
       const authorizer = Authorizer(container);
 
       const req = {
         user: {
           id: 'a',
+          roles: [{
+            id: 'rid',
+            role: 'user',
+          }],
         },
       };
 
@@ -210,16 +203,18 @@ describe('Authorizer', () => {
     let rejected = false;
     try {
       const container = MockContainer();
-      container.persistenceService = {
-        User: {
-          listUserRoles: async () => Promise.resolve(['user', 'admin']),
-        },
-      };
       const authorizer = Authorizer(container);
 
       const req = {
         user: {
           id: 'a',
+          roles: [{
+            id: 'rid',
+            role: 'user',
+          }, {
+            id: 'rid2',
+            role: 'admin',
+          }],
         },
       };
 
@@ -242,16 +237,15 @@ describe('Authorizer', () => {
     let rejected = false;
     try {
       const container = MockContainer();
-      container.persistenceService = {
-        User: {
-          listUserRoles: async () => Promise.resolve(['user', 'admin']),
-        },
-      };
       const authorizer = Authorizer(container);
 
       const req = {
         user: {
           id: 'a',
+          roles: [{
+            id: 'rid',
+            role: 'user',
+          }],
         },
       };
 
@@ -274,16 +268,15 @@ describe('Authorizer', () => {
     let rejected = false;
     try {
       const container = MockContainer();
-      container.persistenceService = {
-        User: {
-          listUserRoles: async () => Promise.resolve(['user', 'admin']),
-        },
-      };
       const authorizer = Authorizer(container);
 
       const req = {
         user: {
           id: 'a',
+          roles: [{
+            id: 'rid',
+            role: 'user',
+          }],
         },
       };
 

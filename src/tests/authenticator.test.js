@@ -54,7 +54,7 @@ describe('Authenticator', () => {
     try {
       const container = MockContainer();
       container.authService = {
-        authenticate: async () => Promise.resolve(),
+        authenticateBasic: async () => Promise.resolve(),
       };
       container.base64Service = {
         decode: async () => Promise.resolve('abc:def'),

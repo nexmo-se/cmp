@@ -1,46 +1,49 @@
 export default (container) => {
   const { L } = container.defaultLogger('AuthService');
 
-  const checkUsername = async (username) => {
+  const authenticateBearer = async (token) => {
     try {
-      const usernameCorrect = username === container.config.user.username;
-      if (!usernameCorrect) {
-        throw new container.AuthenticationError('Invalid Username or Password');
+      if (token == null || token === '') {
+        L.warn('Null or Empty Token');
+        throw new container.AuthenticationError('Invalid token');
       }
 
-      return Promise.resolve(usernameCorrect);
+      const payload = await container.jwtService.decode(token);
+      if (payload == null) {
+        L.warn('Null Token Payload');
+        throw new container.AuthenticationError('Invalid token');
+      }
+
+      const { userId } = payload;
+      if (userId == null || userId === '') {
+        L.warn('Null or Empty User Id in Token Payload');
+        throw new container.AuthenticationError('Invalid token');
+      }
+
+      const { User } = container.persistenceService;
+      const user = await User.readUser(userId, true);
+      return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const checkPassword = async (password, hash, salt) => {
+  const authenticateBasic = async (username, password) => {
     try {
-      const currentHash = await container.hashService.hash(password, salt);
-      const passwordCorrect = currentHash === hash;
-      if (!passwordCorrect) {
+      const { User } = container.persistenceService;
+      const user = await User.getUserByUsername(username, false);
+      const { passwordHash, passwordSalt } = user;
+
+      const currentHash = await container.hashService.hash(password, passwordSalt);
+      if (currentHash !== passwordHash) {
+        L.warn('Password hash mismatch');
         throw new container.AuthenticationError('Invalid Username or Password');
       }
-      return Promise.resolve(passwordCorrect);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
 
-  const authenticate = async (username, password) => {
-    try {
-      // Config
-      const { passwordHash, passwordSalt } = container.config.user;
-      const decodedPasswordHash = await container.base64Service.decode(passwordHash);
-      const decodedPasswordSalt = await container.base64Service.decode(passwordSalt);
+      delete user.passwordHash;
+      delete user.passwordSalt;
 
-      // Check Username
-      await checkUsername(username);
-
-      // Check Password
-      await checkPassword(password, decodedPasswordHash, decodedPasswordSalt);
-
-      return Promise.resolve();
+      return Promise.resolve(user);
     } catch (error) {
       if (error.name === container.AuthenticationError.name) {
         L.warn('User Authentication Failed');
@@ -50,6 +53,7 @@ export default (container) => {
   };
 
   return {
-    authenticate,
+    authenticateBearer,
+    authenticateBasic,
   };
 };
