@@ -26,6 +26,11 @@ export default (container) => {
       }
 
       const rawUser = await User.findOne(query);
+      if (rawUser == null) {
+        L.debug('Null result for Get By Id, returning null');
+        return Promise.resolve(null);
+      }
+
       const userRole = mapUser(rawUser, excludePassword);
       return Promise.resolve(userRole);
     } catch (error) {

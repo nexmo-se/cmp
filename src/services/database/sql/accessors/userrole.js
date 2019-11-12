@@ -16,6 +16,11 @@ export default (container) => {
       }
 
       const rawUserRole = await UserRole.findOne(query);
+      if (rawUserRole == null) {
+        L.debug('Null result for Get By Id, returning null');
+        return Promise.resolve(null);
+      }
+
       const userRole = mapUserRole(rawUserRole);
       return Promise.resolve(userRole);
     } catch (error) {
