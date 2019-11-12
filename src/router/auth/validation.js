@@ -27,8 +27,8 @@ export default {
       }),
       passwordHash: Joi.string().forbidden(),
       passwordSalt: Joi.string().forbidden(),
-      firstName: Joi.string().min(1),
-      lastName: Joi.string().min(1),
+      firstName: Joi.string().min(1).required(),
+      lastName: Joi.string().min(1).required(),
     },
   },
 };
