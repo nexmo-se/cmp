@@ -1,6 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    queryInterface.createTable('Users', {
+    const createUsersTable = () => queryInterface.createTable('Users', {
       id: {
         type: Sequelize.STRING(45),
         allowNull: false,
@@ -28,10 +28,10 @@ module.exports = {
         type: Sequelize.STRING(100),
         allowNull: false,
       },
-      active: {
+      deleted: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        default: true,
+        default: false,
       },
       createdAt: {
         allowNull: false,
@@ -43,7 +43,7 @@ module.exports = {
       },
     });
 
-    queryInterface.createTable('UserRoles', {
+    const createUserRolesTable = () => queryInterface.createTable('UserRoles', {
       id: {
         type: Sequelize.STRING(45),
         allowNull: false,
@@ -58,10 +58,10 @@ module.exports = {
         type: Sequelize.STRING(100),
         allowNull: false,
       },
-      active: {
+      deleted: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        default: true,
+        default: false,
       },
       createdAt: {
         allowNull: false,
@@ -72,9 +72,11 @@ module.exports = {
         type: Sequelize.DATE,
       },
     });
+    return createUsersTable().then(createUserRolesTable);
   },
   down: (queryInterface) => {
-    queryInterface.dropTable('UserRoles');
-    queryInterface.dropTable('Users');
+    const dropUserRolesTable = () => queryInterface.dropTable('UserRoles');
+    const dropUsersTable = () => queryInterface.dropTable('Users');
+    return dropUserRolesTable().then(dropUsersTable);
   },
 };
