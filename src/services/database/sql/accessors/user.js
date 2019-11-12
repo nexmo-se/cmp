@@ -1,12 +1,27 @@
 export default (container) => {
   const { L } = container.defaultLogger('User Model Accessor');
+  const mapUserRole = (userRole) => {
+    const mappedUserRole = userRole.dataValues;
+
+    delete mappedUserRole.deleted;
+    delete mappedUserRole.createdAt;
+    delete mappedUserRole.updatedAt;
+
+    return mappedUserRole;
+  };
   const mapUser = (user, excludePassword = true) => {
-    const mappedUser = Object.assign({}, user);
+    const mappedUser = Object.assign({}, user.dataValues);
+
+    mappedUser.roles = (mappedUser.roles || []).map(mapUserRole);
 
     if (excludePassword) {
       delete mappedUser.passwordHash;
       delete mappedUser.passwordSalt;
     }
+
+    delete mappedUser.deleted;
+    delete mappedUser.createdAt;
+    delete mappedUser.updatedAt;
 
     return mappedUser;
   };
@@ -23,15 +38,14 @@ export default (container) => {
             model: UserRole,
             as: 'roles',
             where: {
-              active: true,
+              deleted: false,
             },
             required: false,
           },
         ],
       });
 
-      const mappedUser = users.map(rawUser => rawUser.dataValues)
-        .map(user => mapUser(user, excludePassword));
+      const mappedUser = users.map(user => mapUser(user, excludePassword));
       return Promise.resolve(mappedUser);
     } catch (error) {
       return Promise.reject(error);
@@ -55,10 +69,10 @@ export default (container) => {
         passwordSalt,
         firstName,
         lastName,
+        deleted: false,
       });
 
-      const jsonUser = rawUser.dataValues;
-      const mappedUser = mapUser(jsonUser, excludePassword);
+      const mappedUser = mapUser(rawUser, excludePassword);
       return Promise.resolve(mappedUser);
     } catch (error) {
       return Promise.reject(error);
@@ -77,15 +91,14 @@ export default (container) => {
             model: UserRole,
             as: 'roles',
             where: {
-              active: true,
+              deleted: false,
             },
             required: false,
           },
         ],
       });
 
-      const jsonUser = rawUser.dataValues;
-      const mappedUser = mapUser(jsonUser, excludePassword);
+      const mappedUser = mapUser(rawUser, excludePassword);
       return Promise.resolve(mappedUser);
     } catch (error) {
       return Promise.reject(error);
@@ -113,15 +126,14 @@ export default (container) => {
             model: UserRole,
             as: 'roles',
             where: {
-              active: true,
+              deleted: false,
             },
             required: false,
           },
         ],
       });
 
-      const jsonUser = user.dataValues;
-      const mappedUser = mapUser(jsonUser, excludePassword);
+      const mappedUser = mapUser(user, excludePassword);
       return Promise.resolve(mappedUser);
     } catch (error) {
       return Promise.reject(error);
@@ -152,15 +164,14 @@ export default (container) => {
             model: UserRole,
             as: 'roles',
             where: {
-              active: true,
+              deleted: false,
             },
             required: false,
           },
         ],
       });
 
-      const jsonUser = user.dataValues;
-      const mappedUser = mapUser(jsonUser, excludePassword);
+      const mappedUser = mapUser(user, excludePassword);
       return Promise.resolve(mappedUser);
     } catch (error) {
       return Promise.reject(error);
@@ -170,24 +181,27 @@ export default (container) => {
   const findUsers = async (criteria, excludePassword = true) => {
     try {
       const { User, UserRole } = container.databaseService.models;
-
-      const user = await User.findAll({
+      const query = {
         where: criteria,
         include: [
           {
             model: UserRole,
             as: 'roles',
             where: {
-              active: true,
+              deleted: false,
             },
             required: false,
           },
         ],
-      });
+      };
+      query.where.deleted = false;
+      const users = await User.findAll(query);
 
-      const jsonUser = user.dataValues;
-      const mappedUser = mapUser(jsonUser, excludePassword);
-      return Promise.resolve(mappedUser);
+      if (users.length === 0) {
+        return Promise.resolve([]);
+      }
+      const mappedUsers = users.map(user => mapUser(user, excludePassword));
+      return Promise.resolve(mappedUsers);
     } catch (error) {
       return Promise.reject(error);
     }

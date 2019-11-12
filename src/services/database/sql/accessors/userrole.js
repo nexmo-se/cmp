@@ -1,5 +1,14 @@
 export default (container) => {
   const { L } = container.defaultLogger('UserRole Model Accessor');
+  const mapUserRole = (userRole) => {
+    const mappedUserRole = userRole.dataValues;
+
+    delete mappedUserRole.deleted;
+    delete mappedUserRole.createdAt;
+    delete mappedUserRole.updatedAt;
+
+    return mappedUserRole;
+  };
 
   const listUserRoles = async () => {
     try {
@@ -10,7 +19,7 @@ export default (container) => {
         },
       });
 
-      const mappedUserRoles = userRoles.map(rawUserRole => rawUserRole.dataValues);
+      const mappedUserRoles = userRoles.map(mapUserRole);
       return Promise.resolve(mappedUserRoles);
     } catch (error) {
       return Promise.reject(error);
@@ -27,9 +36,10 @@ export default (container) => {
         id: container.uuid(),
         user,
         role,
+        deleted: false,
       });
 
-      const userRole = rawUserRole.dataValues;
+      const userRole = mapUserRole(rawUserRole);
       return Promise.resolve(userRole);
     } catch (error) {
       return Promise.reject(error);
@@ -43,7 +53,7 @@ export default (container) => {
         id: userRoleId,
       });
 
-      const userRole = rawUserRole.dataValues;
+      const userRole = mapUserRole(rawUserRole);
       return Promise.resolve(userRole);
     } catch (error) {
       return Promise.reject(error);
@@ -68,7 +78,7 @@ export default (container) => {
         },
       });
 
-      const userRole = rawUserRole.dataValues;
+      const userRole = mapUserRole(rawUserRole);
       return Promise.resolve(userRole);
     } catch (error) {
       return Promise.reject(error);
@@ -96,7 +106,22 @@ export default (container) => {
         },
       });
 
-      const userRole = rawUserRole.dataValues;
+      const userRole = mapUserRole(rawUserRole);
+      return Promise.resolve(userRole);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findUserRole = async (criteria) => {
+    try {
+      const { UserRole } = container.databaseService.models;
+
+      const rawUserRole = await UserRole.findOne({
+        where: criteria,
+      });
+
+      const userRole = mapUserRole(rawUserRole);
       return Promise.resolve(userRole);
     } catch (error) {
       return Promise.reject(error);
@@ -107,12 +132,12 @@ export default (container) => {
     try {
       const { UserRole } = container.databaseService.models;
 
-      const rawUserRole = await UserRole.findAll({
+      const rawUserRoles = await UserRole.findAll({
         where: criteria,
       });
 
-      const userRole = rawUserRole.dataValues;
-      return Promise.resolve(userRole);
+      const userRoles = rawUserRoles.map(mapUserRole);
+      return Promise.resolve(userRoles);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -126,6 +151,7 @@ export default (container) => {
     updateUserRole,
     deleteUserRole,
 
+    findUserRole,
     findUserRoles,
   };
 };
