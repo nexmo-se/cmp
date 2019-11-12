@@ -19,7 +19,8 @@ export default (container) => {
 
   const readMyUser = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { user } = req;
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }
