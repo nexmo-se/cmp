@@ -1,5 +1,129 @@
 export default (container) => {
   const { L } = container.defaultLogger('User Model Accessor');
+
+  const getById = async (userId, excludePassword = true, excludeDeleted = true) => {
+    try {
+      const { User, UserRole } = container.databaseService.models;
+      const query = {
+        where: {
+          id: userId,
+        },
+        include: [
+          {
+            model: UserRole,
+            as: 'roles',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+        ],
+      };
+
+      // Check Deleted
+      if (excludeDeleted) {
+        query.where.deleted = false;
+      }
+
+      const rawUser = await User.findOne(query);
+      const userRole = mapUser(rawUser, excludePassword);
+      return Promise.resolve(userRole);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const getByCriteria = async (criteria = {}, excludePassword = true, excludeDeleted = true) => {
+    try {
+      const { User, UserRole } = container.databaseService.models;
+      const query = {
+        where: criteria,
+        include: [
+          {
+            model: UserRole,
+            as: 'roles',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+        ],
+      };
+
+      // Check Deleted
+      if (excludeDeleted) {
+        query.where.deleted = false;
+      }
+
+      const rawUsers = await User.findAll(query);
+      const users = rawUsers.map(user => mapUser(user, excludePassword));
+      return Promise.resolve(users);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const getOneByCriteria = async (criteria = {}, excludePassword = true, excludeDeleted = true) => {
+    try {
+      const users = await getByCriteria(criteria, excludePassword, excludeDeleted);
+      if (users == null || users.length === 0) {
+        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        return Promise.resolve(null);
+      }
+
+      const user = users[0];
+      return Promise.resolve(user);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const updateById = async (userId, changes, excludePassword = true, excludeDeleted = true) => {
+    try {
+      const { User } = container.databaseService.models;
+      const query = {
+        where: {
+          id: userId,
+        },
+      };
+
+      // Check Deleted
+      if (excludeDeleted) {
+        query.where.deleted = false;
+      }
+
+      const result = await User.update(changes, query);
+      L.debug('User Update Result', result);
+
+      const user = await getById(userId, excludePassword, excludeDeleted);
+      return Promise.resolve(user);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const updateByCriteria = async (
+    criteria = {}, changes = {}, excludePassword = true, excludeDeleted = true,
+  ) => {
+    try {
+      const { User } = container.databaseService.models;
+      const query = { where: criteria };
+
+      // Check Deleted
+      if (excludeDeleted) {
+        query.where.deleted = false;
+      }
+
+      const result = await User.update(changes, query);
+      L.debug('User Update Result', result);
+
+      const users = await getByCriteria(criteria, excludePassword, excludeDeleted);
+      return Promise.resolve(users);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const mapUserRole = (userRole) => {
     const mappedUserRole = userRole.dataValues;
 
@@ -28,25 +152,8 @@ export default (container) => {
 
   const listUsers = async (excludePassword = true) => {
     try {
-      const { User, UserRole } = container.databaseService.models;
-      const users = await User.findAll({
-        where: {
-          deleted: false,
-        },
-        include: [
-          {
-            model: UserRole,
-            as: 'roles',
-            where: {
-              deleted: false,
-            },
-            required: false,
-          },
-        ],
-      });
-
-      const mappedUser = users.map(user => mapUser(user, excludePassword));
-      return Promise.resolve(mappedUser);
+      const users = await getByCriteria({}, excludePassword, true);
+      return Promise.resolve(users);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -81,60 +188,26 @@ export default (container) => {
 
   const readUser = async (userId, excludePassword = true) => {
     try {
-      const { User, UserRole } = container.databaseService.models;
-      const rawUser = await User.findOne({
-        where: {
-          id: userId,
-        },
-        include: [
-          {
-            model: UserRole,
-            as: 'roles',
-            where: {
-              deleted: false,
-            },
-            required: false,
-          },
-        ],
-      });
-
-      const mappedUser = mapUser(rawUser, excludePassword);
-      return Promise.resolve(mappedUser);
+      const user = await getById(userId, excludePassword, false);
+      return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateUser = async (userId, changes, excludePassword = true) => {
+  const updateUser = async (userId, changes = {}, excludePassword = true) => {
     try {
-      const { User, UserRole } = container.databaseService.models;
+      const user = await updateById(userId, changes, excludePassword, true);
+      return Promise.resolve(user);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
 
-      const query = {
-        where: {
-          id: userId,
-        },
-      };
-      const result = await User.update(changes, query);
-      L.debug('User Update Result', result);
-
-      const user = await User.findOne({
-        where: {
-          id: userId,
-        },
-        include: [
-          {
-            model: UserRole,
-            as: 'roles',
-            where: {
-              deleted: false,
-            },
-            required: false,
-          },
-        ],
-      });
-
-      const mappedUser = mapUser(user, excludePassword);
-      return Promise.resolve(mappedUser);
+  const updateUsers = async (criteria = {}, changes = {}, excludePassword = true) => {
+    try {
+      const users = await updateByCriteria(criteria, changes, excludePassword, true);
+      return Promise.resolve(users);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -142,66 +215,37 @@ export default (container) => {
 
   const deleteUser = async (userId, excludePassword = true) => {
     try {
-      const { User, UserRole } = container.databaseService.models;
-
-      const changes = {
-        deleted: true,
-      };
-      const query = {
-        where: {
-          id: userId,
-        },
-      };
-      const result = await User.update(changes, query);
-      L.debug('User Delete Result', result);
-
-      const user = await User.findOne({
-        where: {
-          id: userId,
-        },
-        include: [
-          {
-            model: UserRole,
-            as: 'roles',
-            where: {
-              deleted: false,
-            },
-            required: false,
-          },
-        ],
-      });
-
-      const mappedUser = mapUser(user, excludePassword);
-      return Promise.resolve(mappedUser);
+      const changes = { deleted: true };
+      const user = await updateById(userId, changes, excludePassword, true);
+      return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findUsers = async (criteria, excludePassword = true) => {
+  const deleteUsers = async (criteria = {}, excludePassword = true) => {
     try {
-      const { User, UserRole } = container.databaseService.models;
-      const query = {
-        where: criteria,
-        include: [
-          {
-            model: UserRole,
-            as: 'roles',
-            where: {
-              deleted: false,
-            },
-            required: false,
-          },
-        ],
-      };
-      query.where.deleted = false;
-      const users = await User.findAll(query);
+      const changes = { deleted: true };
+      const users = await updateByCriteria(criteria, changes, excludePassword, true);
+      return Promise.resolve(users);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
 
-      if (users.length === 0) {
-        return Promise.resolve([]);
-      }
-      const mappedUsers = users.map(user => mapUser(user, excludePassword));
-      return Promise.resolve(mappedUsers);
+  const findUser = async (criteria = {}, excludePassword = true) => {
+    try {
+      const user = await getOneByCriteria(criteria, excludePassword, true);
+      return Promise.resolve(user);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findUsers = async (criteria = {}, excludePassword = true) => {
+    try {
+      const users = await getByCriteria(criteria, excludePassword, true);
+      return Promise.resolve(users);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -212,9 +256,14 @@ export default (container) => {
 
     createUser,
     readUser,
-    updateUser,
-    deleteUser,
 
+    updateUser,
+    updateUsers,
+
+    deleteUser,
+    deleteUsers,
+
+    findUser,
     findUsers,
   };
 };

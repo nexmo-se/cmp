@@ -70,10 +70,30 @@ export default (container) => {
     }
   };
 
+  const updateUsers = async (criteria, changes, excludePassword = true) => {
+    try {
+      const { User } = container.databaseService.accessors;
+      const user = await User.updateUsers(criteria, changes, excludePassword);
+      return Promise.resolve(user);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const deleteUser = async (userId, excludePassword = true) => {
     try {
       const { User } = container.databaseService.accessors;
       const user = await User.deleteUser(userId, excludePassword);
+      return Promise.resolve(user);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const deleteUsers = async (criteria, excludePassword = true) => {
+    try {
+      const { User } = container.databaseService.accessors;
+      const user = await User.deleteUsers(criteria, excludePassword);
       return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);
@@ -154,8 +174,12 @@ export default (container) => {
 
     createUser,
     readUser,
+
     updateUser,
+    updateUsers,
+
     deleteUser,
+    deleteUsers,
 
     listUserRoles,
     assignRoleToUser,
