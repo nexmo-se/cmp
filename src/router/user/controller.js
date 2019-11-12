@@ -3,7 +3,9 @@ export default (container) => {
 
   const listUsers = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { User } = container.persistenceService;
+      const users = await User.listUsers();
+      res.status(200).json(users);
     } catch (error) {
       next(error);
     }
@@ -11,7 +13,9 @@ export default (container) => {
 
   const deleteAllUsers = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { User } = container.persistenceService;
+      const users = await User.deleteUsers({}, true);
+      res.status(200).json(users);
     } catch (error) {
       next(error);
     }
@@ -28,7 +32,23 @@ export default (container) => {
 
   const updateMyUser = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { user } = req;
+      const { id } = user;
+      const { firstName, lastName } = req.body;
+
+      const changes = {};
+
+      if (firstName && firstName !== '') {
+        changes.firstName = firstName;
+      }
+
+      if (lastName && lastName !== '') {
+        changes.lastName = lastName;
+      }
+
+      const { User } = container.persistenceService;
+      const updatedUser = await User.updateUser(id, changes);
+      res.status(200).json(updatedUser);
     } catch (error) {
       next(error);
     }
@@ -36,7 +56,18 @@ export default (container) => {
 
   const changeMyUserPassword = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { user } = req;
+      const { id } = user;
+      const { password } = req.body;
+
+      const passwordSalt = await container.hashService.generateSalt();
+      const passwordHash = await container.hashService.hash(password, passwordSalt);
+
+      const changes = { passwordHash, passwordSalt };
+
+      const { User } = container.persistenceService;
+      const updatedUser = await User.updateUser(id, changes);
+      res.status(200).json(updatedUser);
     } catch (error) {
       next(error);
     }
@@ -44,7 +75,11 @@ export default (container) => {
 
   const readUser = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { userId } = req.params;
+      const { User } = container.persistenceService;
+
+      const user = await User.readUser(userId);
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }
@@ -52,7 +87,22 @@ export default (container) => {
 
   const updateUser = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { userId } = req.params;
+      const { firstName, lastName } = req.body;
+
+      const changes = {};
+
+      if (firstName && firstName !== '') {
+        changes.firstName = firstName;
+      }
+
+      if (lastName && lastName !== '') {
+        changes.lastName = lastName;
+      }
+
+      const { User } = container.persistenceService;
+      const updatedUser = await User.updateUser(userId, changes);
+      res.status(200).json(updatedUser);
     } catch (error) {
       next(error);
     }
@@ -68,7 +118,17 @@ export default (container) => {
 
   const changeUserPassword = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { userId } = req.params;
+      const { password } = req.body;
+
+      const passwordSalt = await container.hashService.generateSalt();
+      const passwordHash = await container.hashService.hash(password, passwordSalt);
+
+      const changes = { passwordHash, passwordSalt };
+
+      const { User } = container.persistenceService;
+      const updatedUser = await User.updateUser(userId, changes);
+      res.status(200).json(updatedUser);
     } catch (error) {
       next(error);
     }
@@ -76,7 +136,14 @@ export default (container) => {
 
   const addUserRole = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { userId } = req.params;
+      const { role } = req.body;
+
+      const { User } = container.persistenceService;
+      await User.assignRoleToUser(userId, role);
+
+      const user = await User.readUser(userId);
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }
@@ -84,7 +151,14 @@ export default (container) => {
 
   const removeUserRole = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { userId } = req.params;
+      const { role } = req.body;
+
+      const { User } = container.persistenceService;
+      await User.deassignRoleFromUser(userId, role);
+
+      const user = await User.readUser(userId);
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }

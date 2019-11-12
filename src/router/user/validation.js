@@ -21,6 +21,7 @@ export default {
     query: {},
     params: {},
     body: {
+      username: Joi.string().forbidden(),
       firstName: Joi.string(),
       lastName: Joi.string(),
       password: Joi.string().forbidden(),
@@ -58,6 +59,7 @@ export default {
       userId: Joi.string().min(1).required(),
     },
     body: {
+      username: Joi.string().forbidden(),
       firstName: Joi.string(),
       lastName: Joi.string(),
       password: Joi.string().forbidden(),
