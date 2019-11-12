@@ -110,7 +110,10 @@ export default (container) => {
 
   const deleteUser = async (req, res, next) => {
     try {
-      res.status(200).json([]);
+      const { userId } = req.params;
+      const { User } = container.persistenceService;
+      const user = await User.deleteUser(userId, true);
+      res.status(200).json(user);
     } catch (error) {
       next(error);
     }
