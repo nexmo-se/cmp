@@ -35,12 +35,12 @@ export default (container) => {
   const createApplication = async (req, res, next) => {
     try {
       const {
-        name, apiKey, applicationId, privateKey,
+        name, apiKeyId, applicationId, privateKey,
       } = req.body;
       const { NexmoApplication } = container.persistenceService;
 
       const nexmoApiKey = await NexmoApplication.createApplication(
-        name, apiKey, applicationId, privateKey,
+        name, apiKeyId, applicationId, privateKey,
       );
       res.status(200).json(nexmoApiKey);
     } catch (error) {
@@ -77,7 +77,7 @@ export default (container) => {
     try {
       const { nexmoApplicationId } = req.params;
       const {
-        name, apiKey, applicationId, privateKey,
+        name, apiKeyId, applicationId, privateKey,
       } = req.body;
 
       const changes = {};
@@ -86,8 +86,8 @@ export default (container) => {
         changes.name = name;
       }
 
-      if (apiKey && apiKey !== '') {
-        changes.apiKey = apiKey;
+      if (apiKeyId && apiKeyId !== '') {
+        changes.apiKeyId = apiKeyId;
       }
 
       if (applicationId && applicationId !== '') {

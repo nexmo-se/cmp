@@ -16,7 +16,7 @@ export default {
     params: {},
     body: {
       name: Joi.string().min(1).required(),
-      apiKey: Joi.string().min(1).required(),
+      apiKeyId: Joi.string().min(1).required(),
       applicationId: Joi.string().min(1).required(),
       privateKey: Joi.string().min(1).required(),
     },
@@ -35,7 +35,7 @@ export default {
     },
     body: {
       name: Joi.string(),
-      apiKey: Joi.string(),
+      apiKeyId: Joi.string(),
       applicationId: Joi.string(),
       privateKey: Joi.string(),
     },
