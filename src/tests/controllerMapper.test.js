@@ -112,7 +112,7 @@ describe('Authenticator', () => {
       ];
       const req = {
         user: {
-          roles: ['abc'],
+          roles: [{ role: 'abc' }],
         },
       };
       const res = {
@@ -149,7 +149,7 @@ describe('Authenticator', () => {
       ];
       const req = {
         user: {
-          roles: ['user'],
+          roles: [{ role: 'user' }],
         },
       };
       const res = {
@@ -191,7 +191,7 @@ describe('Authenticator', () => {
       ];
       const req = {
         user: {
-          roles: ['user'],
+          roles: [{ role: 'user' }],
         },
       };
       const res = {
@@ -233,7 +233,7 @@ describe('Authenticator', () => {
       ];
       const req = {
         user: {
-          roles: ['user'],
+          roles: [{ role: 'user' }],
         },
       };
       const res = {
@@ -275,7 +275,11 @@ describe('Authenticator', () => {
       ];
       const req = {
         user: {
-          roles: ['user', 'admin', 'sysadmin'],
+          roles: [
+            { role: 'user' },
+            { role: 'admin' },
+            { role: 'sysadmin' },
+          ],
         },
       };
       const res = {
