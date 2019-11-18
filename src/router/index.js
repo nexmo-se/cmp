@@ -1,5 +1,7 @@
 import AuthRouter from './auth';
 import UserRouter from './user';
+import ApiKeyRouter from './nexmoapikey';
+import ApplicationRouter from './nexmoapplication';
 import WebhookRouter from './webhook';
 
 export default (container) => {
@@ -10,6 +12,8 @@ export default (container) => {
 
   router.use('/auth', AuthRouter(container));
   router.use('/users', UserRouter(container));
+  router.use('/apikeys', ApiKeyRouter(container));
+  router.use('/applications', ApplicationRouter(container));
   router.use('/webhook', WebhookRouter(container));
 
   router.get(
