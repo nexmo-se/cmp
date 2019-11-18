@@ -126,7 +126,7 @@ export default (container) => {
 
   const createApplication = async (
     name,
-    apiKey,
+    apiKeyId,
     applicationId,
     privateKey,
   ) => {
@@ -135,7 +135,7 @@ export default (container) => {
       const rawNexmoApplication = await NexmoApplication.create({
         id: container.uuid(),
         name,
-        apiKey,
+        apiKeyId,
         applicationId,
         privateKey,
         deleted: false,

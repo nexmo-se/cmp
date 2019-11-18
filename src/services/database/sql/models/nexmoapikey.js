@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
 
   NexmoApiKey.associate = (models) => {
     // associations can be defined here
-    NexmoApiKey.hasMany(models.NexmoApplication, { foreignKey: 'apiKey', as: 'applications' });
+    NexmoApiKey.hasMany(models.NexmoApplication, { foreignKey: 'apiKeyId', as: 'applications' });
   };
 
   return NexmoApiKey;

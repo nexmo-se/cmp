@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       default: 'No Name',
     },
-    apiKey: {
+    apiKeyId: {
       type: DataTypes.STRING(45),
       allowNull: false,
     },
@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
 
   NexmoApplication.associate = (models) => {
     // associations can be defined here
-    NexmoApplication.belongsTo(models.NexmoApiKey, { foreignKey: 'apiKey' });
+    NexmoApplication.belongsTo(models.NexmoApiKey, { foreignKey: 'apiKeyId' });
   };
 
   return NexmoApplication;

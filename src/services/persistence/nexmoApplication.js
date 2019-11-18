@@ -13,7 +13,7 @@ export default (container) => {
 
   const createApplication = async (
     name,
-    apiKey,
+    apiKeyId,
     applicationId,
     privateKey,
   ) => {
@@ -21,7 +21,7 @@ export default (container) => {
       const { NexmoApplication } = container.databaseService.accessors;
       const nexmoApplication = await NexmoApplication.createApplication(
         name,
-        apiKey,
+        apiKeyId,
         applicationId,
         privateKey,
       );
