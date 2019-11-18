@@ -15,7 +15,7 @@ export default (container) => {
     let userHasRole = false;
 
     for (let i = 0; i < userRoles.length; i += 1) {
-      const userRole = userRoles[i];
+      const userRole = userRoles[i].role;
 
       if (expectedRole === userRole) {
         userHasRole = true;
