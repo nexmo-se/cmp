@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const ApiKey = sequelize.define('ApiKey', {
+  const NexmoApplication = sequelize.define('NexmoApplication', {
     id: {
       type: DataTypes.STRING(45),
       allowNull: false,
@@ -14,8 +14,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(45),
       allowNull: false,
     },
-    apiSecret: {
+    applicationId: {
       type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    privateKey: {
+      type: DataTypes.STRING(10000),
       allowNull: false,
     },
     deleted: {
@@ -27,10 +31,10 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
   });
 
-  ApiKey.associate = (models) => {
+  NexmoApplication.associate = (models) => {
     // associations can be defined here
-    ApiKey.hasMany(models.Application, { foreignKey: 'apiKey', as: 'applications' });
+    NexmoApplication.belongsTo(models.NexmoApiKey, { foreignKey: 'apiKey' });
   };
 
-  return ApiKey;
+  return NexmoApplication;
 };

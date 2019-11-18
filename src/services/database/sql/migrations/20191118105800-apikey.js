@@ -1,6 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    const createApiKeyTable = () => queryInterface.createTable('ApiKeys', {
+    const createApiKeyTable = () => queryInterface.createTable('NexmoApiKeys', {
       id: {
         type: Sequelize.STRING(45),
         allowNull: false,
@@ -35,7 +35,7 @@ module.exports = {
       },
     });
 
-    const createApplicationTable = () => queryInterface.createTable('Applications', {
+    const createApplicationTable = () => queryInterface.createTable('NexmoApplications', {
       id: {
         type: Sequelize.STRING(45),
         allowNull: false,
@@ -78,8 +78,8 @@ module.exports = {
       .then(createApplicationTable);
   },
   down: (queryInterface) => {
-    const dropApplcationTable = () => queryInterface.dropTable('Applications');
-    const dropApiKeyTable = () => queryInterface.dropTable('ApiKeys');
+    const dropApplcationTable = () => queryInterface.dropTable('NexmoApplications');
+    const dropApiKeyTable = () => queryInterface.dropTable('NexmoApiKeys');
     return Promise.resolve()
       .then(dropApplcationTable)
       .then(dropApiKeyTable);
