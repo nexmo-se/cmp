@@ -17,7 +17,6 @@ module.exports = (sequelize, DataTypes) => {
     applicationId: {
       type: DataTypes.STRING(45),
       allowNull: false,
-      unique: true,
     },
     privateKey: {
       type: DataTypes.STRING(10000),

@@ -15,7 +15,6 @@ module.exports = {
       apiKey: {
         type: Sequelize.STRING(45),
         allowNull: false,
-        unique: true,
       },
       apiSecret: {
         type: Sequelize.STRING(45),
@@ -55,7 +54,6 @@ module.exports = {
       applicationId: {
         type: Sequelize.STRING(45),
         allowNull: false,
-        unique: true,
       },
       privateKey: {
         type: Sequelize.STRING(10000),

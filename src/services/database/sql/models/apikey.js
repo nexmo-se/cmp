@@ -13,7 +13,6 @@ module.exports = (sequelize, DataTypes) => {
     apiKey: {
       type: DataTypes.STRING(45),
       allowNull: false,
-      unique: true,
     },
     apiSecret: {
       type: DataTypes.STRING(45),
