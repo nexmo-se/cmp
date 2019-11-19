@@ -1,15 +1,13 @@
 export default (container) => {
   const getUrl = applicationId => `${container.config.nexmo.host}/v2/applications/${applicationId}`;
   const getSmsUrl = () => `${container.config.nexmo.restHost}/account/settings`;
-  const getApplication = async (userNexmoIni) => {
+  const getApplication = async (apiKey, apiSecret, applicationId) => {
     try {
-      const applicationId = userNexmoIni.app_id;
-      const { key, secret } = userNexmoIni;
       const url = getUrl(applicationId);
       const config = {
         auth: {
-          username: key,
-          password: secret,
+          username: apiKey,
+          password: apiSecret,
         },
       };
       const response = await container.axios.get(url, config);
@@ -20,15 +18,13 @@ export default (container) => {
     }
   };
 
-  const setApplication = async (userNexmoIni, application) => {
+  const setApplication = async (apiKey, apiSecret, applicationId, application) => {
     try {
-      const applicationId = userNexmoIni.app_id;
-      const { key, secret } = userNexmoIni;
       const url = getUrl(applicationId);
       const config = {
         auth: {
-          username: key,
-          password: secret,
+          username: apiKey,
+          password: apiSecret,
         },
       };
       const response = await container.axios.put(url, application, config);
@@ -40,13 +36,12 @@ export default (container) => {
   };
 
   const registerSms = async (
-    userNexmoIni, demoRoute, inboundRoute, deliveryRoute,
+    apiKey, apiSecret, inboundRoute, deliveryRoute,
   ) => {
     try {
-      const { key, secret } = userNexmoIni;
       const rawUrl = getSmsUrl();
 
-      const url = `${rawUrl}?api_key=${key}&api_secret=${secret}`;
+      const url = `${rawUrl}?api_key=${apiKey}&api_secret=${apiSecret}`;
       const config = {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -57,18 +52,18 @@ export default (container) => {
       // Inbound Url
       if (inboundRoute && inboundRoute !== '') {
         if (body === '') {
-          body += `moCallBackUrl=${container.config.host}${demoRoute}/${inboundRoute}`;
+          body += `moCallBackUrl=${container.config.host}${inboundRoute}`;
         } else {
-          body += `&moCallBackUrl=${container.config.host}${demoRoute}/${inboundRoute}`;
+          body += `&moCallBackUrl=${container.config.host}${inboundRoute}`;
         }
       }
 
       // Delivery Url
       if (deliveryRoute && deliveryRoute !== '') {
         if (body === '') {
-          body += `drCallBackUrl=${container.config.host}${demoRoute}/${deliveryRoute}`;
+          body += `drCallBackUrl=${container.config.host}${deliveryRoute}`;
         } else {
-          body += `&drCallBackUrl=${container.config.host}${demoRoute}/${deliveryRoute}`;
+          body += `&drCallBackUrl=${container.config.host}${deliveryRoute}`;
         }
       }
 
@@ -81,11 +76,11 @@ export default (container) => {
   };
 
   const registerRtc = async (
-    userNexmoIni, demoRoute, eventRoute,
+    apiKey, apiSecret, applicationId, eventRoute,
   ) => {
     try {
       // Load
-      const application = await getApplication(userNexmoIni);
+      const application = await getApplication(apiKey, apiSecret, applicationId);
 
       // Initialize if not exist
       if (application.capabilities.rtc == null) {
@@ -97,7 +92,7 @@ export default (container) => {
       // Event Url
       if (eventRoute && eventRoute !== '') {
         application.capabilities.rtc.webhooks.event_url = {
-          address: `${container.config.host}${demoRoute}/${eventRoute}`,
+          address: `${container.config.host}${eventRoute}`,
           http_method: 'POST',
         };
       }
@@ -106,7 +101,7 @@ export default (container) => {
       delete application._links;
 
       // Save
-      await setApplication(userNexmoIni, application);
+      await setApplication(apiKey, apiSecret, applicationId, application);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
@@ -114,11 +109,11 @@ export default (container) => {
   };
 
   const registerMapi = async (
-    userNexmoIni, demoRoute, inboundRoute, statusRoute,
+    apiKey, apiSecret, applicationId, inboundRoute, statusRoute,
   ) => {
     try {
       // Load
-      const application = await getApplication(userNexmoIni);
+      const application = await getApplication(apiKey, apiSecret, applicationId);
 
       // Initialize if not exist
       if (application.capabilities.messages == null) {
@@ -130,7 +125,7 @@ export default (container) => {
       // Inbound Url
       if (inboundRoute && inboundRoute !== '') {
         application.capabilities.messages.webhooks.inbound_url = {
-          address: `${container.config.host}${demoRoute}/${inboundRoute}`,
+          address: `${container.config.host}${inboundRoute}`,
           http_method: 'POST',
         };
       }
@@ -138,7 +133,7 @@ export default (container) => {
       // Status Url
       if (statusRoute && statusRoute !== '') {
         application.capabilities.messages.webhooks.status_url = {
-          address: `${container.config.host}${demoRoute}/${statusRoute}`,
+          address: `${container.config.host}${statusRoute}`,
           http_method: 'POST',
         };
       }
@@ -147,7 +142,7 @@ export default (container) => {
       delete application._links;
 
       // Save
-      await setApplication(userNexmoIni, application);
+      await setApplication(apiKey, apiSecret, applicationId, application);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
@@ -155,11 +150,11 @@ export default (container) => {
   };
 
   const registerVapi = async (
-    userNexmoIni, demoRoute, eventRoute, answerRoute, fallbackAnswerRoute,
+    apiKey, apiSecret, applicationId, eventRoute, answerRoute, fallbackAnswerRoute,
   ) => {
     try {
       // Load
-      const application = await getApplication(userNexmoIni);
+      const application = await getApplication(apiKey, apiSecret, applicationId);
 
       // Initialize if not exist
       if (application.capabilities.voice == null) {
@@ -171,7 +166,7 @@ export default (container) => {
       // Event Url
       if (eventRoute && eventRoute !== '') {
         application.capabilities.voice.webhooks.event_url = {
-          address: `${container.config.host}${demoRoute}/${eventRoute}`,
+          address: `${container.config.host}${eventRoute}`,
           http_method: 'POST',
         };
       }
@@ -179,7 +174,7 @@ export default (container) => {
       // Answer Url
       if (answerRoute && answerRoute !== '') {
         application.capabilities.voice.webhooks.answer_url = {
-          address: `${container.config.host}${demoRoute}/${answerRoute}`,
+          address: `${container.config.host}${answerRoute}`,
           http_method: 'POST',
         };
       }
@@ -187,7 +182,7 @@ export default (container) => {
       // Fallback Answer Url
       if (fallbackAnswerRoute && fallbackAnswerRoute !== '') {
         application.capabilities.voice.webhooks.fallback_answer_url = {
-          address: `${container.config.host}${demoRoute}/${fallbackAnswerRoute}`,
+          address: `${container.config.host}${fallbackAnswerRoute}`,
           http_method: 'POST',
         };
       }
@@ -196,7 +191,7 @@ export default (container) => {
       delete application._links;
 
       // Save
-      await setApplication(userNexmoIni, application);
+      await setApplication(apiKey, apiSecret, applicationId, application);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);

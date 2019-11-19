@@ -1,14 +1,13 @@
 export default (container) => {
-  const sendSms = async (userNexmoIni, to, text, type) => {
+  const sendSms = async (to, text, type, senderId, apiKey, apiSecret) => {
     try {
-      const { key, secret, from } = userNexmoIni;
       const { restHost } = container.config.nexmo;
 
       const url = `${restHost}/sms/json`;
       const body = {
-        api_key: key,
-        api_secret: secret,
-        from,
+        api_key: apiKey,
+        api_secret: apiSecret,
+        from: senderId,
         to,
         text,
         type,

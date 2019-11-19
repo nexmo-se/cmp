@@ -13,22 +13,19 @@ export default (container) => {
     },
   };
 
-  const getSystemJwt = (userNexmoIni) => {
-    const applicationId = userNexmoIni.app_id;
-    const privateKeyPath = userNexmoIni.keyfile;
-    const jwt = container.nexmo.generateJwt(privateKeyPath, {
+  const getSystemJwt = (applicationId, privateKey) => {
+    const privateKeyBuffer = Buffer.from(privateKey);
+    const jwt = container.nexmo.generateJwt(privateKeyBuffer, {
       application_id: applicationId,
     });
 
     return jwt;
   };
 
-  const getUserJwt = (username, userNexmoIni) => {
-    const applicationId = userNexmoIni.app_id;
-    const privateKeyPath = userNexmoIni.keyfile;
+  const getUserJwt = (username, applicationId, privateKey) => {
     const expiry = new Date().getTime() + 86400;
-
-    const jwt = container.nexmo.generateJwt(privateKeyPath, {
+    const privateKeyBuffer = Buffer.from(privateKey);
+    const jwt = container.nexmo.generateJwt(privateKeyBuffer, {
       application_id: applicationId,
       sub: username,
       exp: expiry,
