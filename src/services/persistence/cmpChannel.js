@@ -15,6 +15,7 @@ export default (container) => {
     name,
     channel,
     senderId,
+    tps,
     cmpApplicationId,
     cmpApiKeyId,
   ) => {
@@ -24,6 +25,7 @@ export default (container) => {
         name,
         channel,
         senderId,
+        tps,
         cmpApplicationId,
         cmpApiKeyId,
       );

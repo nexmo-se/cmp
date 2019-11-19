@@ -19,6 +19,11 @@ module.exports = {
       type: Sequelize.STRING(45),
       allowNull: false,
     },
+    tps: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      default: 5,
+    },
     cmpApplicationId: {
       type: Sequelize.STRING(45),
       allowNull: true,

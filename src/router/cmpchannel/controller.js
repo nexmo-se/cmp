@@ -38,13 +38,14 @@ export default (container) => {
         name,
         channel,
         senderId,
+        tps,
         cmpApplicationId,
         cmpApiKeyId,
       } = req.body;
       const { CmpChannel } = container.persistenceService;
 
       const cmpApiKey = await CmpChannel.createChannel(
-        name, channel, senderId, cmpApplicationId, cmpApiKeyId,
+        name, channel, senderId, tps, cmpApplicationId, cmpApiKeyId,
       );
       res.status(200).json(cmpApiKey);
     } catch (error) {
@@ -84,6 +85,7 @@ export default (container) => {
         name,
         channel,
         senderId,
+        tps,
         cmpApplicationId,
         cmpApiKeyId,
       } = req.body;
@@ -100,6 +102,10 @@ export default (container) => {
 
       if (senderId && senderId !== '') {
         changes.senderId = senderId;
+      }
+
+      if (tps && tps > 0) {
+        changes.tps = tps;
       }
 
       if (cmpApplicationId && cmpApplicationId !== '') {
