@@ -1,7 +1,7 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Application Model Accessor');
 
-  const getById = async (cmpApplicationId, excludeDeleted = true) => {
+  const getById = async (cmpApplicationId, excludeSecret = true, excludeDeleted = true) => {
     try {
       const { CmpApplication, CmpChannel } = container.databaseService.models;
       const query = {
@@ -31,14 +31,14 @@ export default (container) => {
         return Promise.resolve(null);
       }
 
-      const cmpApplication = mapCmpApplication(rawCmpApplication);
+      const cmpApplication = mapCmpApplication(rawCmpApplication, excludeSecret);
       return Promise.resolve(cmpApplication);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
       const { CmpApplication, CmpChannel } = container.databaseService.models;
       const query = {
@@ -61,16 +61,17 @@ export default (container) => {
       }
 
       const rawCmpApplications = await CmpApplication.findAll(query);
-      const cmpApplications = rawCmpApplications.map(mapCmpApplication);
+      const cmpApplications = rawCmpApplications
+        .map(cmpApplication => mapCmpApplication(cmpApplication, excludeSecret));
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getOneByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpApplications = await getByCriteria(criteria, excludeDeleted);
+      const cmpApplications = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       if (cmpApplications == null || cmpApplications.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -83,7 +84,9 @@ export default (container) => {
     }
   };
 
-  const updateById = async (cmpApplicationId, changes = {}, excludeDeleted = true) => {
+  const updateById = async (
+    cmpApplicationId, changes = {}, excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
       const { CmpApplication } = container.databaseService.models;
       const query = {
@@ -100,14 +103,16 @@ export default (container) => {
       const result = await CmpApplication.update(changes, query);
       L.debug('CmpApplication Update Result', result);
 
-      const cmpApplication = await getById(cmpApplicationId, excludeDeleted);
+      const cmpApplication = await getById(cmpApplicationId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpApplication);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateByCriteria = async (criteria = {}, changes = {}, excludeDeleted = true) => {
+  const updateByCriteria = async (
+    criteria = {}, changes = {}, excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
       const { CmpApplication } = container.databaseService.models;
       const query = { where: criteria };
@@ -120,15 +125,19 @@ export default (container) => {
       const result = await CmpApplication.update(changes, query);
       L.debug('CmpApplication Update Result', result);
 
-      const cmpApplications = await getByCriteria(criteria, excludeDeleted);
+      const cmpApplications = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const mapCmpApplication = (cmpApplication) => {
+  const mapCmpApplication = (cmpApplication, excludeSecret = true) => {
     const mappedCmpApplication = cmpApplication.dataValues;
+
+    if (excludeSecret) {
+      delete mappedCmpApplication.privateKey;
+    }
 
     delete mappedCmpApplication.deleted;
     delete mappedCmpApplication.createdAt;
@@ -137,9 +146,9 @@ export default (container) => {
     return mappedCmpApplication;
   };
 
-  const listApplications = async () => {
+  const listApplications = async (excludeSecret = true) => {
     try {
-      const cmpApplications = await getByCriteria({}, true);
+      const cmpApplications = await getByCriteria({}, excludeSecret, true);
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);
@@ -151,6 +160,7 @@ export default (container) => {
     cmpApiKeyId,
     applicationId,
     privateKey,
+    excludeSecret = true,
   ) => {
     try {
       const { CmpApplication } = container.databaseService.models;
@@ -163,72 +173,72 @@ export default (container) => {
         deleted: false,
       });
 
-      const cmpApplication = mapCmpApplication(rawCmpApplication);
+      const cmpApplication = mapCmpApplication(rawCmpApplication, excludeSecret);
       return Promise.resolve(cmpApplication);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const readApplication = async (cmpApplicationId) => {
+  const readApplication = async (cmpApplicationId, excludeSecret = true) => {
     try {
-      const cmpApplication = await getById(cmpApplicationId, false);
+      const cmpApplication = await getById(cmpApplicationId, excludeSecret, false);
       return Promise.resolve(cmpApplication);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateApplication = async (cmpApplicationId, changes) => {
+  const updateApplication = async (cmpApplicationId, changes, excludeSecret = true) => {
     try {
-      const cmpApplication = await updateById(cmpApplicationId, changes, true);
+      const cmpApplication = await updateById(cmpApplicationId, changes, excludeSecret, true);
       return Promise.resolve(cmpApplication);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateApplications = async (criteria, changes) => {
+  const updateApplications = async (criteria, changes, excludeSecret = true) => {
     try {
-      const cmpApplications = await updateByCriteria(criteria, changes, true);
+      const cmpApplications = await updateByCriteria(criteria, changes, excludeSecret, true);
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteApplication = async (cmpApplicationId) => {
+  const deleteApplication = async (cmpApplicationId, excludeSecret = true) => {
     try {
       const changes = { deleted: true };
-      const cmpApplication = await updateById(cmpApplicationId, changes, true);
+      const cmpApplication = await updateById(cmpApplicationId, changes, excludeSecret, true);
       return Promise.resolve(cmpApplication);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteApplications = async (criteria = {}) => {
+  const deleteApplications = async (criteria = {}, excludeSecret = true) => {
     try {
       const changes = { deleted: true };
-      const cmpApplications = await updateByCriteria(criteria, changes, true);
+      const cmpApplications = await updateByCriteria(criteria, changes, excludeSecret, true);
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findApplication = async (criteria = {}, excludeDeleted = true) => {
+  const findApplication = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpApplication = await getOneByCriteria(criteria, excludeDeleted);
+      const cmpApplication = await getOneByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpApplication);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findApplications = async (criteria = {}, excludeDeleted = true) => {
+  const findApplications = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpApplications = await getByCriteria(criteria, excludeDeleted);
+      const cmpApplications = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);

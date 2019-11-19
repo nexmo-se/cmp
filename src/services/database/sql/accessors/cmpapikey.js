@@ -1,7 +1,7 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp ApiKey Model Accessor');
 
-  const getById = async (cmpApiKeyId, excludeDeleted = true) => {
+  const getById = async (cmpApiKeyId, excludeSecret = true, excludeDeleted = true) => {
     try {
       const { CmpApiKey, CmpApplication, CmpChannel } = container.databaseService.models;
       const query = {
@@ -39,14 +39,14 @@ export default (container) => {
         return Promise.resolve(null);
       }
 
-      const cmpApiKey = mapCmpApiKey(rawCmpApiKey);
+      const cmpApiKey = mapCmpApiKey(rawCmpApiKey, excludeSecret);
       return Promise.resolve(cmpApiKey);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
       const { CmpApiKey, CmpApplication, CmpChannel } = container.databaseService.models;
       const query = {
@@ -77,16 +77,17 @@ export default (container) => {
       }
 
       const rawCmpApiKeys = await CmpApiKey.findAll(query);
-      const cmpApiKeys = rawCmpApiKeys.map(mapCmpApiKey);
+      const cmpApiKeys = rawCmpApiKeys
+        .map(cmpApiKey => mapCmpApiKey(cmpApiKey, excludeSecret));
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getOneByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpApiKeys = await getByCriteria(criteria, excludeDeleted);
+      const cmpApiKeys = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       if (cmpApiKeys == null || cmpApiKeys.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -99,7 +100,9 @@ export default (container) => {
     }
   };
 
-  const updateById = async (cmpApiKeyId, changes = {}, excludeDeleted = true) => {
+  const updateById = async (
+    cmpApiKeyId, changes = {}, excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
       const { CmpApiKey } = container.databaseService.models;
       const query = {
@@ -116,14 +119,16 @@ export default (container) => {
       const result = await CmpApiKey.update(changes, query);
       L.debug('CmpApiKey Update Result', result);
 
-      const apiKey = await getById(cmpApiKeyId, excludeDeleted);
+      const apiKey = await getById(cmpApiKeyId, excludeSecret, excludeDeleted);
       return Promise.resolve(apiKey);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateByCriteria = async (criteria = {}, changes = {}, excludeDeleted = true) => {
+  const updateByCriteria = async (
+    criteria = {}, changes = {}, excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
       const { CmpApiKey } = container.databaseService.models;
       const query = { where: criteria };
@@ -136,15 +141,29 @@ export default (container) => {
       const result = await CmpApiKey.update(changes, query);
       L.debug('CmpApiKey Update Result', result);
 
-      const cmpApiKeys = await getByCriteria(criteria, excludeDeleted);
+      const cmpApiKeys = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const mapCmpApplication = (cmpApplication) => {
+  const mapCmpChannel = (cmpChannel) => {
+    const mappedCmpChannel = cmpChannel.dataValues;
+
+    delete mappedCmpChannel.deleted;
+    delete mappedCmpChannel.createdAt;
+    delete mappedCmpChannel.updatedAt;
+
+    return mappedCmpChannel;
+  };
+
+  const mapCmpApplication = (cmpApplication, excludeSecret = true) => {
     const mappedCmpApplication = cmpApplication.dataValues;
+
+    if (excludeSecret) {
+      delete mappedCmpApplication.privateKey;
+    }
 
     delete mappedCmpApplication.deleted;
     delete mappedCmpApplication.createdAt;
@@ -153,10 +172,13 @@ export default (container) => {
     return mappedCmpApplication;
   };
 
-  const mapCmpApiKey = (cmpApiKey) => {
+  const mapCmpApiKey = (cmpApiKey, excludeSecret = true) => {
     const mappedCmpApiKey = cmpApiKey.dataValues;
 
-    mappedCmpApiKey.applications = (mapCmpApiKey.applications || []).map(mapCmpApplication);
+    mappedCmpApiKey.applications = (mappedCmpApiKey.applications || [])
+      .map(cmpApplication => mapCmpApplication(cmpApplication, excludeSecret));
+    mappedCmpApiKey.channels = (mappedCmpApiKey.channels || [])
+      .map(mapCmpChannel);
 
     delete mappedCmpApiKey.deleted;
     delete mappedCmpApiKey.createdAt;
@@ -165,9 +187,9 @@ export default (container) => {
     return mappedCmpApiKey;
   };
 
-  const listApiKeys = async () => {
+  const listApiKeys = async (excludeSecret = true) => {
     try {
-      const apiKeys = await getByCriteria({}, true);
+      const apiKeys = await getByCriteria({}, excludeSecret, true);
       return Promise.resolve(apiKeys);
     } catch (error) {
       return Promise.reject(error);
@@ -178,6 +200,7 @@ export default (container) => {
     name,
     apiKey,
     apiSecret,
+    excludeSecret = true,
   ) => {
     try {
       const { CmpApiKey } = container.databaseService.models;
@@ -189,72 +212,72 @@ export default (container) => {
         deleted: false,
       });
 
-      const cmpApiKey = mapCmpApiKey(rawCmpApiKey);
+      const cmpApiKey = mapCmpApiKey(rawCmpApiKey, excludeSecret);
       return Promise.resolve(cmpApiKey);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const readApiKey = async (cmpApiKeyId) => {
+  const readApiKey = async (cmpApiKeyId, excludeSecret = true) => {
     try {
-      const cmpApiKey = await getById(cmpApiKeyId, false);
+      const cmpApiKey = await getById(cmpApiKeyId, excludeSecret, false);
       return Promise.resolve(cmpApiKey);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateApiKey = async (cmpApiKeyId, changes) => {
+  const updateApiKey = async (cmpApiKeyId, changes, excludeSecret = true) => {
     try {
-      const cmpApiKey = await updateById(cmpApiKeyId, changes, true);
+      const cmpApiKey = await updateById(cmpApiKeyId, changes, excludeSecret, true);
       return Promise.resolve(cmpApiKey);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateApiKeys = async (criteria, changes) => {
+  const updateApiKeys = async (criteria, changes, excludeSecret) => {
     try {
-      const cmpApiKeys = await updateByCriteria(criteria, changes, true);
+      const cmpApiKeys = await updateByCriteria(criteria, changes, excludeSecret, true);
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteApiKey = async (cmpApiKeyId) => {
+  const deleteApiKey = async (cmpApiKeyId, excludeSecret) => {
     try {
       const changes = { deleted: true };
-      const cmpApiKey = await updateById(cmpApiKeyId, changes, true);
+      const cmpApiKey = await updateById(cmpApiKeyId, changes, excludeSecret, true);
       return Promise.resolve(cmpApiKey);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteApiKeys = async (criteria = {}) => {
+  const deleteApiKeys = async (criteria = {}, excludeSecret = true) => {
     try {
       const changes = { deleted: true };
-      const cmpApiKeys = await updateByCriteria(criteria, changes, true);
+      const cmpApiKeys = await updateByCriteria(criteria, changes, excludeSecret, true);
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findApiKey = async (criteria = {}, excludeDeleted = true) => {
+  const findApiKey = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpApiKey = await getOneByCriteria(criteria, excludeDeleted);
+      const cmpApiKey = await getOneByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpApiKey);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findApiKeys = async (criteria = {}, excludeDeleted = true) => {
+  const findApiKeys = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpApiKeys = await getByCriteria(criteria, excludeDeleted);
+      const cmpApiKeys = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
       return Promise.reject(error);
