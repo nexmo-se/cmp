@@ -16,6 +16,7 @@
     "debug": "nodemon --inspect --exec babel-node src",
     "initDb": "sequelize-cli init",
     "migrate": "sequelize-cli db:migrate",
+    "seed": "sequelize-cli db:seed:all",
     "build": "npm run clean && babel src -s -D -d build",
     "test": "mocha \"./{,!(node_modules)/**/}*.test.js\" --require babel-polyfill --require esm",
     "decodePrivateKey": "echo $KEY_PRIVATE_KEY | base64 --decode > private.key",
