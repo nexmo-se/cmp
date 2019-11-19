@@ -34,8 +34,8 @@ export default {
     },
     body: {
       name: Joi.string(),
-      apiKey: Joi.string(),
-      apiSecret: Joi.string(),
+      apiKey: Joi.string().forbidden(),
+      apiSecret: Joi.string().forbidden(),
     },
   },
   deleteApiKey: {

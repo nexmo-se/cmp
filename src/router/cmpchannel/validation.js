@@ -36,10 +36,10 @@ export default {
     },
     body: {
       name: Joi.string(),
-      channel: Joi.string(),
+      channel: Joi.string().forbidden(),
       senderId: Joi.string(),
-      cmpApiKeyId: Joi.string(),
-      cmpApplicationId: Joi.string(),
+      cmpApiKeyId: Joi.string().forbidden(),
+      cmpApplicationId: Joi.string().forbidden(),
     },
   },
   deleteChannel: {

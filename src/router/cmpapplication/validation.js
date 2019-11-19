@@ -35,9 +35,9 @@ export default {
     },
     body: {
       name: Joi.string(),
-      cmpApiKeyId: Joi.string(),
-      applicationId: Joi.string(),
-      privateKey: Joi.string(),
+      cmpApiKeyId: Joi.string().forbidden(),
+      applicationId: Joi.string().forbidden(),
+      privateKey: Joi.string().forbidden(),
     },
   },
   deleteApplication: {
