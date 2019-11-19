@@ -10,8 +10,8 @@ export default {
     saltRounds: parseInt(process.env.HASH_SALT_ROUNDS || '10', 10),
   },
   nexmo: {
-    host: 'https://api.nexmo.com',
-    restHost: 'https://rest.nexmo.com',
+    host: process.env.NEXMO_API,
+    restHost: process.env.NEXMO_REST_API,
     useWhatsappSandbox: (process.env.USE_SANDBOX_WHATSAPP || 'false') === 'true',
   },
   log4js: {
