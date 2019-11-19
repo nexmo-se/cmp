@@ -18,8 +18,8 @@ export default {
       name: Joi.string().min(1).required(),
       channel: Joi.string().min(1).required(),
       senderId: Joi.string().min(1).required(),
+      cmpApiKeyId: Joi.string().min(1).required(),
       cmpApplicationId: Joi.string(),
-      cmpApiKeyId: Joi.string(),
     },
   },
   readChannel: {
@@ -38,8 +38,8 @@ export default {
       name: Joi.string(),
       channel: Joi.string(),
       senderId: Joi.string(),
-      cmpApplicationId: Joi.string(),
       cmpApiKeyId: Joi.string(),
+      cmpApplicationId: Joi.string(),
     },
   },
   deleteChannel: {

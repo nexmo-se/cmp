@@ -11,7 +11,7 @@ export default (container) => {
         include: [
           {
             model: CmpChannel,
-            as: 'channels',
+            as: 'cmpChannels',
             where: {
               deleted: false,
             },
@@ -46,7 +46,7 @@ export default (container) => {
         include: [
           {
             model: CmpChannel,
-            as: 'channels',
+            as: 'cmpChannels',
             where: {
               deleted: false,
             },

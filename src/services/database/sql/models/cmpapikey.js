@@ -29,8 +29,8 @@ module.exports = (sequelize, DataTypes) => {
 
   CmpApiKey.associate = (models) => {
     // associations can be defined here
-    CmpApiKey.hasMany(models.CmpApplication, { foreignKey: 'cmpApiKeyId', as: 'applications' });
-    CmpApiKey.hasMany(models.CmpChannel, { foreignKey: 'cmpApiKeyId', as: 'channels' });
+    CmpApiKey.hasMany(models.CmpApplication, { foreignKey: 'cmpApiKeyId', as: 'cmpApplications' });
+    CmpApiKey.hasMany(models.CmpChannel, { foreignKey: 'cmpApiKeyId', as: 'cmpChannels' });
   };
 
   return CmpApiKey;

@@ -11,7 +11,7 @@ export default (container) => {
         include: [
           {
             model: CmpApplication,
-            as: 'applications',
+            as: 'cmpApplications',
             where: {
               deleted: false,
             },
@@ -19,7 +19,7 @@ export default (container) => {
           },
           {
             model: CmpChannel,
-            as: 'channels',
+            as: 'cmpChannels',
             where: {
               deleted: false,
             },
@@ -54,7 +54,7 @@ export default (container) => {
         include: [
           {
             model: CmpApplication,
-            as: 'applications',
+            as: 'cmpApplications',
             where: {
               deleted: false,
             },
@@ -62,7 +62,7 @@ export default (container) => {
           },
           {
             model: CmpChannel,
-            as: 'channels',
+            as: 'cmpChannels',
             where: {
               deleted: false,
             },
@@ -175,9 +175,9 @@ export default (container) => {
   const mapCmpApiKey = (cmpApiKey, excludeSecret = true) => {
     const mappedCmpApiKey = cmpApiKey.dataValues;
 
-    mappedCmpApiKey.applications = (mappedCmpApiKey.applications || [])
+    mappedCmpApiKey.cmpApplications = (mappedCmpApiKey.cmpApplications || [])
       .map(cmpApplication => mapCmpApplication(cmpApplication, excludeSecret));
-    mappedCmpApiKey.channels = (mappedCmpApiKey.channels || [])
+    mappedCmpApiKey.cmpChannels = (mappedCmpApiKey.cmpChannels || [])
       .map(mapCmpChannel);
 
     delete mappedCmpApiKey.deleted;
