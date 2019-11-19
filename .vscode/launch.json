@@ -7,7 +7,21 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "Mocha Test",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "test",
+        "--color",
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "outputCapture": "std",
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch with Debug",
       "skipFiles": [
         "<node_internals>/**"
       ],
