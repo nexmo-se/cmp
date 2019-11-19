@@ -9,26 +9,10 @@ export default {
   hash: {
     saltRounds: parseInt(process.env.HASH_SALT_ROUNDS || '10', 10),
   },
-  user: {
-    username: process.env.USER_USERNAME,
-    passwordHash: process.env.USER_PASSWORD_HASH,
-    passwordSalt: process.env.USER_PASSWORD_SALT,
-  },
   nexmo: {
     host: 'https://api.nexmo.com',
     restHost: 'https://rest.nexmo.com',
-    mock: {
-      sms: (process.env.USE_MOCK_SMS || 'false') === 'true',
-      whatsapp: (process.env.USE_MOCK_WHATSAPP || 'false') === 'true',
-      facebook: (process.env.USE_MOCK_FACEBOOK || 'false') === 'true',
-      viber: (process.env.USE_MOCK_VIBER || 'false') === 'true',
-    },
-    sandbox: {
-      sms: (process.env.USE_SANDBOX_SMS || 'false') === 'true',
-      whatsapp: (process.env.USE_SANDBOX_WHATSAPP || 'false') === 'true',
-      facebook: (process.env.USE_SANDBOX_FACEBOOK || 'false') === 'true',
-      viber: (process.env.USE_SANDBOX_VIBER || 'false') === 'true',
-    },
+    useWhatsappSandbox: (process.env.USE_SANDBOX_WHATSAPP || 'false') === 'true',
   },
   log4js: {
     appenders: {
