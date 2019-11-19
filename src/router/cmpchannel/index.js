@@ -14,46 +14,46 @@ export default (container) => {
     .get(
       checkAuthentication,
       authorize(['user', 'admin']),
-      validate(validator.listApiKeys),
+      validate(validator.listChannels),
       map([
-        { roles: ['admin'], controller: controller.listAllApiKeys },
-        { roles: ['user'], controller: controller.listMyApiKeys },
+        { roles: ['admin'], controller: controller.listAllChannels },
+        { roles: ['user'], controller: controller.listMyChannels },
       ]),
     )
     .post(
       checkAuthentication,
       authorize(['admin']),
-      validate(validator.createApiKey),
-      controller.createApiKey,
+      validate(validator.createChannel),
+      controller.createChannel,
     )
     .delete(
       checkAuthentication,
       authorize(['admin']),
-      validate(validator.deleteAllApiKeys),
-      controller.deleteAllApiKeys,
+      validate(validator.deleteAllChannels),
+      controller.deleteAllChannels,
     );
 
-  router.route('/:nexmoApiKeyId')
+  router.route('/:cmpChannelId')
     .get(
       checkAuthentication,
       authorize(['user', 'admin']),
-      validate(validator.readApiKey),
+      validate(validator.readChannel),
       map([
-        { roles: ['admin'], controller: controller.readApiKey },
-        { roles: ['user'], controller: controller.readMyApiKey },
+        { roles: ['admin'], controller: controller.readChannel },
+        { roles: ['user'], controller: controller.readMyChannel },
       ]),
     )
     .put(
       checkAuthentication,
       authorize(['admin']),
-      validate(validator.updateApiKey),
-      controller.updateApiKey,
+      validate(validator.updateChannel),
+      controller.updateChannel,
     )
     .delete(
       checkAuthentication,
       authorize(['admin']),
-      validate(validator.deleteApiKey),
-      controller.deleteApiKey,
+      validate(validator.deleteChannel),
+      controller.deleteChannel,
     );
 
   return router;

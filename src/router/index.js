@@ -1,7 +1,8 @@
 import AuthRouter from './auth';
 import UserRouter from './user';
-import ApiKeyRouter from './nexmoapikey';
-import ApplicationRouter from './nexmoapplication';
+import ApiKeyRouter from './cmpapikey';
+import ApplicationRouter from './cmpapplication';
+import ChannelRouter from './cmpchannel';
 import WebhookRouter from './webhook';
 
 export default (container) => {
@@ -14,6 +15,7 @@ export default (container) => {
   router.use('/users', UserRouter(container));
   router.use('/apikeys', ApiKeyRouter(container));
   router.use('/applications', ApplicationRouter(container));
+  router.use('/channels', ChannelRouter(container));
   router.use('/webhook', WebhookRouter(container));
 
   router.get(

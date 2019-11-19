@@ -1,6 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    const createApiKeyTable = () => queryInterface.createTable('NexmoApiKeys', {
+    const createApiKeyTable = () => queryInterface.createTable('CmpApiKeys', {
       id: {
         type: Sequelize.STRING(45),
         allowNull: false,
@@ -35,7 +35,7 @@ module.exports = {
       },
     });
 
-    const createApplicationTable = () => queryInterface.createTable('NexmoApplications', {
+    const createApplicationTable = () => queryInterface.createTable('CmpApplications', {
       id: {
         type: Sequelize.STRING(45),
         allowNull: false,
@@ -47,7 +47,7 @@ module.exports = {
         allowNull: false,
         default: 'No Name',
       },
-      apiKeyId: {
+      cmpApiKeyId: {
         type: Sequelize.STRING(45),
         allowNull: false,
       },
@@ -78,8 +78,8 @@ module.exports = {
       .then(createApplicationTable);
   },
   down: (queryInterface) => {
-    const dropApplcationTable = () => queryInterface.dropTable('NexmoApplications');
-    const dropApiKeyTable = () => queryInterface.dropTable('NexmoApiKeys');
+    const dropApplcationTable = () => queryInterface.dropTable('CmpApplications');
+    const dropApiKeyTable = () => queryInterface.dropTable('CmpApiKeys');
     return Promise.resolve()
       .then(dropApplcationTable)
       .then(dropApiKeyTable);

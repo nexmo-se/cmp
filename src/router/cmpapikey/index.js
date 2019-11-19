@@ -14,46 +14,46 @@ export default (container) => {
     .get(
       checkAuthentication,
       authorize(['user', 'admin']),
-      validate(validator.listApplications),
+      validate(validator.listApiKeys),
       map([
-        { roles: ['admin'], controller: controller.listAllApplications },
-        { roles: ['user'], controller: controller.listMyApplications },
+        { roles: ['admin'], controller: controller.listAllApiKeys },
+        { roles: ['user'], controller: controller.listMyApiKeys },
       ]),
     )
     .post(
       checkAuthentication,
       authorize(['admin']),
-      validate(validator.createApplication),
-      controller.createApplication,
+      validate(validator.createApiKey),
+      controller.createApiKey,
     )
     .delete(
       checkAuthentication,
       authorize(['admin']),
-      validate(validator.deleteAllApplications),
-      controller.deleteAllApplications,
+      validate(validator.deleteAllApiKeys),
+      controller.deleteAllApiKeys,
     );
 
-  router.route('/:nexmoApplicationId')
+  router.route('/:cmpApiKeyId')
     .get(
       checkAuthentication,
       authorize(['user', 'admin']),
-      validate(validator.readApplication),
+      validate(validator.readApiKey),
       map([
-        { roles: ['admin'], controller: controller.readApplication },
-        { roles: ['user'], controller: controller.readMyApplication },
+        { roles: ['admin'], controller: controller.readApiKey },
+        { roles: ['user'], controller: controller.readMyApiKey },
       ]),
     )
     .put(
       checkAuthentication,
       authorize(['admin']),
-      validate(validator.updateApplication),
-      controller.updateApplication,
+      validate(validator.updateApiKey),
+      controller.updateApiKey,
     )
     .delete(
       checkAuthentication,
       authorize(['admin']),
-      validate(validator.deleteApplication),
-      controller.deleteApplication,
+      validate(validator.deleteApiKey),
+      controller.deleteApiKey,
     );
 
   return router;

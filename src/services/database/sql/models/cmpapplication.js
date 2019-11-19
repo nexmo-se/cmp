@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  const NexmoApiKey = sequelize.define('NexmoApiKey', {
+  const CmpApplication = sequelize.define('CmpApplication', {
     id: {
       type: DataTypes.STRING(45),
       allowNull: false,
@@ -10,12 +10,16 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       default: 'No Name',
     },
-    apiKey: {
+    cmpApiKeyId: {
       type: DataTypes.STRING(45),
       allowNull: false,
     },
-    apiSecret: {
+    applicationId: {
       type: DataTypes.STRING(45),
+      allowNull: false,
+    },
+    privateKey: {
+      type: DataTypes.STRING(10000),
       allowNull: false,
     },
     deleted: {
@@ -27,10 +31,11 @@ module.exports = (sequelize, DataTypes) => {
     timestamps: true,
   });
 
-  NexmoApiKey.associate = (models) => {
+  CmpApplication.associate = (models) => {
     // associations can be defined here
-    NexmoApiKey.hasMany(models.NexmoApplication, { foreignKey: 'apiKeyId', as: 'applications' });
+    CmpApplication.belongsTo(models.CmpApiKey, { foreignKey: 'cmpApiKeyId' });
+    CmpApplication.hasMany(models.CmpChannel, { foreignKey: 'cmpApplicationId', as: 'channels' });
   };
 
-  return NexmoApiKey;
+  return CmpApplication;
 };

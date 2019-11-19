@@ -23,14 +23,14 @@ export default {
   readApiKey: {
     query: {},
     params: {
-      nexmoApiKeyId: Joi.string().min(1).required(),
+      cmpApiKeyId: Joi.string().min(1).required(),
     },
     body: {},
   },
   updateApiKey: {
     query: {},
     params: {
-      nexmoApiKeyId: Joi.string().min(1).required(),
+      cmpApiKeyId: Joi.string().min(1).required(),
     },
     body: {
       name: Joi.string(),
@@ -41,7 +41,7 @@ export default {
   deleteApiKey: {
     query: {},
     params: {
-      nexmoApiKeyId: Joi.string().min(1).required(),
+      cmpApiKeyId: Joi.string().min(1).required(),
     },
     body: {},
   },

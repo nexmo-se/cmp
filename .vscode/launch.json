@@ -28,6 +28,21 @@
       "program": "${workspaceFolder}/src/index.js",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/babel-node",
       "outputCapture": "std",
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch with Nodemon Debug",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}/src/index.js",
+      "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
+      "runtimeArgs": [
+        "--exec",
+        "babel-node",
+      ],
+      "outputCapture": "std",
     }
   ]
 }

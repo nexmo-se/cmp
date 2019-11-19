@@ -1,9 +1,11 @@
 import User from './user';
-import NexmoApiKey from './nexmoApiKey';
-import NexmoApplication from './nexmoApplication';
+import CmpApiKey from './cmpApiKey';
+import CmpApplication from './cmpApplication';
+import CmpChannel from './cmpChannel';
 
 export default container => ({
   User: User(container),
-  NexmoApiKey: NexmoApiKey(container),
-  NexmoApplication: NexmoApplication(container),
+  CmpApiKey: CmpApiKey(container),
+  CmpApplication: CmpApplication(container),
+  CmpChannel: CmpChannel(container),
 });

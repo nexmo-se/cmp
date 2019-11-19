@@ -16,7 +16,7 @@ export default {
     params: {},
     body: {
       name: Joi.string().min(1).required(),
-      apiKeyId: Joi.string().min(1).required(),
+      cmpApiKeyId: Joi.string().min(1).required(),
       applicationId: Joi.string().min(1).required(),
       privateKey: Joi.string().min(1).required(),
     },
@@ -24,18 +24,18 @@ export default {
   readApplication: {
     query: {},
     params: {
-      nexmoApplicationId: Joi.string().min(1).required(),
+      cmpApplicationId: Joi.string().min(1).required(),
     },
     body: {},
   },
   updateApplication: {
     query: {},
     params: {
-      nexmoApplicationId: Joi.string().min(1).required(),
+      cmpApplicationId: Joi.string().min(1).required(),
     },
     body: {
       name: Joi.string(),
-      apiKeyId: Joi.string(),
+      cmpApiKeyId: Joi.string(),
       applicationId: Joi.string(),
       privateKey: Joi.string(),
     },
@@ -43,7 +43,7 @@ export default {
   deleteApplication: {
     query: {},
     params: {
-      nexmoApplicationId: Joi.string().min(1).required(),
+      cmpApplicationId: Joi.string().min(1).required(),
     },
     body: {},
   },
