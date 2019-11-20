@@ -66,8 +66,33 @@ export default (container) => {
     }
   };
 
+  const sendTemplate = async (
+    to, namespace, name,
+    mediaType, media, parameters, clientRef,
+    applicationId, privateKey,
+    axios = container.axios,
+  ) => {
+    try {
+      if (mediaType === 'text') {
+        L.debug('Using Message Template');
+        return sendMessageTemplate(
+          to, namespace, name, parameters,
+          clientRef, applicationId, privateKey, axios,
+        );
+      }
+
+      L.debug('Using Media Template');
+      return sendMediaTemplate(
+        to, namespace, name, mediaType, media, parameters,
+        clientRef, applicationId, privateKey, axios,
+      );
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const sendMessageTemplate = async (
-    to, name, parameters, clientRef,
+    to, namespace, name, parameters, clientRef,
     applicationId, privateKey,
     axios = container.axios,
   ) => {
@@ -95,7 +120,7 @@ export default (container) => {
           content: {
             type: 'template',
             template: {
-              name,
+              name: `${namespace}:${name}`,
               parameters: parameters.map(parameter => ({ default: parameter })),
             },
           },
@@ -115,8 +140,83 @@ export default (container) => {
     }
   };
 
+  const getTextParameter = text => ({
+    type: 'text',
+    text,
+  });
+
+  const getImageParameter = image => ({
+    type: 'image',
+    image: {
+      link: image.url,
+      caption: image.caption,
+    },
+  });
+
+  const getAudioParameter = audio => ({
+    type: 'audio',
+    audio: {
+      link: audio.url,
+    },
+  });
+
+  const getVideoParameter = video => ({
+    type: 'video',
+    video: {
+      link: video.url,
+      caption: video.caption,
+    },
+  });
+
+  const getFileParameter = file => ({
+    type: 'document',
+    document: {
+      link: file.url,
+      caption: file.caption,
+      filename: file.fileName,
+    },
+  });
+
+  const getLocationParameter = location => ({
+    type: 'location',
+    location: {
+      longitude: location.longitude,
+      latitude: location.latitude,
+      name: location.name,
+      address: location.address,
+    },
+  });
+
+  const getMediaParameter = (mediaType, media) => {
+    let parameter = { type: 'text', text: 'Test_Parameter' };
+    if (mediaType === 'text') {
+      L.debug('MTM Text');
+      parameter = getTextParameter(media);
+    } else if (mediaType === 'image') {
+      L.debug('MTM Image');
+      parameter = getImageParameter(media);
+    } else if (mediaType === 'audio') {
+      L.debug('MTM Audio');
+      parameter = getAudioParameter(media);
+    } else if (mediaType === 'video') {
+      L.debug('MTM Video');
+      parameter = getVideoParameter(media);
+    } else if (mediaType === 'file') {
+      L.debug('MTM File');
+      parameter = getFileParameter(media);
+    } else if (mediaType === 'location') {
+      L.debug('MTM Location');
+      parameter = getLocationParameter(media);
+    } else {
+      L.debug('MTM Unknown - Default');
+    }
+
+    return parameter;
+  };
+
   const sendMediaTemplate = async (
-    to, name, mediaType, media, parameters, clientRef,
+    to, namespace, name,
+    mediaType, media, parameters, clientRef,
     applicationId, privateKey,
     axios = container.axios,
   ) => {
@@ -124,6 +224,7 @@ export default (container) => {
       const url = getUrl();
       const from = getFromNumber();
       const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
+      const mediaParameter = getMediaParameter(mediaType, media);
 
       const config = {
         headers: {
@@ -142,15 +243,25 @@ export default (container) => {
         },
         message: {
           content: {
-            type: 'template',
+            type: 'custom',
             template: {
+              namespace,
               name,
-              parameters: parameters.map(parameter => ({ default: parameter })),
+              language: {
+                policy: 'deterministic',
+                locale: 'en_GB',
+              },
+              components: [
+                {
+                  type: 'header',
+                  parameters: [mediaParameter],
+                },
+                {
+                  type: 'body',
+                  parameters: parameters.map(parameter => getTextParameter(parameter)),
+                },
+              ],
             },
-          },
-          whatsapp: {
-            policy: 'deterministic',
-            locale: 'en_GB',
           },
         },
         client_ref: clientRef,
@@ -166,6 +277,6 @@ export default (container) => {
 
   return {
     sendFreeForm,
-    sendMessageTemplate,
+    sendTemplate,
   };
 };
