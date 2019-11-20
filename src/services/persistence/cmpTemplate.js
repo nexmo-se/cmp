@@ -14,7 +14,8 @@ export default (container) => {
   const createTemplate = async (
     name,
     cmpChannelId,
-    whatsappTemplateId,
+    whatsappTemplateNamespace,
+    whatsappTemplateName,
     mediaType,
     body,
   ) => {
@@ -23,7 +24,8 @@ export default (container) => {
       const cmpTemplate = await CmpTemplate.createTemplate(
         name,
         cmpChannelId,
-        whatsappTemplateId,
+        whatsappTemplateNamespace,
+        whatsappTemplateName,
         mediaType,
         body,
       );

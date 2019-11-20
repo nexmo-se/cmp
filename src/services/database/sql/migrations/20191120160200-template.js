@@ -15,7 +15,11 @@ module.exports = {
       type: Sequelize.STRING(45),
       allowNull: false,
     },
-    whatsappTemplateId: {
+    whatsappTemplateNamespace: {
+      type: Sequelize.STRING(500),
+      allowNull: true,
+    },
+    whatsappTemplateName: {
       type: Sequelize.STRING(500),
       allowNull: true,
     },
