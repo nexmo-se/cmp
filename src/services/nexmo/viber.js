@@ -120,7 +120,8 @@ export default (container) => {
   };
 
   const sendTemplate = async (
-    from, to, text, imageUrl, caption, actionUrl,
+    from, to, templateBody, parameters,
+    imageUrl, caption, actionUrl,
     clientRef, category, ttl,
     applicationId, privateKey,
     axios = container.axios,
@@ -128,6 +129,7 @@ export default (container) => {
     try {
       const url = getUrl();
       const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
+      const contentBody = getContentBody(templateBody, parameters);
 
       const config = {
         headers: {
@@ -148,7 +150,7 @@ export default (container) => {
           content: {
             type: 'custom',
             custom: {
-              '#txt': text,
+              '#txt': contentBody,
               '#img': imageUrl,
               '#caption': caption,
               '#action': actionUrl,
