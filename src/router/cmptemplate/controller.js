@@ -36,16 +36,15 @@ export default (container) => {
     try {
       const {
         name,
-        template,
-        senderId,
-        tps,
-        cmpApplicationId,
-        cmpApiKeyId,
+        cmpChannelId,
+        whatsappTemplateId,
+        mediaType,
+        body,
       } = req.body;
       const { CmpTemplate } = container.persistenceService;
 
       const cmpApiKey = await CmpTemplate.createTemplate(
-        name, template, senderId, tps, cmpApplicationId, cmpApiKeyId,
+        name, cmpChannelId, whatsappTemplateId, mediaType, body,
       );
       res.status(200).json(cmpApiKey);
     } catch (error) {
