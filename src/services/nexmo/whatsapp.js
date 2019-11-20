@@ -188,7 +188,7 @@ export default (container) => {
   });
 
   const getMediaParameter = (mediaType, media) => {
-    let parameter = { type: 'text', text: 'Test_Parameter' };
+    let parameter = { type: 'text', text: media };
     if (mediaType === 'text') {
       L.debug('MTM Text');
       parameter = getTextParameter(media);

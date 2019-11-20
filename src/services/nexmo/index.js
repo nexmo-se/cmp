@@ -3,6 +3,7 @@ import Webhook from './webhook';
 import Sms from './sms';
 import Whatsapp from './whatsapp';
 import Viber from './viber';
+import Facebook from './facebook';
 
 export default container => ({
   jwt: Jwt(container),
@@ -10,4 +11,5 @@ export default container => ({
   sms: Sms(container),
   whatsapp: Whatsapp(container),
   viber: Viber(container),
+  facebook: Facebook(container),
 });

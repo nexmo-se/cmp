@@ -1,14 +1,10 @@
 export default (container) => {
-  const { L } = container.defaultLogger('Nexmo Whatsapp Service');
+  const { L } = container.defaultLogger('Nexmo Viber Service');
+
   const getUrl = () => {
-    const { host, useWhatsappSandbox } = container.config.nexmo;
+    const { host } = container.config.nexmo;
 
-    let url = `${host}/v0.1/messages`;
-    if (useWhatsappSandbox) {
-      L.info('Using APAC Whatsapp Sandbox Url');
-      url = 'http://nexmoapac.hopto.me/sandbox/whatsapp.php';
-    }
-
+    const url = `${host}/v0.1/messages`;
     return url;
   };
 
