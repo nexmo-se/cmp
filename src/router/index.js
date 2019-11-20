@@ -3,6 +3,7 @@ import UserRouter from './user';
 import ApiKeyRouter from './cmpapikey';
 import ApplicationRouter from './cmpapplication';
 import ChannelRouter from './cmpchannel';
+import TemplateRouter from './cmptemplate';
 import WebhookRouter from './webhook';
 
 export default (container) => {
@@ -16,6 +17,7 @@ export default (container) => {
   router.use('/apikeys', ApiKeyRouter(container));
   router.use('/applications', ApplicationRouter(container));
   router.use('/channels', ChannelRouter(container));
+  router.use('/templates', TemplateRouter(container));
   router.use('/webhook', WebhookRouter(container));
 
   router.get(
