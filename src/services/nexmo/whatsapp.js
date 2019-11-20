@@ -25,13 +25,13 @@ export default (container) => {
   };
 
   const sendFreeForm = async (
-    to, text, clientRef,
+    from, to, text, clientRef,
     applicationId, privateKey,
     axios = container.axios,
   ) => {
     try {
       const url = getUrl();
-      const from = getFromNumber();
+      const senderId = getFromNumber(from);
       const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
 
       const config = {
@@ -47,7 +47,7 @@ export default (container) => {
         },
         from: {
           type: 'whatsapp',
-          number: from,
+          number: senderId,
         },
         message: {
           content: {
@@ -67,7 +67,7 @@ export default (container) => {
   };
 
   const sendTemplate = async (
-    to, namespace, name,
+    from, to, namespace, name,
     mediaType, media, parameters, clientRef,
     applicationId, privateKey,
     axios = container.axios,
@@ -76,14 +76,14 @@ export default (container) => {
       if (mediaType === 'text') {
         L.debug('Using Message Template');
         return sendMessageTemplate(
-          to, namespace, name, parameters,
+          from, to, namespace, name, parameters,
           clientRef, applicationId, privateKey, axios,
         );
       }
 
       L.debug('Using Media Template');
       return sendMediaTemplate(
-        to, namespace, name, mediaType, media, parameters,
+        from, to, namespace, name, mediaType, media, parameters,
         clientRef, applicationId, privateKey, axios,
       );
     } catch (error) {
@@ -92,13 +92,13 @@ export default (container) => {
   };
 
   const sendMessageTemplate = async (
-    to, namespace, name, parameters, clientRef,
+    from, to, namespace, name, parameters, clientRef,
     applicationId, privateKey,
     axios = container.axios,
   ) => {
     try {
       const url = getUrl();
-      const from = getFromNumber();
+      const senderId = getFromNumber(from);
       const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
 
       const config = {
@@ -114,7 +114,7 @@ export default (container) => {
         },
         from: {
           type: 'whatsapp',
-          number: from,
+          number: senderId,
         },
         message: {
           content: {
@@ -215,14 +215,14 @@ export default (container) => {
   };
 
   const sendMediaTemplate = async (
-    to, namespace, name,
+    from, to, namespace, name,
     mediaType, media, parameters, clientRef,
     applicationId, privateKey,
     axios = container.axios,
   ) => {
     try {
       const url = getUrl();
-      const from = getFromNumber();
+      const senderId = getFromNumber(from);
       const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
       const mediaParameter = getMediaParameter(mediaType, media);
 
@@ -239,7 +239,7 @@ export default (container) => {
         },
         from: {
           type: 'whatsapp',
-          number: from,
+          number: senderId,
         },
         message: {
           content: {
