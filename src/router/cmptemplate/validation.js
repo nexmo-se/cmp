@@ -17,7 +17,8 @@ export default {
     body: {
       name: Joi.string().min(1).required(),
       cmpChannelId: Joi.string().min(1).required(),
-      whatsappTemplateId: Joi.string(),
+      whatsappTemplateNamespace: Joi.string(),
+      whatsappTemplateName: Joi.string(),
       mediaType: Joi.string().min(1).required(),
       body: Joi.string(),
     },
@@ -37,7 +38,8 @@ export default {
     body: {
       name: Joi.string(),
       cmpChannelId: Joi.string().forbidden(),
-      whatsappTemplateId: Joi.string().forbidden(),
+      whatsappTemplateNamespace: Joi.string().forbidden(),
+      whatsappTemplateName: Joi.string().forbidden(),
       mediaType: Joi.string(),
       body: Joi.string(),
     },
