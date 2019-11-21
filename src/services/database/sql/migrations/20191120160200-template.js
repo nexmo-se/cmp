@@ -28,7 +28,7 @@ module.exports = {
       allowNull: false,
     },
     body: {
-      type: Sequelize.STRING(2000),
+      type: Sequelize.STRING(5000),
       allowNull: true,
     },
     deleted: {

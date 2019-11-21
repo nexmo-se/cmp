@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     body: {
-      type: DataTypes.STRING(2000),
+      type: DataTypes.STRING(5000),
       allowNull: true,
     },
     deleted: {
