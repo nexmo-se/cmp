@@ -8,19 +8,6 @@ export default (container) => {
     return url;
   };
 
-  const getContentBody = (templateBody, parameters) => {
-    let contentBody = templateBody;
-
-    for (let i = 0; i < parameters.length; i += 1) {
-      const parameter = parameters[i];
-      const pattern = `\\{\\{${i + 1}\\}\\}`;
-      const regexp = new RegExp(pattern, 'g');
-      contentBody = contentBody.replace(regexp, parameter);
-    }
-
-    return contentBody;
-  };
-
   const getTextMediaContentBody = text => ({
     type: 'text',
     text,
@@ -123,14 +110,13 @@ export default (container) => {
   };
 
   const sendText = async (
-    from, to, templateBody, parameters, clientRef,
+    from, to, text, clientRef,
     category, tag,
     applicationId, privateKey,
     axios = container.axios,
   ) => {
     try {
-      const contentBody = getContentBody(templateBody, parameters);
-      const content = getTextMediaContentBody(contentBody);
+      const content = getTextMediaContentBody(text);
 
       return sendMedia(
         from, to, 'text', content,

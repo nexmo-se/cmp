@@ -23,6 +23,7 @@ import Base64Service from '../services/base64';
 import AuthService from '../services/auth';
 import PersistenceService from '../services/persistence';
 import JwtService from '../services/jwt';
+import TemplateService from '../services/template';
 
 import Logger from '../services/logger';
 import Authenticator from '../services/authenticator';
@@ -73,5 +74,6 @@ container.jwtService = JwtService(container);
 container.base64Service = Base64Service(container);
 container.authService = AuthService(container);
 container.persistenceService = PersistenceService(container);
+container.templateService = TemplateService(container);
 
 export default container;

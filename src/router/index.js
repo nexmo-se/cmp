@@ -45,11 +45,26 @@ export default (container) => {
 
   router.get(
     '/test',
-    container.authenticator.checkAuthentication,
     async (req, res, next) => {
       try {
-        L.debug('This is the test route');
-        res.status(200).send('ok');
+        const { CmpTemplate } = container.persistenceService;
+        const template = await CmpTemplate.readTemplate('a0a33d37-ec8e-4bc0-ac9c-a40f7714e190', false);
+        const { mediaType, body, cmpChannel } = template;
+        const { senderId, cmpApiKey } = cmpChannel;
+        const { apiKey, apiSecret } = cmpApiKey;
+
+        const to = '6583206274';
+        const parameters = [
+          'Kopitech',
+          '1234',
+          '5 minutes',
+        ];
+
+        const text = container.templateService.getText(body, parameters);
+        const result = await container.nexmoService.sms.sendText(
+          to, text, mediaType, senderId, apiKey, apiSecret,
+        );
+        res.status(200).json(result);
       } catch (error) {
         next(error);
       }

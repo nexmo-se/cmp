@@ -8,21 +8,8 @@ export default (container) => {
     return url;
   };
 
-  const getContentBody = (templateBody, parameters) => {
-    let contentBody = templateBody;
-
-    for (let i = 0; i < parameters.length; i += 1) {
-      const parameter = parameters[i];
-      const pattern = `\\{\\{${i + 1}\\}\\}`;
-      const regexp = new RegExp(pattern, 'g');
-      contentBody = contentBody.replace(regexp, parameter);
-    }
-
-    return contentBody;
-  };
-
   const sendText = async (
-    from, to, templateBody, parameters, clientRef,
+    from, to, text, clientRef,
     category, ttl,
     applicationId, privateKey,
     axios = container.axios,
@@ -30,7 +17,6 @@ export default (container) => {
     try {
       const url = getUrl();
       const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
-      const contentBody = getContentBody(templateBody, parameters);
 
       const config = {
         headers: {
@@ -50,7 +36,7 @@ export default (container) => {
         message: {
           content: {
             type: 'text',
-            text: contentBody,
+            text,
           },
         },
         viber_service_msg: {
@@ -117,8 +103,8 @@ export default (container) => {
   };
 
   const sendTemplate = async (
-    from, to, templateBody, parameters,
-    imageUrl, caption, actionUrl,
+    from, to,
+    text, imageUrl, caption, actionUrl,
     clientRef, category, ttl,
     applicationId, privateKey,
     axios = container.axios,
@@ -126,7 +112,6 @@ export default (container) => {
     try {
       const url = getUrl();
       const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
-      const contentBody = getContentBody(templateBody, parameters);
 
       const config = {
         headers: {
@@ -147,7 +132,7 @@ export default (container) => {
           content: {
             type: 'custom',
             custom: {
-              '#txt': contentBody,
+              '#txt': text,
               '#img': imageUrl,
               '#caption': caption,
               '#action': actionUrl,
