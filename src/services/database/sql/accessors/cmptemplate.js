@@ -338,7 +338,7 @@ export default (container) => {
     }
   };
 
-  const findTemplates = async (criteria = {}, excludeSecret, excludeDeleted = true) => {
+  const findTemplates = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
       const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpTemplates);

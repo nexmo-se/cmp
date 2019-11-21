@@ -180,6 +180,10 @@ export default (container) => {
     mappedCmpApiKey.cmpChannels = (mappedCmpApiKey.cmpChannels || [])
       .map(mapCmpChannel);
 
+    if (excludeSecret) {
+      delete mappedCmpApiKey.apiSecret;
+    }
+
     delete mappedCmpApiKey.deleted;
     delete mappedCmpApiKey.createdAt;
     delete mappedCmpApiKey.updatedAt;
@@ -237,7 +241,7 @@ export default (container) => {
     }
   };
 
-  const updateApiKeys = async (criteria, changes, excludeSecret) => {
+  const updateApiKeys = async (criteria, changes, excludeSecret = true) => {
     try {
       const cmpApiKeys = await updateByCriteria(criteria, changes, excludeSecret, true);
       return Promise.resolve(cmpApiKeys);
@@ -246,7 +250,7 @@ export default (container) => {
     }
   };
 
-  const deleteApiKey = async (cmpApiKeyId, excludeSecret) => {
+  const deleteApiKey = async (cmpApiKeyId, excludeSecret = true) => {
     try {
       const changes = { deleted: true };
       const cmpApiKey = await updateById(cmpApiKeyId, changes, excludeSecret, true);

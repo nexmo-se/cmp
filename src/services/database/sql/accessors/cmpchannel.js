@@ -296,7 +296,7 @@ export default (container) => {
     }
   };
 
-  const findChannels = async (criteria = {}, excludeSecret, excludeDeleted = true) => {
+  const findChannels = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
       const cmpChannels = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpChannels);

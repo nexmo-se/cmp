@@ -1,10 +1,10 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Template Persistence Accessor');
 
-  const listTemplates = async () => {
+  const listTemplates = async (excludeSecret = true) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
-      const cmpTemplates = await CmpTemplate.listTemplates();
+      const cmpTemplates = await CmpTemplate.listTemplates(excludeSecret);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);
@@ -18,6 +18,7 @@ export default (container) => {
     whatsappTemplateName,
     mediaType,
     body,
+    excludeSecret = true,
   ) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
@@ -28,6 +29,7 @@ export default (container) => {
         whatsappTemplateName,
         mediaType,
         body,
+        excludeSecret,
       );
       return Promise.resolve(cmpTemplate);
     } catch (error) {
@@ -35,21 +37,22 @@ export default (container) => {
     }
   };
 
-  const readTemplate = async (cmpTemplateId) => {
+  const readTemplate = async (cmpTemplateId, excludeSecret = true) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
-      const cmpTemplate = await CmpTemplate.readTemplate(cmpTemplateId);
+      console.log(excludeSecret);
+      const cmpTemplate = await CmpTemplate.readTemplate(cmpTemplateId, excludeSecret);
       return Promise.resolve(cmpTemplate);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateTemplate = async (cmpTemplateId, changes) => {
+  const updateTemplate = async (cmpTemplateId, changes, excludeSecret = true) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
       const cmpTemplate = await CmpTemplate.updateTemplate(
-        cmpTemplateId, changes,
+        cmpTemplateId, changes, excludeSecret,
       );
       return Promise.resolve(cmpTemplate);
     } catch (error) {
@@ -57,30 +60,30 @@ export default (container) => {
     }
   };
 
-  const updateTemplates = async (criteria, changes) => {
+  const updateTemplates = async (criteria, changes, excludeSecret = true) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
-      const cmpTemplates = await CmpTemplate.updateTemplates(criteria, changes);
+      const cmpTemplates = await CmpTemplate.updateTemplates(criteria, changes, excludeSecret);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteTemplate = async (cmpTemplateId) => {
+  const deleteTemplate = async (cmpTemplateId, excludeSecret = true) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
-      const cmpTemplate = await CmpTemplate.deleteTemplate(cmpTemplateId);
+      const cmpTemplate = await CmpTemplate.deleteTemplate(cmpTemplateId, excludeSecret);
       return Promise.resolve(cmpTemplate);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteTemplates = async (criteria) => {
+  const deleteTemplates = async (criteria, excludeSecret = true) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
-      const cmpTemplates = await CmpTemplate.deleteTemplates(criteria);
+      const cmpTemplates = await CmpTemplate.deleteTemplates(criteria, excludeSecret);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);
