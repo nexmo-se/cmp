@@ -13,7 +13,8 @@ export default (container) => {
 
     for (let i = 0; i < parameters.length; i += 1) {
       const parameter = parameters[i];
-      const regexp = new RegExp(`{{${i + 1}}}`, 'g');
+      const pattern = `\\{\\{${i + 1}\\}\\}`;
+      const regexp = new RegExp(pattern, 'g');
       contentBody = contentBody.replace(regexp, parameter);
     }
 
