@@ -40,7 +40,6 @@ export default (container) => {
   const readTemplate = async (cmpTemplateId, excludeSecret = true) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
-      console.log(excludeSecret);
       const cmpTemplate = await CmpTemplate.readTemplate(cmpTemplateId, excludeSecret);
       return Promise.resolve(cmpTemplate);
     } catch (error) {
