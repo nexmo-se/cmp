@@ -4,12 +4,70 @@ export default (container) => {
   const getById = async (cmpMediaId, excludeDeleted = true) => {
     try {
       const {
-        CmpMedia,
+        CmpMedia, CmpMediaText, CmpMediaImage,
+        CmpMediaAudio, CmpMediaVideo, CmpMediaFile,
+        CmpMediaLocation,
       } = container.databaseService.models;
       const query = {
         where: {
           id: cmpMediaId,
         },
+        include: [
+          {
+            model: CmpMediaText,
+            as: 'cmpMediaText',
+            foreignKey: 'cmpMediaTextId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaImage,
+            as: 'cmpMediaImage',
+            foreignKey: 'cmpMediaImageId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaAudio,
+            as: 'cmpMediaAudio',
+            foreignKey: 'cmpMediaAudioId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaVideo,
+            as: 'cmpMediaVideo',
+            foreignKey: 'cmpMediaVideoId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaFile,
+            as: 'cmpMediaFile',
+            foreignKey: 'cmpMediaFileId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaLocation,
+            as: 'cmpMediaLocation',
+            foreignKey: 'cmpMediaLocationId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+        ],
       };
 
       // Check Deleted
@@ -33,10 +91,68 @@ export default (container) => {
   const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
       const {
-        CmpMedia,
+        CmpMedia, CmpMediaText, CmpMediaImage,
+        CmpMediaAudio, CmpMediaVideo, CmpMediaFile,
+        CmpMediaLocation,
       } = container.databaseService.models;
       const query = {
         where: criteria,
+        include: [
+          {
+            model: CmpMediaText,
+            as: 'cmpMediaText',
+            foreignKey: 'cmpMediaTextId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaImage,
+            as: 'cmpMediaImage',
+            foreignKey: 'cmpMediaImageId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaAudio,
+            as: 'cmpMediaAudio',
+            foreignKey: 'cmpMediaAudioId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaVideo,
+            as: 'cmpMediaVideo',
+            foreignKey: 'cmpMediaVideoId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaFile,
+            as: 'cmpMediaFile',
+            foreignKey: 'cmpMediaFileId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaLocation,
+            as: 'cmpMediaLocation',
+            foreignKey: 'cmpMediaLocationId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+        ],
       };
 
       // Check Deleted
@@ -116,9 +232,87 @@ export default (container) => {
     }
   };
 
+  const mapCmpMediaText = (cmpMediaText) => {
+    const mappedCmpMediaText = cmpMediaText.dataValues;
+
+    delete mappedCmpMediaText.deleted;
+    delete mappedCmpMediaText.createdAt;
+    delete mappedCmpMediaText.updatedAt;
+
+    return mappedCmpMediaText;
+  };
+
+  const mapCmpMediaImage = (cmpMediaImage) => {
+    const mappedCmpMediaImage = cmpMediaImage.dataValues;
+
+    delete mappedCmpMediaImage.deleted;
+    delete mappedCmpMediaImage.createdAt;
+    delete mappedCmpMediaImage.updatedAt;
+
+    return mappedCmpMediaImage;
+  };
+
+  const mapCmpMediaAudio = (cmpMediaAudio) => {
+    const mappedCmpMediaAudio = cmpMediaAudio.dataValues;
+
+    delete mappedCmpMediaAudio.deleted;
+    delete mappedCmpMediaAudio.createdAt;
+    delete mappedCmpMediaAudio.updatedAt;
+
+    return mappedCmpMediaAudio;
+  };
+
+  const mapCmpMediaVideo = (cmpMediaVideo) => {
+    const mappedCmpMediaVideo = cmpMediaVideo.dataValues;
+
+    delete mappedCmpMediaVideo.deleted;
+    delete mappedCmpMediaVideo.createdAt;
+    delete mappedCmpMediaVideo.updatedAt;
+
+    return mappedCmpMediaVideo;
+  };
+
+  const mapCmpMediaFile = (cmpMediaFile) => {
+    const mappedCmpMediaFile = cmpMediaFile.dataValues;
+
+    delete mappedCmpMediaFile.deleted;
+    delete mappedCmpMediaFile.createdAt;
+    delete mappedCmpMediaFile.updatedAt;
+
+    return mappedCmpMediaFile;
+  };
+
+  const mapCmpMediaLocation = (cmpMediaLocation) => {
+    const mappedCmpMediaLocation = cmpMediaLocation.dataValues;
+
+    delete mappedCmpMediaLocation.deleted;
+    delete mappedCmpMediaLocation.createdAt;
+    delete mappedCmpMediaLocation.updatedAt;
+
+    return mappedCmpMediaLocation;
+  };
+
   const mapCmpMedia = (cmpMedia) => {
     const mappedCmpMedia = cmpMedia.dataValues;
 
+    if (mappedCmpMedia.cmpMediaText) {
+      mappedCmpMedia.cmpMediaText = mapCmpMediaText(mappedCmpMedia.cmpMediaText);
+    }
+    if (mappedCmpMedia.cmpMediaImage) {
+      mappedCmpMedia.cmpMediaImage = mapCmpMediaImage(mappedCmpMedia.cmpMediaImage);
+    }
+    if (mappedCmpMedia.cmpMediaAudio) {
+      mappedCmpMedia.cmpMediaAudio = mapCmpMediaAudio(mappedCmpMedia.cmpMediaAudio);
+    }
+    if (mappedCmpMedia.cmpMediaVideo) {
+      mappedCmpMedia.cmpMediaVideo = mapCmpMediaVideo(mappedCmpMedia.cmpMediaVideo);
+    }
+    if (mappedCmpMedia.cmpMediaFile) {
+      mappedCmpMedia.cmpMediaFile = mapCmpMediaFile(mappedCmpMedia.cmpMediaFile);
+    }
+    if (mappedCmpMedia.cmpMediaLocation) {
+      mappedCmpMedia.cmpMediaLocation = mapCmpMediaLocation(mappedCmpMedia.cmpMediaLocation);
+    }
     delete mappedCmpMedia.deleted;
     delete mappedCmpMedia.createdAt;
     delete mappedCmpMedia.updatedAt;
@@ -137,32 +331,29 @@ export default (container) => {
 
   const createMedia = async (
     mediaType,
-    text,
-    url,
-    caption,
-    fileName,
-    latitude,
-    longitude,
-    name,
-    address,
+    cmpMediaTextId,
+    cmpMediaImageId,
+    cmpMediaAudioId,
+    cmpMediaVideoId,
+    cmpMediaFileId,
+    cmpMediaLocationId,
   ) => {
     try {
       const { CmpMedia } = container.databaseService.models;
-      const rawCmpMedia = await CmpMedia.create({
+      const createdCmpMedia = await CmpMedia.create({
         id: container.uuid(),
         mediaType,
-        text,
-        url,
-        caption,
-        fileName,
-        latitude,
-        longitude,
-        name,
-        address,
+        cmpMediaTextId,
+        cmpMediaImageId,
+        cmpMediaAudioId,
+        cmpMediaVideoId,
+        cmpMediaFileId,
+        cmpMediaLocationId,
         deleted: false,
       });
 
-      const cmpMedia = mapCmpMedia(rawCmpMedia);
+      const { id } = createdCmpMedia;
+      const cmpMedia = await getById(id, true);
       return Promise.resolve(cmpMedia);
     } catch (error) {
       return Promise.reject(error);

@@ -4,6 +4,7 @@ import ApiKeyRouter from './cmpapikey';
 import ApplicationRouter from './cmpapplication';
 import ChannelRouter from './cmpchannel';
 import TemplateRouter from './cmptemplate';
+import MediaRouter from './cmpmedia';
 import CampaignRouter from './cmpcampaign';
 import WebhookRouter from './webhook';
 
@@ -19,6 +20,7 @@ export default (container) => {
   router.use('/applications', ApplicationRouter(container));
   router.use('/channels', ChannelRouter(container));
   router.use('/templates', TemplateRouter(container));
+  router.use('/media', MediaRouter(container));
   router.use('/campaigns', CampaignRouter(container));
   router.use('/webhook', WebhookRouter(container));
 

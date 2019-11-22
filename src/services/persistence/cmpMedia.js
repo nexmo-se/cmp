@@ -1,41 +1,218 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Media Persistence Accessor');
 
+  const mapMedia = (media) => {
+    let mediaData = {};
+    if (media.mediaType === 'text') {
+      mediaData = media.cmpMediaText;
+    } else if (media.mediaType === 'image') {
+      mediaData = media.cmpMediaImage;
+    } else if (media.mediaType === 'audio') {
+      mediaData = media.cmpMediaAudio;
+    } else if (media.mediaType === 'video') {
+      mediaData = media.cmpMediaVideo;
+    } else if (media.mediaType === 'file') {
+      mediaData = media.cmpMediaFile;
+    } else if (media.mediaType === 'location') {
+      mediaData = media.cmpMediaLocation;
+    }
+
+    console.log(mediaData);
+
+    mediaData.typeId = mediaData.id;
+    mediaData.id = media.id;
+    mediaData.type = media.mediaType;
+
+    return mediaData;
+  };
+
   const listMedias = async () => {
     try {
       const { CmpMedia } = container.databaseService.accessors;
       const cmpMedias = await CmpMedia.listMedias();
-      return Promise.resolve(cmpMedias);
+      const mappedCmpMedias = cmpMedias.map(mapMedia);
+      return Promise.resolve(mappedCmpMedias);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
   const createMedia = async (
-    mediaType,
-    text,
-    url,
-    caption,
-    fileName,
-    latitude,
-    longitude,
-    name,
-    address,
+    type, text, url, caption, fileName, latitude, longitude, name, address,
   ) => {
     try {
-      const { CmpMedia } = container.databaseService.accessors;
+      let media;
+      if (type === 'text') {
+        media = await createMediaText(text);
+      } else if (type === 'image') {
+        media = await createMediaImage(url, caption);
+      } else if (type === 'audio') {
+        media = await createMediaAudio(url);
+      } else if (type === 'video') {
+        media = await createMediaVideo(url, caption);
+      } else if (type === 'file') {
+        media = await createMediaFile(url, caption, fileName);
+      } else if (type === 'location') {
+        media = await createMediaLocation(latitude, longitude, name, address);
+      } else {
+        throw new container.BadRequestError('Unknown Media Type');
+      }
+
+      return Promise.resolve(media);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaText = async (text) => {
+    try {
+      const { CmpMedia, CmpMediaText } = container.databaseService.accessors;
+
+      // Create Media Text
+      const cmpMediaText = await CmpMediaText.createMediaText(text);
+      const cmpMediaTextId = cmpMediaText.id;
+
+      // Create Media
       const cmpMedia = await CmpMedia.createMedia(
-        mediaType,
-        text,
-        url,
-        caption,
-        fileName,
-        latitude,
-        longitude,
-        name,
-        address,
+        'text',
+        cmpMediaTextId,
+        null,
+        null,
+        null,
+        null,
+        null,
       );
-      return Promise.resolve(cmpMedia);
+      const mappedCmpMedia = mapMedia(cmpMedia);
+      return Promise.resolve(mappedCmpMedia);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaImage = async (url, caption) => {
+    try {
+      const { CmpMedia, CmpMediaImage } = container.databaseService.accessors;
+
+      // Create Media Text
+      const cmpMediaImage = await CmpMediaImage.createMediaImage(url, caption);
+      const cmpMediaImageId = cmpMediaImage.id;
+
+      // Create Media
+      const cmpMedia = await CmpMedia.createMedia(
+        'image',
+        null,
+        cmpMediaImageId,
+        null,
+        null,
+        null,
+        null,
+      );
+      const mappedCmpMedia = mapMedia(cmpMedia);
+      return Promise.resolve(mappedCmpMedia);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaAudio = async (url) => {
+    try {
+      const { CmpMedia, CmpMediaAudio } = container.databaseService.accessors;
+
+      // Create Media Text
+      const cmpMediaAudio = await CmpMediaAudio.createMediaAudio(url);
+      const cmpMediaAudioId = cmpMediaAudio.id;
+
+      // Create Media
+      const cmpMedia = await CmpMedia.createMedia(
+        'audio',
+        null,
+        null,
+        cmpMediaAudioId,
+        null,
+        null,
+        null,
+      );
+      const mappedCmpMedia = mapMedia(cmpMedia);
+      return Promise.resolve(mappedCmpMedia);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaVideo = async (url, caption) => {
+    try {
+      const { CmpMedia, CmpMediaVideo } = container.databaseService.accessors;
+
+      // Create Media Text
+      const cmpMediaVideo = await CmpMediaVideo.createMediaVideo(url, caption);
+      const cmpMediaVideoId = cmpMediaVideo.id;
+
+      // Create Media
+      const cmpMedia = await CmpMedia.createMedia(
+        'video',
+        null,
+        null,
+        null,
+        cmpMediaVideoId,
+        null,
+        null,
+      );
+      const mappedCmpMedia = mapMedia(cmpMedia);
+      return Promise.resolve(mappedCmpMedia);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaFile = async (url, caption, fileName) => {
+    try {
+      const { CmpMedia, CmpMediaFile } = container.databaseService.accessors;
+
+      // Create Media Text
+      const cmpMediaFile = await CmpMediaFile.createMediaFile(url, caption, fileName);
+      const cmpMediaFileId = cmpMediaFile.id;
+
+      // Create Media
+      const cmpMedia = await CmpMedia.createMedia(
+        'file',
+        null,
+        null,
+        null,
+        null,
+        cmpMediaFileId,
+        null,
+      );
+      const mappedCmpMedia = mapMedia(cmpMedia);
+      return Promise.resolve(mappedCmpMedia);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaLocation = async (
+    latitude, longitude, name, address,
+  ) => {
+    try {
+      const { CmpMedia, CmpMediaLocation } = container.databaseService.accessors;
+
+      // Create Media Text
+      const cmpMediaLocation = await CmpMediaLocation.createMediaLocation(
+        latitude, longitude, name, address,
+      );
+      const cmpMediaLocationId = cmpMediaLocation.id;
+
+      // Create Media
+      const cmpMedia = await CmpMedia.createMedia(
+        'location',
+        null,
+        null,
+        null,
+        null,
+        null,
+        cmpMediaLocationId,
+      );
+      const mappedCmpMedia = mapMedia(cmpMedia);
+      return Promise.resolve(mappedCmpMedia);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -45,29 +222,8 @@ export default (container) => {
     try {
       const { CmpMedia } = container.databaseService.accessors;
       const cmpMedia = await CmpMedia.readMedia(cmpMediaId);
-      return Promise.resolve(cmpMedia);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const updateMedia = async (cmpMediaId, changes) => {
-    try {
-      const { CmpMedia } = container.databaseService.accessors;
-      const cmpMedia = await CmpMedia.updateMedia(
-        cmpMediaId, changes,
-      );
-      return Promise.resolve(cmpMedia);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const updateMedias = async (criteria, changes) => {
-    try {
-      const { CmpMedia } = container.databaseService.accessors;
-      const cmpMedias = await CmpMedia.updateMedias(criteria, changes);
-      return Promise.resolve(cmpMedias);
+      const mappedCmpMedia = mapMedia(cmpMedia);
+      return Promise.resolve(mappedCmpMedia);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -77,7 +233,8 @@ export default (container) => {
     try {
       const { CmpMedia } = container.databaseService.accessors;
       const cmpMedia = await CmpMedia.deleteMedia(cmpMediaId);
-      return Promise.resolve(cmpMedia);
+      const mappedCmpMedia = mapMedia(cmpMedia);
+      return Promise.resolve(mappedCmpMedia);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -87,7 +244,8 @@ export default (container) => {
     try {
       const { CmpMedia } = container.databaseService.accessors;
       const cmpMedias = await CmpMedia.deleteMedias(criteria);
-      return Promise.resolve(cmpMedias);
+      const mappedCmpMedias = cmpMedias.map(mapMedia);
+      return Promise.resolve(mappedCmpMedias);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -99,9 +257,6 @@ export default (container) => {
 
     createMedia,
     readMedia,
-
-    updateMedia,
-    updateMedias,
 
     deleteMedia,
     deleteMedias,

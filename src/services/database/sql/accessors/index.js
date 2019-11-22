@@ -9,6 +9,13 @@ import CmpParameter from './cmpparameter';
 import CmpRecord from './cmprecord';
 import CmpCampaign from './cmpcampaign';
 
+import CmpMediaText from './cmpmediatext';
+import CmpMediaImage from './cmpmediaimage';
+import CmpMediaAudio from './cmpmediaaudio';
+import CmpMediaVideo from './cmpmediavideo';
+import CmpMediaFile from './cmpmediafile';
+import CmpMediaLocation from './cmpmedialocation';
+
 export default container => ({
   User: User(container),
   UserRole: UserRole(container),
@@ -20,4 +27,11 @@ export default container => ({
   CmpParameter: CmpParameter(container),
   CmpRecord: CmpRecord(container),
   CmpCampaign: CmpCampaign(container),
+
+  CmpMediaText: CmpMediaText(container),
+  CmpMediaImage: CmpMediaImage(container),
+  CmpMediaAudio: CmpMediaAudio(container),
+  CmpMediaVideo: CmpMediaVideo(container),
+  CmpMediaFile: CmpMediaFile(container),
+  CmpMediaLocation: CmpMediaLocation(container),
 });

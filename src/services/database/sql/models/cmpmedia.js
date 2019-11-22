@@ -10,37 +10,28 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       default: 'text',
     },
-    text: {
-      type: DataTypes.STRING(5000),
-      allowNull: true,
-      default: 'No Media',
-    },
-    url: {
-      type: DataTypes.STRING(1000),
+    cmpMediaTextId: {
+      type: DataTypes.STRING(45),
       allowNull: true,
     },
-    caption: {
-      type: DataTypes.STRING(2000),
+    cmpMediaImageId: {
+      type: DataTypes.STRING(45),
       allowNull: true,
     },
-    fileName: {
-      type: DataTypes.STRING(1000),
+    cmpMediaAudioId: {
+      type: DataTypes.STRING(45),
       allowNull: true,
     },
-    latitude: {
-      type: DataTypes.DECIMAL(9, 5),
+    cmpMediaVideoId: {
+      type: DataTypes.STRING(45),
       allowNull: true,
     },
-    longitude: {
-      type: DataTypes.DECIMAL(9, 5),
+    cmpMediaFileId: {
+      type: DataTypes.STRING(45),
       allowNull: true,
     },
-    name: {
-      type: DataTypes.STRING(100),
-      allowNull: true,
-    },
-    address: {
-      type: DataTypes.STRING(1000),
+    cmpMediaLocationId: {
+      type: DataTypes.STRING(45),
       allowNull: true,
     },
     deleted: {
@@ -54,6 +45,12 @@ module.exports = (sequelize, DataTypes) => {
 
   CmpMedia.associate = (models) => {
     // associations can be defined here
+    CmpMedia.belongsTo(models.CmpMediaText, { foreignKey: 'cmpMediaTextId', as: 'cmpMediaText' });
+    CmpMedia.belongsTo(models.CmpMediaImage, { foreignKey: 'cmpMediaImageId', as: 'cmpMediaImage' });
+    CmpMedia.belongsTo(models.CmpMediaAudio, { foreignKey: 'cmpMediaAudioId', as: 'cmpMediaAudio' });
+    CmpMedia.belongsTo(models.CmpMediaVideo, { foreignKey: 'cmpMediaVideoId', as: 'cmpMediaVideo' });
+    CmpMedia.belongsTo(models.CmpMediaFile, { foreignKey: 'cmpMediaFileId', as: 'cmpMediaFile' });
+    CmpMedia.belongsTo(models.CmpMediaLocation, { foreignKey: 'cmpMediaLocationId', as: 'cmpMediaLocation' });
   };
 
   return CmpMedia;

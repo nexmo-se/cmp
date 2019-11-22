@@ -14,6 +14,7 @@ import jsonwebtoken from 'jsonwebtoken';
 import AuthenticationError from '../errors/authError';
 import ForbiddenError from '../errors/forbiddenError';
 import NotFoundError from '../errors/notFoundError';
+import BadRequestError from '../errors/badRequestError';
 
 import NexmoService from '../services/nexmo';
 import SocketIoService from '../services/socketIO';
@@ -58,6 +59,7 @@ container.jsonwebtoken = jsonwebtoken;
 container.AuthenticationError = AuthenticationError;
 container.NotFoundError = NotFoundError;
 container.ForbiddenError = ForbiddenError;
+container.BadRequestError = BadRequestError;
 
 // Core Service
 container.authenticator = Authenticator(container);
