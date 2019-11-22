@@ -35,13 +35,14 @@ export default (container) => {
   const createParameter = async (req, res, next) => {
     try {
       const {
+        cmpRecordId,
         parameter,
         order,
       } = req.body;
       const { CmpParameter } = container.persistenceService;
 
       const cmpParameter = await CmpParameter.createParameter(
-        parameter, order,
+        cmpRecordId, parameter, order,
       );
       res.status(200).json(cmpParameter);
     } catch (error) {
