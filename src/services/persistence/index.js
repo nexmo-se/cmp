@@ -5,6 +5,8 @@ import CmpChannel from './cmpChannel';
 import CmpTemplate from './cmpTemplate';
 import CmpMedia from './cmpMedia';
 import CmpParameter from './cmpParameter';
+import CmpRecord from './cmpRecord';
+import CmpCampaign from './cmpCampaign';
 
 export default container => ({
   User: User(container),
@@ -14,4 +16,6 @@ export default container => ({
   CmpTemplate: CmpTemplate(container),
   CmpMedia: CmpMedia(container),
   CmpParameter: CmpParameter(container),
+  CmpRecord: CmpRecord(container),
+  CmpCampaign: CmpCampaign(container),
 });
