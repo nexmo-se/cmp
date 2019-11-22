@@ -9,6 +9,7 @@ import MediaRouter from './cmpmedia';
 import CampaignRouter from './cmpcampaign';
 import RecordRouter from './cmprecord';
 import WebhookRouter from './webhook';
+import cmpmedia from './cmpmedia';
 
 export default (container) => {
   const { L } = container.defaultLogger('Root Router');
@@ -52,26 +53,45 @@ export default (container) => {
   );
 
   router.get(
-    '/test',
+    '/test/:id',
     async (req, res, next) => {
       try {
-        const { CmpTemplate } = container.persistenceService;
-        const template = await CmpTemplate.readTemplate('a0a33d37-ec8e-4bc0-ac9c-a40f7714e190', false);
-        const { mediaType, body, cmpChannel } = template;
-        const { senderId, cmpApiKey } = cmpChannel;
+        const { CmpRecord } = container.persistenceService;
+        const { id } = req.params;
+        const record = await CmpRecord.readRecord(id, false);
+        const {
+          recipient, cmpTemplate, cmpParameters, cmpMedia,
+        } = record;
+        const { type } = cmpmedia || {};
+        const {
+          whatsappTemplateNamespace, whatsappTemplateName, body, cmpChannel,
+        } = cmpTemplate;
+        const {
+          channel, senderId, cmpApiKey, cmpApplication,
+        } = cmpChannel;
+        const { applicationId, privateKey } = cmpApplication || {};
         const { apiKey, apiSecret } = cmpApiKey;
 
-        const to = '6583206274';
-        const parameters = [
-          'Kopitech',
-          '1234',
-          '5 minutes',
-        ];
+        let result;
+        if (channel === 'sms') {
+          const parameters = cmpParameters
+            .sort((a, b) => a.order - b.order)
+            .map(cmpParameter => cmpParameter.parameter);
+          const text = container.templateService.getText(body, parameters);
+          result = await container.nexmoService.sms.sendText(
+            recipient, text, 'text', senderId, apiKey, apiSecret,
+          );
+        } else if (channel === 'whatsapp') {
+          const parameters = cmpParameters
+            .sort((a, b) => a.order - b.order)
+            .map(cmpParameter => cmpParameter.parameter);
+          result = await container.nexmoService.whatsapp.sendTemplate(
+            senderId, recipient, whatsappTemplateNamespace, whatsappTemplateName,
+            type || 'text', cmpMedia, parameters, `rec_${id}`,
+            applicationId, privateKey,
+          );
+        }
 
-        const text = container.templateService.getText(body, parameters);
-        const result = await container.nexmoService.sms.sendText(
-          to, text, mediaType, senderId, apiKey, apiSecret,
-        );
         res.status(200).json(result);
       } catch (error) {
         next(error);
