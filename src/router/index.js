@@ -9,7 +9,7 @@ import MediaRouter from './cmpmedia';
 import CampaignRouter from './cmpcampaign';
 import RecordRouter from './cmprecord';
 import WebhookRouter from './webhook';
-import cmpmedia from './cmpmedia';
+import BlasterRouter from './blaster';
 
 export default (container) => {
   const { L } = container.defaultLogger('Root Router');
@@ -27,6 +27,7 @@ export default (container) => {
   router.use('/media', MediaRouter(container));
   router.use('/campaigns', CampaignRouter(container));
   router.use('/records', RecordRouter(container));
+  router.use('/blaster', BlasterRouter(container));
   router.use('/webhook', WebhookRouter(container));
 
   router.get(
@@ -62,7 +63,7 @@ export default (container) => {
         const {
           recipient, cmpTemplate, cmpParameters, cmpMedia,
         } = record;
-        const { type } = cmpmedia || {};
+        const { type } = cmpMedia || {};
         const {
           whatsappTemplateNamespace, whatsappTemplateName, body, cmpChannel,
         } = cmpTemplate;
