@@ -10,6 +10,7 @@ import joi from 'joi';
 import uuid from 'uuid/v4';
 import bcrypt from 'bcrypt';
 import jsonwebtoken from 'jsonwebtoken';
+import nexmo from 'nexmo';
 
 import AuthenticationError from '../errors/authError';
 import ForbiddenError from '../errors/forbiddenError';
@@ -54,6 +55,7 @@ container.Sequelize = Sequelize;
 container.uuid = uuid;
 container.bcrypt = bcrypt;
 container.jsonwebtoken = jsonwebtoken;
+container.nexmo = nexmo;
 
 // Errors
 container.AuthenticationError = AuthenticationError;
