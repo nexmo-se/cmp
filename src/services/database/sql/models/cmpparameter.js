@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       primaryKey: true,
     },
+    cmpRecordId: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
     parameter: {
       type: DataTypes.STRING(5000),
       allowNull: false,
@@ -24,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
 
   CmpParameter.associate = (models) => {
     // associations can be defined here
+    CmpParameter.belongsTo(models.CmpRecord, { foreignKey: 'cmpRecordId', as: 'cmpRecord' });
   };
 
   return CmpParameter;

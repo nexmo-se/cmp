@@ -66,6 +66,7 @@ export default (container) => {
       const {
         CmpApiKey, CmpApplication, CmpChannel, CmpTemplate,
       } = container.databaseService.models;
+      console.log(Object.keys(container.databaseService.models));
       const query = {
         where: criteria,
         include: [

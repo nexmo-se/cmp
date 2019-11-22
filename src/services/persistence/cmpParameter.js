@@ -12,12 +12,14 @@ export default (container) => {
   };
 
   const createParameter = async (
+    cmpRecordId,
     parameter,
     order,
   ) => {
     try {
       const { CmpParameter } = container.databaseService.accessors;
       const cmpParameter = await CmpParameter.createParameter(
+        cmpRecordId,
         parameter,
         order,
       );

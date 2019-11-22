@@ -5,6 +5,10 @@ module.exports = {
       allowNull: false,
       primaryKey: true,
     },
+    cmpRecordId: {
+      type: Sequelize.STRING(45),
+      allowNull: false,
+    },
     parameter: {
       type: Sequelize.STRING(5000),
       allowNull: false,

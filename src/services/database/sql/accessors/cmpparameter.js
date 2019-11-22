@@ -136,6 +136,7 @@ export default (container) => {
   };
 
   const createParameter = async (
+    cmpRecordId,
     parameter,
     order,
   ) => {
@@ -143,6 +144,7 @@ export default (container) => {
       const { CmpParameter } = container.databaseService.models;
       const rawCmpParameter = await CmpParameter.create({
         id: container.uuid(),
+        cmpRecordId,
         parameter,
         order,
         deleted: false,
