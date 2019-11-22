@@ -73,7 +73,7 @@ export default (container) => {
   ) => {
     try {
       const url = getUrl();
-      const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
+      const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
       const contentBody = getMediaContentBody(mediaType, media);
 
       const config = {

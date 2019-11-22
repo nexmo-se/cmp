@@ -16,7 +16,7 @@ export default (container) => {
   ) => {
     try {
       const url = getUrl();
-      const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
+      const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
 
       const config = {
         headers: {
@@ -62,7 +62,7 @@ export default (container) => {
   ) => {
     try {
       const url = getUrl();
-      const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
+      const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
 
       const config = {
         headers: {
@@ -111,7 +111,7 @@ export default (container) => {
   ) => {
     try {
       const url = getUrl();
-      const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
+      const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
 
       const config = {
         headers: {

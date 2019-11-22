@@ -13,26 +13,36 @@ export default (container) => {
     },
   };
 
-  const getSystemJwt = (applicationId, privateKey) => {
-    const privateKeyBuffer = Buffer.from(privateKey);
-    const jwt = container.nexmo.generateJwt(privateKeyBuffer, {
-      application_id: applicationId,
-    });
+  const getSystemJwt = async (applicationId, privateKey) => {
+    try {
+      const decodedPrivateKey = await container.base64Service.decode(privateKey);
+      const privateKeyBuffer = Buffer.from(decodedPrivateKey);
+      const jwt = container.nexmo.generateJwt(privateKeyBuffer, {
+        application_id: applicationId,
+      });
 
-    return jwt;
+      return Promise.resolve(jwt);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   };
 
-  const getUserJwt = (username, applicationId, privateKey) => {
-    const expiry = new Date().getTime() + 86400;
-    const privateKeyBuffer = Buffer.from(privateKey);
-    const jwt = container.nexmo.generateJwt(privateKeyBuffer, {
-      application_id: applicationId,
-      sub: username,
-      exp: expiry,
-      acl,
-    });
+  const getUserJwt = async (username, applicationId, privateKey) => {
+    try {
+      const expiry = new Date().getTime() + 86400;
+      const decodedPrivateKey = await container.base64Service.decode(privateKey);
+      const privateKeyBuffer = Buffer.from(decodedPrivateKey);
+      const jwt = container.nexmo.generateJwt(privateKeyBuffer, {
+        application_id: applicationId,
+        sub: username,
+        exp: expiry,
+        acl,
+      });
 
-    return jwt;
+      return Promise.resolve(jwt);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   };
 
   return {

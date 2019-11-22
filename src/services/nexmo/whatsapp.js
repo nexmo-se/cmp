@@ -32,7 +32,7 @@ export default (container) => {
     try {
       const url = getUrl();
       const senderId = getFromNumber(from);
-      const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
+      const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
 
       const config = {
         headers: {
@@ -99,7 +99,7 @@ export default (container) => {
     try {
       const url = getUrl();
       const senderId = getFromNumber(from);
-      const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
+      const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
 
       const config = {
         headers: {
@@ -223,7 +223,7 @@ export default (container) => {
     try {
       const url = getUrl();
       const senderId = getFromNumber(from);
-      const jwt = container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
+      const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
       const mediaParameter = getMediaParameter(mediaType, media);
 
       const config = {
