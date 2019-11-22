@@ -51,7 +51,7 @@ module.exports = (sequelize, DataTypes) => {
 
   CmpCampaign.associate = (models) => {
     // associations can be defined here
-    CmpCampaign.hasMany(models.CmpRecord, { foreignKey: 'cmpRecordId', as: 'cmpRecords' });
+    CmpCampaign.hasMany(models.CmpRecord, { foreignKey: 'cmpCampaignId', as: 'cmpRecords' });
   };
 
   return CmpCampaign;

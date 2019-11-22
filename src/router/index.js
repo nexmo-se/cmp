@@ -4,8 +4,10 @@ import ApiKeyRouter from './cmpapikey';
 import ApplicationRouter from './cmpapplication';
 import ChannelRouter from './cmpchannel';
 import TemplateRouter from './cmptemplate';
+import ParameterRouter from './cmpparameter';
 import MediaRouter from './cmpmedia';
 import CampaignRouter from './cmpcampaign';
+import RecordRouter from './cmprecord';
 import WebhookRouter from './webhook';
 
 export default (container) => {
@@ -20,8 +22,10 @@ export default (container) => {
   router.use('/applications', ApplicationRouter(container));
   router.use('/channels', ChannelRouter(container));
   router.use('/templates', TemplateRouter(container));
+  router.use('/parameters', ParameterRouter(container));
   router.use('/media', MediaRouter(container));
   router.use('/campaigns', CampaignRouter(container));
+  router.use('/records', RecordRouter(container));
   router.use('/webhook', WebhookRouter(container));
 
   router.get(

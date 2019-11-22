@@ -1,10 +1,10 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Record Persistence Accessor');
 
-  const listRecords = async () => {
+  const listRecords = async (excludeSecret = true) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecords = await CmpRecord.listRecords();
+      const cmpRecords = await CmpRecord.listRecords(excludeSecret);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
@@ -14,7 +14,7 @@ export default (container) => {
   const createRecord = async (
     recipient,
     cmpCampaignId,
-    cmpChannelId,
+    cmpTemplateId,
     cmpMediaId,
     activeStartHour,
     activeStartMinute,
@@ -22,13 +22,14 @@ export default (container) => {
     activeEndMinute,
     activeOnWeekends,
     timezone,
+    excludeSecret = true,
   ) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
       const cmpRecord = await CmpRecord.createRecord(
         recipient,
         cmpCampaignId,
-        cmpChannelId,
+        cmpTemplateId,
         cmpMediaId,
         activeStartHour,
         activeStartMinute,
@@ -36,6 +37,7 @@ export default (container) => {
         activeEndMinute,
         activeOnWeekends,
         timezone,
+        excludeSecret,
       );
       return Promise.resolve(cmpRecord);
     } catch (error) {
@@ -43,21 +45,21 @@ export default (container) => {
     }
   };
 
-  const readRecord = async (cmpRecordId) => {
+  const readRecord = async (cmpRecordId, excludeSecret = true) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecord = await CmpRecord.readRecord(cmpRecordId);
+      const cmpRecord = await CmpRecord.readRecord(cmpRecordId, excludeSecret);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateRecord = async (cmpRecordId, changes) => {
+  const updateRecord = async (cmpRecordId, changes, excludeSecret = true) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
       const cmpRecord = await CmpRecord.updateRecord(
-        cmpRecordId, changes,
+        cmpRecordId, changes, excludeSecret,
       );
       return Promise.resolve(cmpRecord);
     } catch (error) {
@@ -65,30 +67,30 @@ export default (container) => {
     }
   };
 
-  const updateRecords = async (criteria, changes) => {
+  const updateRecords = async (criteria, changes, excludeSecret = true) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecords = await CmpRecord.updateRecords(criteria, changes);
+      const cmpRecords = await CmpRecord.updateRecords(criteria, changes, excludeSecret);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteRecord = async (cmpRecordId) => {
+  const deleteRecord = async (cmpRecordId, excludeSecret = true) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecord = await CmpRecord.deleteRecord(cmpRecordId);
+      const cmpRecord = await CmpRecord.deleteRecord(cmpRecordId, excludeSecret);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteRecords = async (criteria) => {
+  const deleteRecords = async (criteria, excludeSecret = true) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecords = await CmpRecord.deleteRecords(criteria);
+      const cmpRecords = await CmpRecord.deleteRecords(criteria, excludeSecret);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);

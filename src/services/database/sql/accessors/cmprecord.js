@@ -1,10 +1,11 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Record Model Accessor');
 
-  const getById = async (cmpRecordId, excludeDeleted = true) => {
+  const getById = async (cmpRecordId, excludeSecret = true, excludeDeleted = true) => {
     try {
       const {
-        CmpRecord, CmpCampaign, CmpChannel, CmpMedia, CmpParameter,
+        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia,
+        CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
       } = container.databaseService.models;
       const query = {
         where: {
@@ -21,13 +22,44 @@ export default (container) => {
             required: false,
           },
           {
-            model: CmpChannel,
-            as: 'cmpChannel',
-            foreignKey: 'cmpChannelId',
+            model: CmpTemplate,
+            as: 'cmpTemplate',
+            foreignKey: 'cmpTemplateId',
             where: {
               deleted: false,
             },
             required: false,
+            include: [
+              {
+                model: CmpChannel,
+                as: 'cmpChannel',
+                foreignKey: 'cmpChannelId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+                include: [
+                  {
+                    model: CmpApplication,
+                    as: 'cmpApplication',
+                    foreignKey: 'cmpApplicationId',
+                    where: {
+                      deleted: false,
+                    },
+                    required: false,
+                  },
+                  {
+                    model: CmpApiKey,
+                    as: 'cmpApiKey',
+                    foreignKey: 'cmpApiKeyId',
+                    where: {
+                      deleted: false,
+                    },
+                    required: false,
+                  },
+                ],
+              },
+            ],
           },
           {
             model: CmpMedia,
@@ -61,17 +93,18 @@ export default (container) => {
         return Promise.resolve(null);
       }
 
-      const cmpRecord = mapCmpRecord(rawCmpRecord);
+      const cmpRecord = mapCmpRecord(rawCmpRecord, excludeSecret);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
       const {
-        CmpRecord, CmpCampaign, CmpChannel, CmpMedia, CmpParameter,
+        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia,
+        CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
       } = container.databaseService.models;
       const query = {
         where: criteria,
@@ -86,13 +119,44 @@ export default (container) => {
             required: false,
           },
           {
-            model: CmpChannel,
-            as: 'cmpChannel',
-            foreignKey: 'cmpChannelId',
+            model: CmpTemplate,
+            as: 'cmpTemplate',
+            foreignKey: 'cmpTemplateId',
             where: {
               deleted: false,
             },
             required: false,
+            include: [
+              {
+                model: CmpChannel,
+                as: 'cmpChannel',
+                foreignKey: 'cmpChannelId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+                include: [
+                  {
+                    model: CmpApplication,
+                    as: 'cmpApplication',
+                    foreignKey: 'cmpApplicationId',
+                    where: {
+                      deleted: false,
+                    },
+                    required: false,
+                  },
+                  {
+                    model: CmpApiKey,
+                    as: 'cmpApiKey',
+                    foreignKey: 'cmpApiKeyId',
+                    where: {
+                      deleted: false,
+                    },
+                    required: false,
+                  },
+                ],
+              },
+            ],
           },
           {
             model: CmpMedia,
@@ -122,16 +186,16 @@ export default (container) => {
 
       const rawCmpRecords = await CmpRecord.findAll(query);
       const cmpRecords = rawCmpRecords
-        .map(cmpRecord => mapCmpRecord(cmpRecord));
+        .map(cmpRecord => mapCmpRecord(cmpRecord, excludeSecret));
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getOneByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpRecords = await getByCriteria(criteria, excludeDeleted);
+      const cmpRecords = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       if (cmpRecords == null || cmpRecords.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -145,7 +209,7 @@ export default (container) => {
   };
 
   const updateById = async (
-    cmpRecordId, changes = {}, excludeDeleted = true,
+    cmpRecordId, changes = {}, excludeSecret = true, excludeDeleted = true,
   ) => {
     try {
       const { CmpRecord } = container.databaseService.models;
@@ -163,7 +227,7 @@ export default (container) => {
       const result = await CmpRecord.update(changes, query);
       L.debug('CmpRecord Update Result', result);
 
-      const cmpRecord = await getById(cmpRecordId, excludeDeleted);
+      const cmpRecord = await getById(cmpRecordId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
@@ -171,7 +235,7 @@ export default (container) => {
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludeDeleted = true,
+    criteria = {}, changes = {}, excludeSecret = true, excludeDeleted = true,
   ) => {
     try {
       const { CmpRecord } = container.databaseService.models;
@@ -185,31 +249,124 @@ export default (container) => {
       const result = await CmpRecord.update(changes, query);
       L.debug('CmpRecord Update Result', result);
 
-      const cmpRecords = await getByCriteria(criteria, excludeDeleted);
+      const cmpRecords = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const mapCmpCampaign = (cmpCampaign) => {
+  const mapCmpApplication = (cmpApplication, excludeSecret = true) => {
+    const mappedCmpApplication = cmpApplication.dataValues;
 
+    if (excludeSecret) {
+      delete mappedCmpApplication.privateKey;
+    }
+
+    delete mappedCmpApplication.deleted;
+    delete mappedCmpApplication.createdAt;
+    delete mappedCmpApplication.updatedAt;
+
+    return mappedCmpApplication;
   };
 
-  const mapCmpChannel = (cmpChannel) => {
+  const mapCmpApiKey = (cmpApiKey, excludeSecret = true) => {
+    const mappedCmpApiKey = cmpApiKey.dataValues;
 
+    if (excludeSecret) {
+      delete mappedCmpApiKey.apiSecret;
+    }
+
+    delete mappedCmpApiKey.deleted;
+    delete mappedCmpApiKey.createdAt;
+    delete mappedCmpApiKey.updatedAt;
+
+    return mappedCmpApiKey;
+  };
+
+  const mapCmpChannel = (cmpChannel, excludeSecret = true) => {
+    const mappedCmpChannel = cmpChannel.dataValues;
+
+    if (mappedCmpChannel.cmpApiKey) {
+      mappedCmpChannel.cmpApiKey = mapCmpApiKey(
+        mappedCmpChannel.cmpApiKey, excludeSecret,
+      );
+    }
+
+    if (mappedCmpChannel.cmpApplication) {
+      mappedCmpChannel.cmpApplication = mapCmpApplication(
+        mappedCmpChannel.cmpApplication, excludeSecret,
+      );
+    }
+
+    delete mappedCmpChannel.deleted;
+    delete mappedCmpChannel.createdAt;
+    delete mappedCmpChannel.updatedAt;
+
+    return mappedCmpChannel;
+  };
+
+  const mapCmpTemplate = (cmpTemplate, excludeSecret = true) => {
+    const mappedCmpTemplate = cmpTemplate.dataValues;
+
+    if (mappedCmpTemplate.cmpChannel) {
+      mappedCmpTemplate.cmpChannel = mapCmpChannel(
+        mappedCmpTemplate.cmpChannel, excludeSecret,
+      );
+    }
+
+    delete mappedCmpTemplate.deleted;
+    delete mappedCmpTemplate.createdAt;
+    delete mappedCmpTemplate.updatedAt;
+
+    return mappedCmpTemplate;
+  };
+
+  const mapCmpCampaign = (cmpCampaign) => {
+    const mappedCmpCampaign = cmpCampaign.dataValues;
+
+    delete mappedCmpCampaign.deleted;
+    delete mappedCmpCampaign.createdAt;
+    delete mappedCmpCampaign.updatedAt;
+
+    return mappedCmpCampaign;
   };
 
   const mapCmpMedia = (cmpMedia) => {
+    const mappedCmpMedia = cmpMedia.dataValues;
 
+    delete mappedCmpMedia.deleted;
+    delete mappedCmpMedia.createdAt;
+    delete mappedCmpMedia.updatedAt;
+
+    return mappedCmpMedia;
   };
 
   const mapCmpParameter = (cmpParameter) => {
+    const mappedCmpParameter = cmpParameter.dataValues;
 
+    delete mappedCmpParameter.deleted;
+    delete mappedCmpParameter.createdAt;
+    delete mappedCmpParameter.updatedAt;
+
+    return mappedCmpParameter;
   };
 
-  const mapCmpRecord = (cmpRecord) => {
+  const mapCmpRecord = (cmpRecord, excludeSecret = true) => {
     const mappedCmpRecord = cmpRecord.dataValues;
+
+    if (mappedCmpRecord.cmpCampaign) {
+      mappedCmpRecord.cmpCampaign = mapCmpCampaign(mappedCmpRecord.cmpCampaign);
+    }
+    if (mappedCmpRecord.cmpMedia) {
+      mappedCmpRecord.cmpMedia = mapCmpMedia(mappedCmpRecord.cmpMedia);
+    }
+    if (mappedCmpRecord.cmpTemplate) {
+      mappedCmpRecord.cmpTemplate = mapCmpTemplate(mappedCmpRecord.cmpTemplate, excludeSecret);
+    }
+    if (mappedCmpRecord.cmpParameters) {
+      mappedCmpRecord.cmpParameters = mappedCmpRecord.cmpParameters.map(mapCmpParameter);
+    }
 
     delete mappedCmpRecord.deleted;
     delete mappedCmpRecord.createdAt;
@@ -218,9 +375,9 @@ export default (container) => {
     return mappedCmpRecord;
   };
 
-  const listRecords = async () => {
+  const listRecords = async (excludeSecret = true) => {
     try {
-      const cmpRecords = await getByCriteria({}, true);
+      const cmpRecords = await getByCriteria({}, excludeSecret, true);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
@@ -230,7 +387,7 @@ export default (container) => {
   const createRecord = async (
     recipient,
     cmpCampaignId,
-    cmpChannelId,
+    cmpTemplateId,
     cmpMediaId,
     activeStartHour,
     activeStartMinute,
@@ -238,6 +395,7 @@ export default (container) => {
     activeEndMinute,
     activeOnWeekends,
     timezone,
+    excludeSecret = true,
   ) => {
     try {
       const { CmpRecord } = container.databaseService.models;
@@ -245,7 +403,7 @@ export default (container) => {
         id: container.uuid(),
         recipient,
         cmpCampaignId,
-        cmpChannelId,
+        cmpTemplateId,
         cmpMediaId,
         activeStartHour,
         activeStartMinute,
@@ -258,72 +416,72 @@ export default (container) => {
         deleted: false,
       });
 
-      const cmpRecord = mapCmpRecord(rawCmpRecord);
+      const cmpRecord = mapCmpRecord(rawCmpRecord, excludeSecret);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const readRecord = async (cmpRecordId) => {
+  const readRecord = async (cmpRecordId, excludeSecret = true) => {
     try {
-      const cmpRecord = await getById(cmpRecordId, false);
+      const cmpRecord = await getById(cmpRecordId, excludeSecret, false);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateRecord = async (cmpRecordId, changes) => {
+  const updateRecord = async (cmpRecordId, changes, excludeSecret = true) => {
     try {
-      const cmpRecord = await updateById(cmpRecordId, changes, true);
+      const cmpRecord = await updateById(cmpRecordId, changes, excludeSecret, true);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateRecords = async (criteria, changes) => {
+  const updateRecords = async (criteria, changes, excludeSecret = true) => {
     try {
-      const cmpRecords = await updateByCriteria(criteria, changes, true);
+      const cmpRecords = await updateByCriteria(criteria, changes, excludeSecret, true);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteRecord = async (cmpRecordId) => {
+  const deleteRecord = async (cmpRecordId, excludeSecret = true) => {
     try {
       const changes = { deleted: true };
-      const cmpRecord = await updateById(cmpRecordId, changes, true);
+      const cmpRecord = await updateById(cmpRecordId, changes, excludeSecret, true);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteRecords = async (criteria = {}) => {
+  const deleteRecords = async (criteria = {}, excludeSecret = true) => {
     try {
       const changes = { deleted: true };
-      const cmpRecords = await updateByCriteria(criteria, changes, true);
+      const cmpRecords = await updateByCriteria(criteria, changes, excludeSecret, true);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findRecord = async (criteria = {}, excludeDeleted = true) => {
+  const findRecord = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpRecord = await getOneByCriteria(criteria, excludeDeleted);
+      const cmpRecord = await getOneByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findRecords = async (criteria = {}, excludeDeleted = true) => {
+  const findRecords = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpRecords = await getByCriteria(criteria, excludeDeleted);
+      const cmpRecords = await getByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);

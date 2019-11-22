@@ -38,7 +38,7 @@ module.exports = {
       allowNull: true,
     },
     activeOnWeekends: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.BOOLEAN,
       allowNull: true,
     },
     timezone: {
@@ -49,12 +49,12 @@ module.exports = {
       type: Sequelize.DATE,
       allowNull: true,
     },
-    latestStatus: {
+    status: {
       type: Sequelize.STRING(45),
       allowNull: false,
       default: 'draft',
     },
-    latestStatusTime: {
+    statusTime: {
       type: Sequelize.DATE,
       allowNull: false,
     },
