@@ -4,7 +4,7 @@ export default (container) => {
   const listAllRecords = async (req, res, next) => {
     try {
       const { CmpRecord } = container.persistenceService;
-      const cmpRecords = await CmpRecord.listRecords(false);
+      const cmpRecords = await CmpRecord.listRecords();
       res.status(200).json(cmpRecords);
     } catch (error) {
       next(error);
