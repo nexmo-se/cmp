@@ -6,7 +6,7 @@ export default (container) => {
       const {
         CmpMedia, CmpMediaText, CmpMediaImage,
         CmpMediaAudio, CmpMediaVideo, CmpMediaFile,
-        CmpMediaLocation,
+        CmpMediaLocation, CmpMediaViberTemplate,
       } = container.databaseService.models;
       const query = {
         where: {
@@ -67,6 +67,15 @@ export default (container) => {
             },
             required: false,
           },
+          {
+            model: CmpMediaViberTemplate,
+            as: 'cmpMediaViberTemplate',
+            foreignKey: 'cmpMediaViberTemplateId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
         ],
       };
 
@@ -93,7 +102,7 @@ export default (container) => {
       const {
         CmpMedia, CmpMediaText, CmpMediaImage,
         CmpMediaAudio, CmpMediaVideo, CmpMediaFile,
-        CmpMediaLocation,
+        CmpMediaLocation, CmpMediaViberTemplate,
       } = container.databaseService.models;
       const query = {
         where: criteria,
@@ -147,6 +156,15 @@ export default (container) => {
             model: CmpMediaLocation,
             as: 'cmpMediaLocation',
             foreignKey: 'cmpMediaLocationId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpMediaViberTemplate,
+            as: 'cmpMediaViberTemplate',
+            foreignKey: 'cmpMediaViberTemplateId',
             where: {
               deleted: false,
             },
@@ -292,6 +310,16 @@ export default (container) => {
     return mappedCmpMediaLocation;
   };
 
+  const mapCmpMediaViberTemplate = (cmpMediaViberTemplate) => {
+    const mappedCmpMediaViberTemplate = cmpMediaViberTemplate.dataValues;
+
+    delete mappedCmpMediaViberTemplate.deleted;
+    delete mappedCmpMediaViberTemplate.createdAt;
+    delete mappedCmpMediaViberTemplate.updatedAt;
+
+    return mappedCmpMediaViberTemplate;
+  };
+
   const mapCmpMedia = (cmpMedia) => {
     const mappedCmpMedia = cmpMedia.dataValues;
 
@@ -312,6 +340,11 @@ export default (container) => {
     }
     if (mappedCmpMedia.cmpMediaLocation) {
       mappedCmpMedia.cmpMediaLocation = mapCmpMediaLocation(mappedCmpMedia.cmpMediaLocation);
+    }
+    if (mappedCmpMedia.cmpMediaViberTemplate) {
+      mappedCmpMedia.cmpMediaViberTemplate = mapCmpMediaViberTemplate(
+        mappedCmpMedia.cmpMediaViberTemplate,
+      );
     }
     delete mappedCmpMedia.deleted;
     delete mappedCmpMedia.createdAt;
@@ -337,6 +370,7 @@ export default (container) => {
     cmpMediaVideoId,
     cmpMediaFileId,
     cmpMediaLocationId,
+    cmpMediaViberTemplateId,
   ) => {
     try {
       const { CmpMedia } = container.databaseService.models;
@@ -349,6 +383,7 @@ export default (container) => {
         cmpMediaVideoId,
         cmpMediaFileId,
         cmpMediaLocationId,
+        cmpMediaViberTemplateId,
         deleted: false,
       });
 

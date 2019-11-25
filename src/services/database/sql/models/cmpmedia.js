@@ -34,6 +34,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(45),
       allowNull: true,
     },
+    cmpMediaViberTemplateId: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
     deleted: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -51,6 +55,7 @@ module.exports = (sequelize, DataTypes) => {
     CmpMedia.belongsTo(models.CmpMediaVideo, { foreignKey: 'cmpMediaVideoId', as: 'cmpMediaVideo' });
     CmpMedia.belongsTo(models.CmpMediaFile, { foreignKey: 'cmpMediaFileId', as: 'cmpMediaFile' });
     CmpMedia.belongsTo(models.CmpMediaLocation, { foreignKey: 'cmpMediaLocationId', as: 'cmpMediaLocation' });
+    CmpMedia.belongsTo(models.CmpMediaViberTemplate, { foreignKey: 'cmpMediaViberTemplateId', as: 'cmpMediaViberTemplate' });
   };
 
   return CmpMedia;

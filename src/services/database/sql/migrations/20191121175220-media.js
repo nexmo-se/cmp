@@ -35,6 +35,10 @@ module.exports = {
         type: Sequelize.STRING(45),
         allowNull: true,
       },
+      cmpMediaViberTemplateId: {
+        type: Sequelize.STRING(45),
+        allowNull: true,
+      },
       deleted: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
@@ -224,6 +228,39 @@ module.exports = {
       },
     });
 
+    const createMediaViberTemplateTable = () => queryInterface.createTable('CmpMediaViberTemplates', {
+      id: {
+        type: Sequelize.STRING(45),
+        allowNull: false,
+        primaryKey: true,
+      },
+      url: {
+        type: Sequelize.STRING(1000),
+        allowNull: false,
+      },
+      caption: {
+        type: Sequelize.STRING(2000),
+        allowNull: true,
+      },
+      actionUrl: {
+        type: Sequelize.STRING(1000),
+        allowNull: true,
+      },
+      deleted: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        default: false,
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+    });
+
     return Promise.resolve()
       .then(createMediaTextTable)
       .then(createMediaImageTable)
@@ -231,6 +268,7 @@ module.exports = {
       .then(createMediaVideoTable)
       .then(createMediaFileTable)
       .then(createMediaLocationTable)
+      .then(createMediaViberTemplateTable)
       .then(createMediaTable);
   },
   down: (queryInterface) => {
@@ -241,6 +279,7 @@ module.exports = {
     const dropMediaVideoTable = () => queryInterface.dropTable('CmpMediaVideos');
     const dropMediaFileTable = () => queryInterface.dropTable('CmpMediaFiles');
     const dropMediaLocationTable = () => queryInterface.dropTable('CmpMediaLocations');
+    const dropMediaViberTemplateTable = () => queryInterface.dropTable('CmpMediaViberTemplates');
 
     return Promise.resolve()
       .then(dropMediaTable)
@@ -249,6 +288,7 @@ module.exports = {
       .then(dropMediaAudioTable)
       .then(dropMediaVideoTable)
       .then(dropMediaFileTable)
-      .then(dropMediaLocationTable);
+      .then(dropMediaLocationTable)
+      .then(dropMediaViberTemplateTable);
   },
 };

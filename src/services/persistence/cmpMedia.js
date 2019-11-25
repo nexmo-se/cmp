@@ -15,6 +15,8 @@ export default (container) => {
       mediaData = media.cmpMediaFile;
     } else if (media.mediaType === 'location') {
       mediaData = media.cmpMediaLocation;
+    } else if (media.mediaType === 'viber_template') {
+      mediaData = media.cmpMediaViberTemplate;
     }
 
     console.log(mediaData);
@@ -38,7 +40,7 @@ export default (container) => {
   };
 
   const createMedia = async (
-    type, text, url, caption, fileName, latitude, longitude, name, address,
+    type, text, url, caption, fileName, latitude, longitude, name, address, actionUrl,
   ) => {
     try {
       let media;
@@ -54,6 +56,8 @@ export default (container) => {
         media = await createMediaFile(url, caption, fileName);
       } else if (type === 'location') {
         media = await createMediaLocation(latitude, longitude, name, address);
+      } else if (type === 'viber_template') {
+        media = await createMediaViberTemplate(url, caption, actionUrl);
       } else {
         throw new container.BadRequestError('Unknown Media Type');
       }
@@ -76,6 +80,7 @@ export default (container) => {
       const cmpMedia = await CmpMedia.createMedia(
         'text',
         cmpMediaTextId,
+        null,
         null,
         null,
         null,
@@ -106,6 +111,7 @@ export default (container) => {
         null,
         null,
         null,
+        null,
       );
       const mappedCmpMedia = mapMedia(cmpMedia);
       return Promise.resolve(mappedCmpMedia);
@@ -128,6 +134,7 @@ export default (container) => {
         null,
         null,
         cmpMediaAudioId,
+        null,
         null,
         null,
         null,
@@ -156,6 +163,7 @@ export default (container) => {
         cmpMediaVideoId,
         null,
         null,
+        null,
       );
       const mappedCmpMedia = mapMedia(cmpMedia);
       return Promise.resolve(mappedCmpMedia);
@@ -180,6 +188,7 @@ export default (container) => {
         null,
         null,
         cmpMediaFileId,
+        null,
         null,
       );
       const mappedCmpMedia = mapMedia(cmpMedia);
@@ -210,6 +219,35 @@ export default (container) => {
         null,
         null,
         cmpMediaLocationId,
+        null,
+      );
+      const mappedCmpMedia = mapMedia(cmpMedia);
+      return Promise.resolve(mappedCmpMedia);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaViberTemplate = async (url, caption, actionUrl) => {
+    try {
+      const { CmpMedia, CmpMediaViberTemplate } = container.databaseService.accessors;
+
+      // Create Media Text
+      const cmpMediaViberTemplate = await CmpMediaViberTemplate.createMediaViberTemplate(
+        url, caption, actionUrl,
+      );
+      const cmpMediaViberTemplateId = cmpMediaViberTemplate.id;
+
+      // Create Media
+      const cmpMedia = await CmpMedia.createMedia(
+        'viber_template',
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        cmpMediaViberTemplateId,
       );
       const mappedCmpMedia = mapMedia(cmpMedia);
       return Promise.resolve(mappedCmpMedia);
