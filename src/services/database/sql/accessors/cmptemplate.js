@@ -274,6 +274,7 @@ export default (container) => {
         cmpChannelId,
         whatsappTemplateNamespace,
         whatsappTemplateName,
+        viberTtl,
         facebookTag,
         category,
         mediaType,

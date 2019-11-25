@@ -29,6 +29,7 @@ export default {
         longitude: Joi.number(),
         name: Joi.string(),
         address: Joi.string(),
+        actionUrl: Joi.string(),
       }),
       cmpParameters: Joi.array().items(Joi.string().min(1)),
       activeStartHour: Joi.number().integer()
@@ -69,6 +70,7 @@ export default {
         longitude: Joi.number(),
         name: Joi.string(),
         address: Joi.string(),
+        actionUrl: Joi.string(),
       }),
       cmpParameters: Joi.array().items(Joi.string().min(1)),
       activeStartHour: Joi.number().integer()

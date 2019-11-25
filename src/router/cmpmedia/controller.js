@@ -35,12 +35,12 @@ export default (container) => {
   const createMedia = async (req, res, next) => {
     try {
       const {
-        type, text, url, caption, fileName, latitude, longitude, name, address,
+        type, text, url, caption, fileName, latitude, longitude, name, address, actionUrl,
       } = req.body;
       const { CmpMedia } = container.persistenceService;
 
       const cmpMedia = await CmpMedia.createMedia(
-        type, text, url, caption, fileName, latitude, longitude, name, address,
+        type, text, url, caption, fileName, latitude, longitude, name, address, actionUrl,
       );
       res.status(200).json(cmpMedia);
     } catch (error) {

@@ -72,12 +72,12 @@ export default (container) => {
   const createMedia = async (media) => {
     try {
       const {
-        type, text, url, caption, fileName, latitude, longitude, name, address,
+        type, text, url, caption, fileName, latitude, longitude, name, address, actionUrl,
       } = media;
       const { CmpMedia } = container.persistenceService;
 
       const cmpMedia = await CmpMedia.createMedia(
-        type, text, url, caption, fileName, latitude, longitude, name, address,
+        type, text, url, caption, fileName, latitude, longitude, name, address, actionUrl,
       );
       return Promise.resolve(cmpMedia);
     } catch (error) {

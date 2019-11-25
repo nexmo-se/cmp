@@ -24,6 +24,7 @@ export default {
       longitude: Joi.number(),
       name: Joi.string(),
       address: Joi.string(),
+      actionUrl: Joi.string(),
     },
   },
   readMedia: {

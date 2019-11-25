@@ -39,13 +39,24 @@ export default (container) => {
         cmpChannelId,
         whatsappTemplateNamespace,
         whatsappTemplateName,
+        viberTtl,
+        facebookTag,
+        category,
         mediaType,
         body,
       } = req.body;
       const { CmpTemplate } = container.persistenceService;
 
       const cmpApiKey = await CmpTemplate.createTemplate(
-        name, cmpChannelId, whatsappTemplateNamespace, whatsappTemplateName, mediaType, body,
+        name,
+        cmpChannelId,
+        whatsappTemplateNamespace,
+        whatsappTemplateName,
+        viberTtl,
+        facebookTag,
+        category,
+        mediaType,
+        body,
       );
       res.status(200).json(cmpApiKey);
     } catch (error) {
