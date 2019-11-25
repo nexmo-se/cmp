@@ -22,6 +22,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(500),
       allowNull: true,
     },
+    viberTtl: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    facebookTag: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
+    category: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
     mediaType: {
       type: DataTypes.STRING(45),
       allowNull: false,
