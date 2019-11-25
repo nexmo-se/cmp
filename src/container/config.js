@@ -9,6 +9,10 @@ export default {
   hash: {
     saltRounds: parseInt(process.env.HASH_SALT_ROUNDS || '10', 10),
   },
+  blaster: {
+    secondsPerBatch: parseInt(process.env.SECONDS_PER_BATCH || '5', 10),
+    recordsPerBatch: parseInt(process.env.RECORDS_PER_BATCH || '30', 10),
+  },
   nexmo: {
     host: process.env.NEXMO_API,
     restHost: process.env.NEXMO_REST_API,

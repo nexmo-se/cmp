@@ -1,5 +1,8 @@
 export default (container) => {
-  const sendText = async (to, text, type, senderId, apiKey, apiSecret) => {
+  const sendText = async (
+    to, text, type, senderId,
+    apiKey, apiSecret,
+    axios = container.axios) => {
     try {
       const { restHost } = container.config.nexmo;
 
@@ -13,7 +16,7 @@ export default (container) => {
         type,
       };
 
-      const response = await container.axios.post(url, body);
+      const response = await axios.post(url, body);
       const { data } = response;
       return Promise.resolve(data);
     } catch (error) {
