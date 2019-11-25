@@ -6,6 +6,14 @@ export default {
     params: {},
     body: {},
   },
+  listActiveRecords: {
+    query: {
+      limit: Joi.number().integer().default(30),
+      time: Joi.date(),
+    },
+    params: {},
+    body: {},
+  },
   deleteAllRecords: {
     query: {},
     params: {},

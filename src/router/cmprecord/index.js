@@ -33,6 +33,14 @@ export default (container) => {
       controller.deleteAllRecords,
     );
 
+  router.route('/active')
+    .get(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.listActiveRecords),
+      controller.listActiveRecords,
+    );
+
   router.route('/batch')
     .post(
       checkAuthentication,

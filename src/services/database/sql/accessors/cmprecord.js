@@ -1,7 +1,9 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Record Model Accessor');
 
-  const getById = async (cmpRecordId, excludeSecret = true, excludeDeleted = true) => {
+  const getById = async (
+    cmpRecordId, excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
       const {
         CmpRecord, CmpCampaign, CmpTemplate, CmpMedia,
@@ -100,7 +102,12 @@ export default (container) => {
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const getByCriteria = async (
+    criteria = {},
+    limit,
+    offset,
+    excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
       const {
         CmpRecord, CmpCampaign, CmpTemplate, CmpMedia,
@@ -108,6 +115,8 @@ export default (container) => {
       } = container.databaseService.models;
       const query = {
         where: criteria,
+        limit,
+        offset,
         include: [
           {
             model: CmpCampaign,
@@ -193,9 +202,12 @@ export default (container) => {
     }
   };
 
-  const getOneByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const getOneByCriteria = async (
+    criteria = {}, offset,
+    excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
-      const cmpRecords = await getByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpRecords = await getByCriteria(criteria, null, offset, excludeSecret, excludeDeleted);
       if (cmpRecords == null || cmpRecords.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -249,7 +261,7 @@ export default (container) => {
       const result = await CmpRecord.update(changes, query);
       L.debug('CmpRecord Update Result', result);
 
-      const cmpRecords = await getByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpRecords = await getByCriteria(criteria, null, null, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
@@ -375,9 +387,9 @@ export default (container) => {
     return mappedCmpRecord;
   };
 
-  const listRecords = async (excludeSecret = true) => {
+  const listRecords = async (limit, offset, excludeSecret = true) => {
     try {
-      const cmpRecords = await getByCriteria({}, excludeSecret, true);
+      const cmpRecords = await getByCriteria({}, limit, offset, excludeSecret, true);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
@@ -470,18 +482,159 @@ export default (container) => {
     }
   };
 
-  const findRecord = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const findRecord = async (criteria = {}, offset, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpRecord = await getOneByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpRecord = await getOneByCriteria(criteria, offset, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findRecords = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const findRecords = async (
+    criteria = {},
+    limit, offset,
+    excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
-      const cmpRecords = await getByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpRecords = await getByCriteria(
+        criteria, limit, offset, excludeSecret, excludeDeleted,
+      );
+      return Promise.resolve(cmpRecords);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const getActiveRecords = async (
+    limit, currentTime,
+    excludeSecret = true,
+  ) => {
+    try {
+      const {
+        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia,
+        CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
+      } = container.databaseService.models;
+
+      const { Op } = container.Sequelize;
+      const currentHour = currentTime.getHours();
+      const currentMinute = currentTime.getMinutes();
+      const currentDay = currentTime.getDay();
+
+      const query = {
+        where: {
+          [Op.or]: [
+            {
+              activeStartHour: {
+                [Op.lt]: currentHour,
+              },
+              activeEndHour: {
+                [Op.gt]: currentHour,
+              },
+            },
+            {
+              activeStartHour: currentHour,
+              activeStartMinute: {
+                [Op.lte]: currentMinute,
+              },
+            },
+            {
+              activeEndHour: currentHour,
+              activeEndMinute: {
+                [Op.gt]: currentMinute,
+              },
+            },
+          ],
+          status: 'pending',
+          deleted: false,
+        },
+        limit,
+        include: [
+          {
+            model: CmpCampaign,
+            as: 'cmpCampaign',
+            foreignKey: 'cmpCampaignId',
+            where: {
+              campaignStartDate: {
+                [Op.lte]: currentTime,
+              },
+              campaignEndDate: {
+                [Op.gt]: currentTime,
+              },
+              status: 'pending',
+              deleted: false,
+            },
+            required: true,
+          },
+          {
+            model: CmpTemplate,
+            as: 'cmpTemplate',
+            foreignKey: 'cmpTemplateId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+            include: [
+              {
+                model: CmpChannel,
+                as: 'cmpChannel',
+                foreignKey: 'cmpChannelId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+                include: [
+                  {
+                    model: CmpApplication,
+                    as: 'cmpApplication',
+                    foreignKey: 'cmpApplicationId',
+                    where: {
+                      deleted: false,
+                    },
+                    required: false,
+                  },
+                  {
+                    model: CmpApiKey,
+                    as: 'cmpApiKey',
+                    foreignKey: 'cmpApiKeyId',
+                    where: {
+                      deleted: false,
+                    },
+                    required: false,
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: CmpMedia,
+            as: 'cmpMedia',
+            foreignKey: 'cmpMediaId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpParameter,
+            as: 'cmpParameters',
+            foreignKey: 'cmpParameterId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+        ],
+      };
+
+      if (currentDay === 0 || currentDay === 6) {
+        // Check Weekend
+        query.where.activeOnWeekends = true;
+      }
+
+      const rawCmpRecords = await CmpRecord.findAll(query);
+      const cmpRecords = rawCmpRecords
+        .map(cmpRecord => mapCmpRecord(cmpRecord, excludeSecret));
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
@@ -490,6 +643,7 @@ export default (container) => {
 
   return {
     listRecords,
+    getActiveRecords,
 
     createRecord,
     readRecord,

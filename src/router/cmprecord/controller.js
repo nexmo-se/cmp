@@ -22,6 +22,18 @@ export default (container) => {
     }
   };
 
+  const listActiveRecords = async (req, res, next) => {
+    try {
+      const numberOfRecords = req.query.limit;
+      const currentTime = req.query.time ? new Date(req.query.time) : new Date();
+      const { CmpRecord } = container.persistenceService;
+      const cmpRecords = await CmpRecord.getActiveRecords(numberOfRecords, currentTime, true);
+      res.status(200).json(cmpRecords);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   const deleteAllRecords = async (req, res, next) => {
     try {
       const { CmpRecord } = container.persistenceService;
@@ -206,6 +218,7 @@ export default (container) => {
   return {
     listAllRecords,
     listMyRecords,
+    listActiveRecords,
     deleteAllRecords,
 
     createRecordBatch,

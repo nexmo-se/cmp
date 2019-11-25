@@ -1,10 +1,24 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Record Persistence Accessor');
 
-  const listRecords = async (excludeSecret = true) => {
+  const listRecords = async (limit, offset, excludeSecret = true) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecords = await CmpRecord.listRecords(excludeSecret);
+      const cmpRecords = await CmpRecord.listRecords(limit, offset, excludeSecret);
+      return Promise.resolve(cmpRecords);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const getActiveRecords = async (numberOfRecords, currentTime, excludeSecret = true) => {
+    try {
+      console.log(numberOfRecords);
+      console.log(currentTime);
+      const { CmpRecord } = container.databaseService.accessors;
+      const cmpRecords = await CmpRecord.getActiveRecords(
+        numberOfRecords, currentTime, excludeSecret,
+      );
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
@@ -100,6 +114,7 @@ export default (container) => {
 
   return {
     listRecords,
+    getActiveRecords,
 
     createRecord,
     readRecord,
