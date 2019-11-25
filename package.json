@@ -10,7 +10,9 @@
   "scripts": {
     "start": "NODE_ENV=production node build",
     "trigger": "NODE_ENV=production node build/runIndex.js",
+    "blast": "NODE_ENV=production node build/blastIndex.js",
     "dev": "NODE_ENV=development nodemon --exec babel-node src",
+    "devBlast": "NODE_ENV=development babel-node src/blastIndex.js",
     "devTrigger": "NODE_ENV=development babel-node src/runIndex.js",
     "clean": "rm -rf build",
     "debug": "nodemon --inspect --exec babel-node src",

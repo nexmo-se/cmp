@@ -18,6 +18,8 @@ import ForbiddenError from '../errors/forbiddenError';
 import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
 
+import BlasterProcess from '../processes/blaster';
+
 import NexmoService from '../services/nexmo';
 import SocketIoService from '../services/socketIO';
 import DatabaseService from '../services/database';
@@ -83,5 +85,8 @@ container.authService = AuthService(container);
 container.persistenceService = PersistenceService(container);
 container.templateService = TemplateService(container);
 container.rateLimiterService = RateLimiterService(container);
+
+// Process
+container.blasterProcess = BlasterProcess(container);
 
 export default container;
