@@ -4,6 +4,7 @@ npm-debug.log
 logs/
 build/
 output/
+xcmp/
 
 output.zip
 xcmp.zip
