@@ -19,10 +19,17 @@
     "initDb": "sequelize-cli init",
     "migrate": "sequelize-cli db:migrate",
     "seed": "sequelize-cli db:seed:all",
-    "build": "npm run clean && babel src -s -D -d build",
+    "build": "npm run clean && babel src -D -d build",
     "test": "mocha \"./{,!(node_modules)/**/}*.test.js\" --require babel-polyfill --require esm",
     "decodePrivateKey": "echo $KEY_PRIVATE_KEY | base64 --decode > private.key",
-    "heroku-postbuild": "npm run decodePrivateKey && npm run build"
+    "heroku-postbuild": "npm run decodePrivateKey && npm run build",
+    "distributeClean" : "rm -rf output",
+    "bundleServer": "nexe build/index.js -o \"output/server\" -r \"build/**/*\" --verbose",
+    "bundleBlaster": "nexe build/blastIndex.js -o \"output/blaster\" -r \"build/**/*\" --verbose",
+    "bundle": "npm run bundleServer && npm run bundleBlaster",
+    "copyEssentialFiles": "cp package.json output/package.json",
+    "zip": "zip -r -X output.zip output",
+    "distribute": "npm run distributeClean && npm run build && npm run bundle && npm run copyEssentialFiles && npm run zip"
   },
   "author": "Yee Hui Poh <yhpoh91@gmail.com>",
   "license": "ISC",
@@ -75,8 +82,13 @@
     "esm": "^3.2.25",
     "jest": "^24.1.0",
     "mocha": "^6.0.1",
+    "nexe": "^3.3.2",
     "nodemon": "^1.18.10",
     "regenerator-runtime": "^0.13.2",
     "sequelize-cli": "^5.5.1"
+  },
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "assets": "views/**/*"
   }
 }

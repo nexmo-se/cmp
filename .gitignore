@@ -3,7 +3,9 @@ npm-debug.log
 .DS_Store
 logs/
 build/
+output/
 
+output.zip
 .env
 private.key
 vcmp.key
