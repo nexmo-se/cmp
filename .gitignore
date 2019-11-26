@@ -6,6 +6,7 @@ build/
 output/
 
 output.zip
+xcmp.zip
 .env
 private.key
 vcmp.key

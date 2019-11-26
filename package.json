@@ -1,7 +1,7 @@
 {
-  "name": "vcmp",
+  "name": "xcmp",
   "version": "0.0.1",
-  "description": "Vonage Campaign Management Portal",
+  "description": "Campaign Management Portal",
   "main": "index.js",
   "entry": [
     "regenerator-runtime/runtime",
@@ -23,12 +23,15 @@
     "test": "mocha \"./{,!(node_modules)/**/}*.test.js\" --require babel-polyfill --require esm",
     "decodePrivateKey": "echo $KEY_PRIVATE_KEY | base64 --decode > private.key",
     "heroku-postbuild": "npm run decodePrivateKey && npm run build",
-    "distributeClean" : "rm -rf output",
     "bundleServer": "nexe build/index.js -o \"output/server\" -r \"build/**/*\" --verbose",
     "bundleBlaster": "nexe build/blastIndex.js -o \"output/blaster\" -r \"build/**/*\" --verbose",
     "bundle": "npm run bundleServer && npm run bundleBlaster",
-    "copyEssentialFiles": "cp package.json output/package.json",
-    "zip": "zip -r -X output.zip output",
+    "copyPackageJson": "cp package.json output/package.json",
+    "copyEnvExample": "cp .env.example output/.env.example",
+    "copyReadme": "cp README.md output/README-dist.md",
+    "copyEssentialFiles": "npm run copyPackageJson && npm run copyEnvExample && npm run copyReadme",
+    "zip": "zip -r -X xcmp.zip output",
+    "distributeClean" : "rm -rf output && rm -rf xcmp.zip",
     "distribute": "npm run distributeClean && npm run build && npm run bundle && npm run copyEssentialFiles && npm run zip"
   },
   "author": "Yee Hui Poh <yhpoh91@gmail.com>",
@@ -87,8 +90,4 @@
     "regenerator-runtime": "^0.13.2",
     "sequelize-cli": "^5.5.1"
   },
-  "pkg": {
-    "scripts": "build/**/*.js",
-    "assets": "views/**/*"
-  }
 }

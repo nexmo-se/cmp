@@ -2,23 +2,25 @@
 Campaign Management Portal
 
 # Installation
-Install required softwares: `nodejs`, `npm`, `git`
+Install required softwares: `nodejs`, `npm`
 
-Clone this repo:
+Unzip
 ```
-$ git clone git@github.com:nexmo-se/vcmp.git
+unzip xcmp.zip
 ```
+
+Get into the directory
+```
+cd xcmp
+```
+
 Install required dependencies: 
 ```
 npm install
 ```
 
-Setup `.env` according to `.env.example` (For Local Development Use only)
+Setup `.env` according to `.env.example`
 
-Build production server (babel transpile)
-```
-npm run build
-```
 
 # Initializing Database
 To initialize the database to initial state:
@@ -38,7 +40,7 @@ npm run seed
 
 4. Database is now seeded and ready for use.
 
-# System Admin User (Initial User)
+# Seeding the System Admin User (Initial User)
 On initializing the database via seeding, a user (`sysadmin`) with the following roles is created:
 
 - `user`
@@ -58,10 +60,11 @@ Additional admin accounts are to be created for regular use.
 
 Do NOT use the `sysadmin` account for regular usage of the application.
 
-# Starting the Server
-#### Production
-The built production server can be started by running `npm start`.
+# Starting the Application
+#### Web Server
+The server can be started by running `./server`.
 
-#### Development
-The development version of the server that uses `babel-node` can be started by running `npm run dev`.
-This server will run with nodemon, meaning that any changes to the server code will trigger a restart automatically on save.
+#### Blaster Process
+The blaster process can be started by running `./blaster`
+
+Note: You may want to run both the server and the blaster in the background using `pm2`.
