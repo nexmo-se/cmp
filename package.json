@@ -28,7 +28,7 @@
     "bundle": "npm run bundleServer && npm run bundleBlaster",
     "copyPackageJson": "cp package.json output/package.json",
     "copyEnvExample": "cp .env.example output/.env.example",
-    "copyReadme": "cp README.md output/README-dist.md",
+    "copyReadme": "cp README-dist.md output/README.md",
     "copyEssentialFiles": "npm run copyPackageJson && npm run copyEnvExample && npm run copyReadme",
     "zip": "zip -r -X xcmp.zip output",
     "distributeClean" : "rm -rf output && rm -rf xcmp.zip",
