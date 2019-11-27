@@ -87,7 +87,9 @@ export default (container) => {
       const result = await container.nexmoService.sms.sendText(
         recipient, text, 'text', senderId, apiKey, apiSecret, axios,
       );
-      return Promise.resolve(result);
+
+      const messageIds = result.messages.map(message => message['message-id']);
+      return Promise.resolve(messageIds);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -112,7 +114,8 @@ export default (container) => {
         applicationId, privateKey, axios,
       );
 
-      return Promise.resolve(result);
+      const messageIds = [result.message_uuid];
+      return Promise.resolve(messageIds);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -159,7 +162,8 @@ export default (container) => {
         );
       }
 
-      return Promise.resolve(result);
+      const messageIds = [result.message_uuid];
+      return Promise.resolve(messageIds);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -191,7 +195,8 @@ export default (container) => {
         applicationId, privateKey, axios,
       );
 
-      return Promise.resolve(result);
+      const messageIds = [result.message_uuid];
+      return Promise.resolve(messageIds);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -202,10 +207,10 @@ export default (container) => {
     try {
       const { cmpTemplate } = record;
       const { cmpChannel } = cmpTemplate;
-      const { id, channel, tps } = cmpChannel;
+      const { channel, tps } = cmpChannel;
 
       const startTime = new Date().getTime();
-      const axios = container.rateLimiterService.getAxios(id, channel, tps);
+      const axios = container.rateLimiterService.getAxios(cmpChannel.id, channel, tps);
 
       let result;
       if (channel === 'sms') {
@@ -224,6 +229,7 @@ export default (container) => {
       L.debug(`Time Taken (Blast Record - ${record.id}): ${duration}ms`);
 
       await updateRecordSendTime(record);
+      // await createRecordMessages(record, result);
       return Promise.resolve(result);
     } catch (error) {
       return Promise.reject(error);

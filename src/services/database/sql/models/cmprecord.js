@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       primaryKey: true,
     },
+    messageId: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
     recipient: {
       type: DataTypes.STRING(100),
       allowNull: false,
