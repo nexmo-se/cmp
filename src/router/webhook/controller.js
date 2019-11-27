@@ -1,5 +1,5 @@
 export default (container) => {
-  const { L } = container.defaultLogger('ExampleDemo Controller');
+  const { L } = container.defaultLogger('Webhook Controller');
   const getUserId = (req) => {
     const nexmoIni = container.utils.getIniStuff();
     const bearerToken = container.utils.getBearerToken(req);
@@ -54,9 +54,26 @@ export default (container) => {
     }
   };
 
+  const updateRecordMessage = async (messageId, status) => {
+    try {
+      const { CmpRecordMessage } = container.persistenceService;
+      const criteria = {
+        messageId,
+      };
+      const changes = {
+        status,
+        statusTime: new Date(),
+      };
+      const recordMessages = await CmpRecordMessage.updateRecordMessages(criteria, changes);
+      return Promise.resolve(recordMessages);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const smsInbound = async (req, res, next) => {
     try {
-      L.debug('Demo SMS Inbound');
+      L.debug('SMS Inbound');
       L.debug(req.params);
       L.debug(req.body);
       L.debug(req.query);
@@ -71,12 +88,15 @@ export default (container) => {
 
   const smsDelivery = async (req, res, next) => {
     try {
-      L.debug('Demo SMS Delivery');
+      L.debug('SMS Delivery');
       L.debug(req.params);
       L.debug(req.body);
       L.debug(req.query);
       const combined = Object.assign({}, req.body || {}, req.query || {});
       L.debug(combined);
+
+      const { messageId, status } = combined;
+      await updateRecordMessage(messageId, status);
 
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
@@ -86,7 +106,7 @@ export default (container) => {
 
   const vapiAnswer = async (req, res, next) => {
     try {
-      L.debug('Demo VAPI Answer');
+      L.debug('VAPI Answer');
       L.debug(req.params);
       L.debug(req.body);
 
@@ -104,7 +124,7 @@ export default (container) => {
 
   const vapiFallbackAnswer = async (req, res, next) => {
     try {
-      L.debug('Demo VAPI Fallback Answer');
+      L.debug('VAPI Fallback Answer');
       L.debug(req.params);
       L.debug(req.body);
 
@@ -122,7 +142,7 @@ export default (container) => {
 
   const vapiEvent = async (req, res, next) => {
     try {
-      L.debug('Demo VAPI Event');
+      L.debug('VAPI Event');
       L.debug(req.params);
       L.debug(req.body);
 
@@ -140,7 +160,7 @@ export default (container) => {
 
   const mapiInbound = async (req, res, next) => {
     try {
-      L.debug('Demo MAPI Inbound');
+      L.debug('MAPI Inbound');
       L.debug(req.params);
       L.debug(req.body);
       res.status(container.httpStatus.OK).send('ok');
@@ -151,9 +171,13 @@ export default (container) => {
 
   const mapiStatus = async (req, res, next) => {
     try {
-      L.debug('Demo MAPI Status');
+      L.debug('MAPI Status');
       L.debug(req.params);
       L.debug(req.body);
+
+      const { status } = req.body;
+      const messageId = req.body.message_uuid;
+      await updateRecordMessage(messageId, status);
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
       next(error);
@@ -162,7 +186,7 @@ export default (container) => {
 
   const rtcEvent = async (req, res, next) => {
     try {
-      L.debug('Demo RTC Event');
+      L.debug('RTC Event');
       L.debug(req.params);
       L.debug(req.body);
       res.status(container.httpStatus.OK).send('ok');

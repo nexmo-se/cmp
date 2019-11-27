@@ -6,7 +6,7 @@ export default (container) => {
   ) => {
     try {
       const {
-        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia,
+        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpRecordMessage,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
       } = container.databaseService.models;
       const query = {
@@ -81,6 +81,15 @@ export default (container) => {
             },
             required: false,
           },
+          {
+            model: CmpRecordMessage,
+            as: 'cmpRecordMessages',
+            foreignKey: 'cmpRecordId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
         ],
       };
 
@@ -110,7 +119,7 @@ export default (container) => {
   ) => {
     try {
       const {
-        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia,
+        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpRecordMessage,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
       } = container.databaseService.models;
       const query = {
@@ -180,6 +189,15 @@ export default (container) => {
             model: CmpParameter,
             as: 'cmpParameters',
             foreignKey: 'cmpParameterId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpRecordMessage,
+            as: 'cmpRecordMessages',
+            foreignKey: 'cmpRecordId',
             where: {
               deleted: false,
             },
@@ -512,7 +530,7 @@ export default (container) => {
   ) => {
     try {
       const {
-        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia,
+        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpRecordMessage,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
       } = container.databaseService.models;
 
@@ -619,6 +637,15 @@ export default (container) => {
             model: CmpParameter,
             as: 'cmpParameters',
             foreignKey: 'cmpParameterId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpRecordMessage,
+            as: 'cmpRecordMessages',
+            foreignKey: 'cmpRecordId',
             where: {
               deleted: false,
             },

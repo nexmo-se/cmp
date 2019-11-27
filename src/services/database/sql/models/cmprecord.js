@@ -5,10 +5,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       primaryKey: true,
     },
-    messageId: {
-      type: DataTypes.STRING(45),
-      allowNull: true,
-    },
     recipient: {
       type: DataTypes.STRING(100),
       allowNull: false,
@@ -78,6 +74,7 @@ module.exports = (sequelize, DataTypes) => {
     CmpRecord.belongsTo(models.CmpTemplate, { foreignKey: 'cmpTemplateId', as: 'cmpTemplate' });
     CmpRecord.hasMany(models.CmpParameter, { foreignKey: 'cmpRecordId', as: 'cmpParameters' });
     CmpRecord.belongsTo(models.CmpCampaign, { foreignKey: 'cmpCampaignId', as: 'cmpCampaign' });
+    CmpRecord.hasMany(models.CmpRecordMessage, { foreignKey: 'cmpRecordId', as: 'cmpRecordMessages' });
   };
 
   return CmpRecord;

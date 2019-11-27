@@ -72,6 +72,26 @@ export default (container) => {
     }
   };
 
+  const createRecordMessage = async (record, messageId) => {
+    try {
+      const { CmpRecordMessage } = container.persistenceService;
+      const recordMessages = await CmpRecordMessage.createRecordMessage(record.id, messageId);
+      return Promise.resolve(recordMessages);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createRecordMessages = async (record, messageIds) => {
+    try {
+      const promises = messageIds.map(messageId => createRecordMessage(record, messageId));
+      const recordMessages = await Promise.all(promises);
+      return Promise.resolve(recordMessages);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const blastSms = async (record, axios) => {
     try {
       const { recipient, cmpTemplate, cmpParameters } = record;
@@ -229,7 +249,7 @@ export default (container) => {
       L.debug(`Time Taken (Blast Record - ${record.id}): ${duration}ms`);
 
       await updateRecordSendTime(record);
-      // await createRecordMessages(record, result);
+      await createRecordMessages(record, result);
       return Promise.resolve(result);
     } catch (error) {
       return Promise.reject(error);

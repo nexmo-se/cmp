@@ -8,6 +8,7 @@ import CmpMedia from './cmpmedia';
 import CmpParameter from './cmpparameter';
 import CmpRecord from './cmprecord';
 import CmpCampaign from './cmpcampaign';
+import CmpRecordMessage from './cmprecordmessage';
 
 import CmpMediaText from './cmpmediatext';
 import CmpMediaImage from './cmpmediaimage';
@@ -27,6 +28,7 @@ export default container => ({
   CmpParameter: CmpParameter(container),
   CmpRecord: CmpRecord(container),
   CmpCampaign: CmpCampaign(container),
+  CmpRecordMessage: CmpRecordMessage(container),
 
   CmpMediaText: CmpMediaText(container),
   CmpMediaImage: CmpMediaImage(container),
