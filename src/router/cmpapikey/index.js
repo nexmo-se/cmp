@@ -33,6 +33,14 @@ export default (container) => {
       controller.deleteAllApiKeys,
     );
 
+  router.route('/:cmpApiKeyId/webhook')
+    .post(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.setWebhook),
+      controller.setWebhook,
+    );
+
   router.route('/:cmpApiKeyId')
     .get(
       checkAuthentication,

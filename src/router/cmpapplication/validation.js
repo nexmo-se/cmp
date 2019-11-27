@@ -1,6 +1,13 @@
 import Joi from 'joi';
 
 export default {
+  setWebhook: {
+    query: {},
+    params: {
+      cmpApplicationId: Joi.string().min(1).required(),
+    },
+    body: {},
+  },
   listApplications: {
     query: {},
     params: {},

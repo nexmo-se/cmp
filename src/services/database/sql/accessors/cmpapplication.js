@@ -3,12 +3,20 @@ export default (container) => {
 
   const getById = async (cmpApplicationId, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const { CmpApplication, CmpChannel } = container.databaseService.models;
+      const { CmpApiKey, CmpApplication, CmpChannel } = container.databaseService.models;
       const query = {
         where: {
           id: cmpApplicationId,
         },
         include: [
+          {
+            model: CmpApiKey,
+            as: 'cmpApiKey',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
           {
             model: CmpChannel,
             as: 'cmpChannels',
@@ -40,10 +48,18 @@ export default (container) => {
 
   const getByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const { CmpApplication, CmpChannel } = container.databaseService.models;
+      const { CmpApiKey, CmpApplication, CmpChannel } = container.databaseService.models;
       const query = {
         where: criteria,
         include: [
+          {
+            model: CmpApiKey,
+            as: 'cmpApiKey',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
           {
             model: CmpChannel,
             as: 'cmpChannels',

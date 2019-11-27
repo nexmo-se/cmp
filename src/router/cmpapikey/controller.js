@@ -1,6 +1,29 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp ApiKey Controller');
 
+  const setWebhook = async (req, res, next) => {
+    try {
+      const { cmpApiKeyId } = req.params;
+      const { CmpApiKey } = container.persistenceService;
+
+      const cmpApiKey = await CmpApiKey.readApiKey(cmpApiKeyId, false);
+      const { apiKey, apiSecret } = cmpApiKey;
+
+      const routes = {
+        inbound: 'webhook/sms/inbound',
+        delivery: 'webhook/sms/delivery',
+      };
+
+      await container.nexmoService.webhook.registerSms(
+        apiKey, apiSecret, routes.inbound, routes.delivery,
+      );
+
+      res.status(200).send('ok');
+    } catch (error) {
+      next(error);
+    }
+  };
+
   const listAllApiKeys = async (req, res, next) => {
     try {
       const { CmpApiKey } = container.persistenceService;
@@ -108,6 +131,8 @@ export default (container) => {
   };
 
   return {
+    setWebhook,
+
     listAllApiKeys,
     listMyApiKeys,
     deleteAllApiKeys,

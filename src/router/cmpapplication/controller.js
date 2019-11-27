@@ -1,6 +1,29 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Application Controller');
 
+  const setWebhook = async (req, res, next) => {
+    try {
+      const { cmpApplicationId } = req.params;
+      const { CmpApplication } = container.persistenceService;
+
+      const cmpApplication = await CmpApplication.readApplication(cmpApplicationId);
+      const { cmpApiKey, applicationId } = cmpApplication;
+      const { apiKey, apiSecret } = cmpApiKey;
+
+      const routes = {
+        inbound: 'webhook/mapi/inbound',
+        status: 'webhook/mapi/status',
+      };
+
+      await container.nexmoService.webhook.registerMapi(
+        apiKey, apiSecret, applicationId, routes.inbound, routes.status,
+      );
+      res.status(200).send('ok');
+    } catch (error) {
+      next(error);
+    }
+  };
+
   const listAllApplications = async (req, res, next) => {
     try {
       const { CmpApplication } = container.persistenceService;
@@ -120,6 +143,8 @@ export default (container) => {
   };
 
   return {
+    setWebhook,
+
     listAllApplications,
     listMyApplications,
     deleteAllApplications,

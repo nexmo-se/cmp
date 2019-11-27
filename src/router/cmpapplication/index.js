@@ -33,6 +33,14 @@ export default (container) => {
       controller.deleteAllApplications,
     );
 
+  router.route('/:cmpApplicationId/webhook')
+    .post(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.setWebhook),
+      controller.setWebhook,
+    );
+
   router.route('/:cmpApplicationId')
     .get(
       checkAuthentication,
