@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       primaryKey: true,
     },
+    cmpRecordMessageId: {
+      type: DataTypes.STRING(45),
+      allowNull: false,
+    },
     messageType: {
       type: DataTypes.STRING(45),
       allowNull: false,
@@ -31,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
     CmpRecordMessageStatusAudit.belongsTo(models.CmpRecordMessageStatusAuditSms, { foreignKey: 'cmpRecordMessageStatusAuditSmsId', as: 'cmpRecordMessageStatusAuditSms' });
     CmpRecordMessageStatusAudit.belongsTo(models.CmpRecordMessageStatusAuditMapi, { foreignKey: 'cmpRecordMessageStatusAuditMapiId', as: 'cmpRecordMessageStatusAuditMapi' });
+    CmpRecordMessageStatusAudit.belongsTo(models.CmpRecordMessage, { foreignKey: 'cmpRecordMessageId', as: 'cmpRecordMessage' });
   };
 
   return CmpRecordMessageStatusAudit;

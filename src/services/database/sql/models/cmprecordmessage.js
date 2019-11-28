@@ -34,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
   CmpRecordMessage.associate = (models) => {
     // associations can be defined here
     CmpRecordMessage.belongsTo(models.CmpRecord, { foreignKey: 'cmpRecordId', as: 'cmpRecord' });
+    CmpRecordMessage.hasMany(models.CmpRecordMessageStatusAudit, { foreignKey: 'cmpRecordMessageId', as: 'cmpRecordMessageStatusAudits' });
   };
 
   return CmpRecordMessage;

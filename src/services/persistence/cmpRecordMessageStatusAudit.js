@@ -32,6 +32,7 @@ export default (container) => {
   };
 
   const createRecordMessageStatusAuditSms = async (
+    cmpRecordMessageId,
     msisdn, to,
     networkCode, messageId,
     price, status,
@@ -39,6 +40,7 @@ export default (container) => {
     messageTimestamp,
   ) => {
     try {
+      L.debug(cmpRecordMessageId);
       const {
         CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditSms,
       } = container.databaseService.accessors;
@@ -57,7 +59,8 @@ export default (container) => {
       // Create RecordMessageStatusAudit
       const cmpRecordMessageStatusAudit = await CmpRecordMessageStatusAudit
         .createRecordMessageStatusAudit(
-          'mapi',
+          cmpRecordMessageId,
+          'sms',
           cmpRMSAuditSmsId,
           null,
         );
@@ -72,6 +75,7 @@ export default (container) => {
   };
 
   const createRecordMessageStatusAuditMapi = async (
+    cmpRecordMessageId,
     messageUuid,
     toType, toId, toNumber,
     fromType, fromId, fromNumber,
@@ -81,6 +85,7 @@ export default (container) => {
     clientRef,
   ) => {
     try {
+      L.debug(cmpRecordMessageId);
       const {
         CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditMapi,
       } = container.databaseService.accessors;
@@ -101,6 +106,7 @@ export default (container) => {
       // Create RecordMessageStatusAudit
       const cmpRecordMessageStatusAudit = await CmpRecordMessageStatusAudit
         .createRecordMessageStatusAudit(
+          cmpRecordMessageId,
           'mapi',
           null,
           cmpRMSAuditMapiId,

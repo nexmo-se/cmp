@@ -216,6 +216,7 @@ export default (container) => {
   };
 
   const createRecordMessageStatusAudit = async (
+    cmpRecordMessageId,
     messageType,
     cmpRecordMessageStatusAuditSmsId,
     cmpRecordMessageStatusAuditMapiId,
@@ -224,6 +225,7 @@ export default (container) => {
       const { CmpRecordMessageStatusAudit } = container.databaseService.models;
       const createdCmpRecordMessageStatusAudit = await CmpRecordMessageStatusAudit.create({
         id: container.uuid(),
+        cmpRecordMessageId,
         messageType,
         cmpRecordMessageStatusAuditSmsId,
         cmpRecordMessageStatusAuditMapiId,

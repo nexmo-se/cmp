@@ -71,8 +71,9 @@ export default (container) => {
     }
   };
 
-  const publishMapiStatusAudit = async (data) => {
+  const publishMapiStatusAudit = async (recordMessage, data) => {
     try {
+      L.debug(recordMessage.id);
       const { CmpRecordMessageStatusAudit } = container.persistenceService;
       const {
         to, from,
@@ -91,6 +92,7 @@ export default (container) => {
       const fromNumber = from.number;
 
       const statusAudit = await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditMapi(
+        recordMessage.id,
         messageUuid,
         toType, toId, toNumber,
         fromType, fromId, fromNumber,
@@ -105,8 +107,9 @@ export default (container) => {
     }
   };
 
-  const publishSmsStatusAudit = async (data) => {
+  const publishSmsStatusAudit = async (recordMessage, data) => {
     try {
+      L.debug(recordMessage.id);
       const { CmpRecordMessageStatusAudit } = container.persistenceService;
       const {
         msisdn, to,
@@ -118,6 +121,7 @@ export default (container) => {
       const messageTimestamp = data['message-timestamp'];
 
       const statusAudit = await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditSms(
+        recordMessage.id,
         msisdn, to,
         networkCode, messageId,
         price, status,
@@ -155,8 +159,15 @@ export default (container) => {
       L.debug(combined);
 
       const { messageId, status } = combined;
-      await updateRecordMessage(messageId, status);
-      await publishSmsStatusAudit(combined);
+      const recordMessages = await updateRecordMessage(messageId, status);
+
+      if (recordMessages.length < 1) {
+        L.info('No Sms Record Message Updated');
+      } else {
+        L.debug('Publishing Sms Status Audit');
+        const recordMessage = recordMessages[0];
+        await publishSmsStatusAudit(recordMessage, combined);
+      }
 
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
@@ -237,8 +248,15 @@ export default (container) => {
 
       const { status } = req.body;
       const messageId = req.body.message_uuid;
-      await updateRecordMessage(messageId, status);
-      await publishMapiStatusAudit(req.body);
+      const recordMessages = await updateRecordMessage(messageId, status);
+
+      if (recordMessages.length < 1) {
+        L.info('No Mapi Record Message Updated');
+      } else {
+        L.debug('Publishing Mapi Status Audit');
+        const recordMessage = recordMessages[0];
+        await publishMapiStatusAudit(recordMessage, req.body);
+      }
 
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
