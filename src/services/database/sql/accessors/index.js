@@ -9,6 +9,7 @@ import CmpParameter from './cmpparameter';
 import CmpRecord from './cmprecord';
 import CmpCampaign from './cmpcampaign';
 import CmpRecordMessage from './cmprecordmessage';
+import CmpRecordMessageStatusAudit from './cmprecordmessagestatusaudit';
 
 import CmpMediaText from './cmpmediatext';
 import CmpMediaImage from './cmpmediaimage';
@@ -16,6 +17,9 @@ import CmpMediaAudio from './cmpmediaaudio';
 import CmpMediaVideo from './cmpmediavideo';
 import CmpMediaFile from './cmpmediafile';
 import CmpMediaLocation from './cmpmedialocation';
+
+import CmpRecordMessageStatusAuditMapi from './cmprecordmessagestatusauditmapi';
+import CmpRecordMessageStatusAuditSms from './cmprecordmessagestatusauditsms';
 
 export default container => ({
   User: User(container),
@@ -29,6 +33,7 @@ export default container => ({
   CmpRecord: CmpRecord(container),
   CmpCampaign: CmpCampaign(container),
   CmpRecordMessage: CmpRecordMessage(container),
+  CmpRecordMessageStatusAudit: CmpRecordMessageStatusAudit(container),
 
   CmpMediaText: CmpMediaText(container),
   CmpMediaImage: CmpMediaImage(container),
@@ -36,4 +41,7 @@ export default container => ({
   CmpMediaVideo: CmpMediaVideo(container),
   CmpMediaFile: CmpMediaFile(container),
   CmpMediaLocation: CmpMediaLocation(container),
+
+  CmpRecordMessageStatusAuditMapi: CmpRecordMessageStatusAuditMapi(container),
+  CmpRecordMessageStatusAuditSms: CmpRecordMessageStatusAuditSms(container),
 });

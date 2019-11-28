@@ -71,6 +71,65 @@ export default (container) => {
     }
   };
 
+  const publishMapiStatusAudit = async (data) => {
+    try {
+      const { CmpRecordMessageStatusAudit } = container.persistenceService;
+      const {
+        to, from,
+        timestamp, status,
+        error, usage,
+      } = data;
+      const messageUuid = data.message_uuid;
+      const clientRef = data.client_ref;
+      const { code, reason } = error || {};
+      const { currency, price } = usage || {};
+      const toType = to.type;
+      const toId = to.id;
+      const toNumber = to.number;
+      const fromType = from.type;
+      const fromId = from.id;
+      const fromNumber = from.number;
+
+      const statusAudit = await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditMapi(
+        messageUuid,
+        toType, toId, toNumber,
+        fromType, fromId, fromNumber,
+        timestamp, status,
+        code, reason,
+        currency, price,
+        clientRef,
+      );
+      return Promise.resolve(statusAudit);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const publishSmsStatusAudit = async (data) => {
+    try {
+      const { CmpRecordMessageStatusAudit } = container.persistenceService;
+      const {
+        msisdn, to,
+        messageId,
+        price, status, scts,
+      } = data;
+      const networkCode = data['network-code'];
+      const errCode = data['err-code'];
+      const messageTimestamp = data['message-timestamp'];
+
+      const statusAudit = await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditSms(
+        msisdn, to,
+        networkCode, messageId,
+        price, status,
+        scts, errCode,
+        messageTimestamp,
+      );
+      return Promise.resolve(statusAudit);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const smsInbound = async (req, res, next) => {
     try {
       L.debug('SMS Inbound');
@@ -97,6 +156,7 @@ export default (container) => {
 
       const { messageId, status } = combined;
       await updateRecordMessage(messageId, status);
+      await publishSmsStatusAudit(combined);
 
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
@@ -178,6 +238,8 @@ export default (container) => {
       const { status } = req.body;
       const messageId = req.body.message_uuid;
       await updateRecordMessage(messageId, status);
+      await publishMapiStatusAudit(req.body);
+
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
       next(error);
