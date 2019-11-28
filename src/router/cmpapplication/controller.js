@@ -1,6 +1,22 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Application Controller');
 
+  const updateWebhook = async (apiKey, apiSecret, applicationId) => {
+    try {
+      const routes = {
+        inbound: 'webhook/mapi/inbound',
+        status: 'webhook/mapi/status',
+      };
+
+      await container.nexmoService.webhook.registerMapi(
+        apiKey, apiSecret, applicationId, routes.inbound, routes.status,
+      );
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const setWebhook = async (req, res, next) => {
     try {
       const { cmpApplicationId } = req.params;
@@ -10,14 +26,7 @@ export default (container) => {
       const { cmpApiKey, applicationId } = cmpApplication;
       const { apiKey, apiSecret } = cmpApiKey;
 
-      const routes = {
-        inbound: 'webhook/mapi/inbound',
-        status: 'webhook/mapi/status',
-      };
-
-      await container.nexmoService.webhook.registerMapi(
-        apiKey, apiSecret, applicationId, routes.inbound, routes.status,
-      );
+      await updateWebhook(apiKey, apiSecret, applicationId);
       res.status(200).send('ok');
     } catch (error) {
       next(error);
@@ -62,10 +71,17 @@ export default (container) => {
       } = req.body;
       const { CmpApplication } = container.persistenceService;
 
-      const cmpApiKey = await CmpApplication.createApplication(
+      const createdCmpApplication = await CmpApplication.createApplication(
         name, cmpApiKeyId, applicationId, privateKey,
       );
-      res.status(200).json(cmpApiKey);
+
+      // Setup Webhook
+      const cmpApplication = CmpApplication.readApplication(createdCmpApplication.id, false);
+      const { cmpApiKey } = cmpApplication;
+      const { apiKey, apiSecret } = cmpApiKey;
+      await updateWebhook(apiKey, apiSecret, applicationId);
+
+      res.status(200).json(createdCmpApplication);
     } catch (error) {
       next(error);
     }
