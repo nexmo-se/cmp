@@ -16,7 +16,7 @@ export default (container) => {
           {
             model: CmpRecordMessageStatusAuditMapi,
             as: 'cmpRecordMessageStatusAuditMapi',
-            foreignKey: 'cmpRecordMessageStatusAudit<apiId',
+            foreignKey: 'cmpRecordMessageStatusAuditMapiId',
             where: {
               deleted: false,
             },

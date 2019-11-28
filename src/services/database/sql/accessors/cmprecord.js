@@ -8,6 +8,8 @@ export default (container) => {
       const {
         CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpRecordMessage,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
+        CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditSms,
+        CmpRecordMessageStatusAuditMapi,
       } = container.databaseService.models;
       const query = {
         where: {
@@ -88,6 +90,37 @@ export default (container) => {
             where: {
               deleted: false,
             },
+            include: [
+              {
+                model: CmpRecordMessageStatusAudit,
+                as: 'cmpRecordMessageStatusAudits',
+                foreignKey: 'cmpRecordMessageId',
+                where: {
+                  deleted: false,
+                },
+                include: [
+                  {
+                    model: CmpRecordMessageStatusAuditMapi,
+                    as: 'cmpRecordMessageStatusAuditMapi',
+                    foreignKey: 'cmpRecordMessageStatusAuditMapiId',
+                    where: {
+                      deleted: false,
+                    },
+                    required: false,
+                  },
+                  {
+                    model: CmpRecordMessageStatusAuditSms,
+                    as: 'cmpRecordMessageStatusAuditSms',
+                    foreignKey: 'cmpRecordMessageStatusAuditSmsId',
+                    where: {
+                      deleted: false,
+                    },
+                    required: false,
+                  },
+                ],
+                required: false,
+              },
+            ],
             required: false,
           },
         ],
@@ -121,6 +154,8 @@ export default (container) => {
       const {
         CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpRecordMessage,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
+        CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditSms,
+        CmpRecordMessageStatusAuditMapi,
       } = container.databaseService.models;
       const query = {
         where: criteria,
@@ -201,6 +236,37 @@ export default (container) => {
             where: {
               deleted: false,
             },
+            include: [
+              {
+                model: CmpRecordMessageStatusAudit,
+                as: 'cmpRecordMessageStatusAudits',
+                foreignKey: 'cmpRecordMessageId',
+                where: {
+                  deleted: false,
+                },
+                include: [
+                  {
+                    model: CmpRecordMessageStatusAuditMapi,
+                    as: 'cmpRecordMessageStatusAuditMapi',
+                    foreignKey: 'cmpRecordMessageStatusAuditMapiId',
+                    where: {
+                      deleted: false,
+                    },
+                    required: false,
+                  },
+                  {
+                    model: CmpRecordMessageStatusAuditSms,
+                    as: 'cmpRecordMessageStatusAuditSms',
+                    foreignKey: 'cmpRecordMessageStatusAuditSmsId',
+                    where: {
+                      deleted: false,
+                    },
+                    required: false,
+                  },
+                ],
+                required: false,
+              },
+            ],
             required: false,
           },
         ],
@@ -362,9 +428,102 @@ export default (container) => {
     return mappedCmpCampaign;
   };
 
+  const mapCmpMediaText = (cmpMediaText) => {
+    const mappedCmpMediaText = cmpMediaText.dataValues;
+
+    delete mappedCmpMediaText.deleted;
+    delete mappedCmpMediaText.createdAt;
+    delete mappedCmpMediaText.updatedAt;
+
+    return mappedCmpMediaText;
+  };
+
+  const mapCmpMediaImage = (cmpMediaImage) => {
+    const mappedCmpMediaImage = cmpMediaImage.dataValues;
+
+    delete mappedCmpMediaImage.deleted;
+    delete mappedCmpMediaImage.createdAt;
+    delete mappedCmpMediaImage.updatedAt;
+
+    return mappedCmpMediaImage;
+  };
+
+  const mapCmpMediaAudio = (cmpMediaAudio) => {
+    const mappedCmpMediaAudio = cmpMediaAudio.dataValues;
+
+    delete mappedCmpMediaAudio.deleted;
+    delete mappedCmpMediaAudio.createdAt;
+    delete mappedCmpMediaAudio.updatedAt;
+
+    return mappedCmpMediaAudio;
+  };
+
+  const mapCmpMediaVideo = (cmpMediaVideo) => {
+    const mappedCmpMediaVideo = cmpMediaVideo.dataValues;
+
+    delete mappedCmpMediaVideo.deleted;
+    delete mappedCmpMediaVideo.createdAt;
+    delete mappedCmpMediaVideo.updatedAt;
+
+    return mappedCmpMediaVideo;
+  };
+
+  const mapCmpMediaFile = (cmpMediaFile) => {
+    const mappedCmpMediaFile = cmpMediaFile.dataValues;
+
+    delete mappedCmpMediaFile.deleted;
+    delete mappedCmpMediaFile.createdAt;
+    delete mappedCmpMediaFile.updatedAt;
+
+    return mappedCmpMediaFile;
+  };
+
+  const mapCmpMediaLocation = (cmpMediaLocation) => {
+    const mappedCmpMediaLocation = cmpMediaLocation.dataValues;
+
+    delete mappedCmpMediaLocation.deleted;
+    delete mappedCmpMediaLocation.createdAt;
+    delete mappedCmpMediaLocation.updatedAt;
+
+    return mappedCmpMediaLocation;
+  };
+
+  const mapCmpMediaViberTemplate = (cmpMediaViberTemplate) => {
+    const mappedCmpMediaViberTemplate = cmpMediaViberTemplate.dataValues;
+
+    delete mappedCmpMediaViberTemplate.deleted;
+    delete mappedCmpMediaViberTemplate.createdAt;
+    delete mappedCmpMediaViberTemplate.updatedAt;
+
+    return mappedCmpMediaViberTemplate;
+  };
+
   const mapCmpMedia = (cmpMedia) => {
     const mappedCmpMedia = cmpMedia.dataValues;
 
+    if (mappedCmpMedia.cmpMediaText) {
+      mappedCmpMedia.cmpMediaText = mapCmpMediaText(mappedCmpMedia.cmpMediaText);
+    }
+    if (mappedCmpMedia.cmpMediaImage) {
+      mappedCmpMedia.cmpMediaImage = mapCmpMediaImage(mappedCmpMedia.cmpMediaImage);
+    }
+    if (mappedCmpMedia.cmpMediaAudio) {
+      mappedCmpMedia.cmpMediaAudio = mapCmpMediaAudio(mappedCmpMedia.cmpMediaAudio);
+    }
+    if (mappedCmpMedia.cmpMediaVideo) {
+      mappedCmpMedia.cmpMediaVideo = mapCmpMediaVideo(mappedCmpMedia.cmpMediaVideo);
+    }
+    if (mappedCmpMedia.cmpMediaFile) {
+      mappedCmpMedia.cmpMediaFile = mapCmpMediaFile(mappedCmpMedia.cmpMediaFile);
+    }
+    if (mappedCmpMedia.cmpMediaLocation) {
+      mappedCmpMedia.cmpMediaLocation = mapCmpMediaLocation(mappedCmpMedia.cmpMediaLocation);
+    }
+    if (mappedCmpMedia.cmpMediaViberTemplate) {
+      mappedCmpMedia.cmpMediaViberTemplate = mapCmpMediaViberTemplate(
+        mappedCmpMedia.cmpMediaViberTemplate,
+      );
+    }
     delete mappedCmpMedia.deleted;
     delete mappedCmpMedia.createdAt;
     delete mappedCmpMedia.updatedAt;
@@ -382,6 +541,62 @@ export default (container) => {
     return mappedCmpParameter;
   };
 
+  const mapCmpRecordMessageStatusAuditSms = (cmpRecordMessageStatusAuditSms) => {
+    const mappedCmpRecordMessageStatusAuditSms = cmpRecordMessageStatusAuditSms.dataValues;
+
+    delete mappedCmpRecordMessageStatusAuditSms.deleted;
+    delete mappedCmpRecordMessageStatusAuditSms.createdAt;
+    delete mappedCmpRecordMessageStatusAuditSms.updatedAt;
+
+    return mappedCmpRecordMessageStatusAuditSms;
+  };
+
+  const mapCmpRecordMessageStatusAuditMapi = (cmpRecordMessageStatusAuditMapi) => {
+    const mappedCmpRecordMessageStatusAuditMapi = cmpRecordMessageStatusAuditMapi.dataValues;
+
+    delete mappedCmpRecordMessageStatusAuditMapi.deleted;
+    delete mappedCmpRecordMessageStatusAuditMapi.createdAt;
+    delete mappedCmpRecordMessageStatusAuditMapi.updatedAt;
+
+    return mappedCmpRecordMessageStatusAuditMapi;
+  };
+
+  const mapCmpRecordMessageStatusAudit = (cmpRMSAudit) => {
+    const mappedCmpRMSAudit = cmpRMSAudit.dataValues;
+
+    if (mappedCmpRMSAudit.cmpRecordMessageStatusAuditSms) {
+      mappedCmpRMSAudit.cmpRecordMessageStatusAuditSms = mapCmpRecordMessageStatusAuditSms(
+        mappedCmpRMSAudit.cmpRecordMessageStatusAuditSms,
+      );
+    }
+    if (mappedCmpRMSAudit.cmpRecordMessageStatusAuditMapi) {
+      mappedCmpRMSAudit.cmpRecordMessageStatusAuditMapi = mapCmpRecordMessageStatusAuditMapi(
+        mappedCmpRMSAudit.cmpRecordMessageStatusAuditMapi,
+      );
+    }
+    delete mappedCmpRMSAudit.deleted;
+    delete mappedCmpRMSAudit.createdAt;
+    delete mappedCmpRMSAudit.updatedAt;
+
+    return mappedCmpRMSAudit;
+  };
+
+  const mapCmpRecordMessage = (cmpRecordMessage) => {
+    const mappedCmpRecordMessage = cmpRecordMessage.dataValues;
+
+    if (mappedCmpRecordMessage.cmpRecordMessageStatusAudits) {
+      mappedCmpRecordMessage.cmpRecordMessageStatusAudits = mappedCmpRecordMessage
+        .cmpRecordMessageStatusAudits
+        .map(mapCmpRecordMessageStatusAudit);
+    }
+
+    delete mappedCmpRecordMessage.deleted;
+    delete mappedCmpRecordMessage.createdAt;
+    delete mappedCmpRecordMessage.updatedAt;
+
+    return mappedCmpRecordMessage;
+  };
+
   const mapCmpRecord = (cmpRecord, excludeSecret = true) => {
     const mappedCmpRecord = cmpRecord.dataValues;
 
@@ -396,6 +611,10 @@ export default (container) => {
     }
     if (mappedCmpRecord.cmpParameters) {
       mappedCmpRecord.cmpParameters = mappedCmpRecord.cmpParameters.map(mapCmpParameter);
+    }
+    if (mappedCmpRecord.cmpRecordMessages) {
+      mappedCmpRecord.cmpRecordMessages = mappedCmpRecord.cmpRecordMessages
+        .map(mapCmpRecordMessage);
     }
 
     delete mappedCmpRecord.deleted;
