@@ -8,6 +8,8 @@ export default (container) => {
       const {
         CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpRecordMessage,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
+        CmpMediaText, CmpMediaImage, CmpMediaAudio, CmpMediaVideo,
+        CmpMediaFile, CmpMediaLocation, CmpMediaViberTemplate,
         CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditSms,
         CmpRecordMessageStatusAuditMapi,
       } = container.databaseService.models;
@@ -72,6 +74,71 @@ export default (container) => {
             where: {
               deleted: false,
             },
+            include: [
+              {
+                model: CmpMediaText,
+                as: 'cmpMediaText',
+                foreignKey: 'cmpMediaTextId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaImage,
+                as: 'cmpMediaImage',
+                foreignKey: 'cmpMediaImageId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaAudio,
+                as: 'cmpMediaAudio',
+                foreignKey: 'cmpMediaAudioId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaVideo,
+                as: 'cmpMediaVideo',
+                foreignKey: 'cmpMediaVideoId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaFile,
+                as: 'cmpMediaFile',
+                foreignKey: 'cmpMediaFileId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaLocation,
+                as: 'cmpMediaLocation',
+                foreignKey: 'cmpMediaLocationId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaViberTemplate,
+                as: 'cmpMediaViberTemplate',
+                foreignKey: 'cmpMediaViberTemplateId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+            ],
             required: false,
           },
           {
@@ -154,6 +221,8 @@ export default (container) => {
       const {
         CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpRecordMessage,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
+        CmpMediaText, CmpMediaImage, CmpMediaAudio, CmpMediaVideo,
+        CmpMediaFile, CmpMediaLocation, CmpMediaViberTemplate,
         CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditSms,
         CmpRecordMessageStatusAuditMapi,
       } = container.databaseService.models;
@@ -218,6 +287,71 @@ export default (container) => {
             where: {
               deleted: false,
             },
+            include: [
+              {
+                model: CmpMediaText,
+                as: 'cmpMediaText',
+                foreignKey: 'cmpMediaTextId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaImage,
+                as: 'cmpMediaImage',
+                foreignKey: 'cmpMediaImageId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaAudio,
+                as: 'cmpMediaAudio',
+                foreignKey: 'cmpMediaAudioId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaVideo,
+                as: 'cmpMediaVideo',
+                foreignKey: 'cmpMediaVideoId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaFile,
+                as: 'cmpMediaFile',
+                foreignKey: 'cmpMediaFileId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaLocation,
+                as: 'cmpMediaLocation',
+                foreignKey: 'cmpMediaLocationId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaViberTemplate,
+                as: 'cmpMediaViberTemplate',
+                foreignKey: 'cmpMediaViberTemplateId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+            ],
             required: false,
           },
           {
@@ -749,8 +883,10 @@ export default (container) => {
   ) => {
     try {
       const {
-        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpRecordMessage,
+        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
+        CmpMediaText, CmpMediaImage, CmpMediaAudio, CmpMediaVideo,
+        CmpMediaFile, CmpMediaLocation, CmpMediaViberTemplate,
       } = container.databaseService.models;
 
       const { Op } = container.Sequelize;
@@ -850,21 +986,77 @@ export default (container) => {
             where: {
               deleted: false,
             },
+            include: [
+              {
+                model: CmpMediaText,
+                as: 'cmpMediaText',
+                foreignKey: 'cmpMediaTextId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaImage,
+                as: 'cmpMediaImage',
+                foreignKey: 'cmpMediaImageId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaAudio,
+                as: 'cmpMediaAudio',
+                foreignKey: 'cmpMediaAudioId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaVideo,
+                as: 'cmpMediaVideo',
+                foreignKey: 'cmpMediaVideoId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaFile,
+                as: 'cmpMediaFile',
+                foreignKey: 'cmpMediaFileId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaLocation,
+                as: 'cmpMediaLocation',
+                foreignKey: 'cmpMediaLocationId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+              {
+                model: CmpMediaViberTemplate,
+                as: 'cmpMediaViberTemplate',
+                foreignKey: 'cmpMediaViberTemplateId',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+            ],
             required: false,
           },
           {
             model: CmpParameter,
             as: 'cmpParameters',
             foreignKey: 'cmpParameterId',
-            where: {
-              deleted: false,
-            },
-            required: false,
-          },
-          {
-            model: CmpRecordMessage,
-            as: 'cmpRecordMessages',
-            foreignKey: 'cmpRecordId',
             where: {
               deleted: false,
             },

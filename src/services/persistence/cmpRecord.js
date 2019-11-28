@@ -28,7 +28,8 @@ export default (container) => {
 
   const mapRecord = (record) => {
     const mappedCmpRecord = Object.assign({}, record);
-    mappedCmpRecord.cmpRecordMessages = mappedCmpRecord.cmpRecordMessages.map(mapRecordMessage);
+    const recordedMessages = mappedCmpRecord.cmpRecordMessages || [];
+    mappedCmpRecord.cmpRecordMessages = recordedMessages.map(mapRecordMessage);
     return mappedCmpRecord;
   };
 
