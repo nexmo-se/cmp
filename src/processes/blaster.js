@@ -92,6 +92,37 @@ export default (container) => {
     }
   };
 
+  const updateCampaignStatus = async (record) => {
+    try {
+      const { CmpCampaign, CmpRecord } = container.persistenceService;
+      const { cmpCampaignId } = record;
+      const campaign = await CmpCampaign.readCampaign(cmpCampaignId);
+
+      const changes = {};
+      if (campaign.status === 'pending') {
+        // Start, first record
+        changes.status = 'started';
+        changes.statusTime = new Date();
+        changes.actualStartDate = new Date();
+      }
+
+      const recordsCount = await CmpRecord.countPendingRecordsByCampaignId(cmpCampaignId);
+      if (recordsCount === 0) {
+        const actualStartDate = campaign.actualStartDate || new Date();
+        // End, last record
+        changes.status = 'completed';
+        changes.statusTime = new Date();
+        changes.actualEndDate = new Date();
+        changes.actualDuration = new Date().getTime() - actualStartDate.getTime();
+      }
+
+      const result = await CmpCampaign.updateCampaign(cmpCampaignId, changes);
+      return Promise.resolve(result);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const blastSms = async (record, axios) => {
     try {
       const { recipient, cmpTemplate, cmpParameters } = record;
@@ -250,6 +281,7 @@ export default (container) => {
 
       await updateRecordSendTime(record);
       await createRecordMessages(record, result);
+      await updateCampaignStatus(record);
       return Promise.resolve(result);
     } catch (error) {
       return Promise.reject(error);

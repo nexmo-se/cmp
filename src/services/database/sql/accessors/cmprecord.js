@@ -668,9 +668,29 @@ export default (container) => {
     }
   };
 
+  const countPendingRecordsByCampaignId = async (campaignId) => {
+    try {
+      const { CmpRecord } = container.databaseService.models;
+
+      const query = {
+        where: {
+          cmpCampaignId: campaignId,
+          status: 'pending',
+          deleted: false,
+        },
+      };
+
+      const count = await CmpRecord.count(query);
+      return Promise.resolve(count);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   return {
     listRecords,
     getActiveRecords,
+    countPendingRecordsByCampaignId,
 
     createRecord,
     readRecord,

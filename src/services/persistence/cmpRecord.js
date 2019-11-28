@@ -13,13 +13,21 @@ export default (container) => {
 
   const getActiveRecords = async (numberOfRecords, currentTime, excludeSecret = true) => {
     try {
-      console.log(numberOfRecords);
-      console.log(currentTime);
       const { CmpRecord } = container.databaseService.accessors;
       const cmpRecords = await CmpRecord.getActiveRecords(
         numberOfRecords, currentTime, excludeSecret,
       );
       return Promise.resolve(cmpRecords);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const countPendingRecordsByCampaignId = async (campaignId) => {
+    try {
+      const { CmpRecord } = container.databaseService.accessors;
+      const count = await CmpRecord.countPendingRecordsByCampaignId(campaignId);
+      return Promise.resolve(count);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -115,6 +123,7 @@ export default (container) => {
   return {
     listRecords,
     getActiveRecords,
+    countPendingRecordsByCampaignId,
 
     createRecord,
     readRecord,
