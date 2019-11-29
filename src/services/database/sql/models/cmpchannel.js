@@ -45,6 +45,9 @@ module.exports = (sequelize, DataTypes) => {
     CmpChannel.belongsTo(models.CmpApiKey, { foreignKey: 'cmpApiKeyId', as: 'cmpApiKey' });
     CmpChannel.belongsTo(models.CmpApplication, { foreignKey: 'cmpApplicationId', as: 'cmpApplication' });
     CmpChannel.hasMany(models.CmpTemplate, { foreignKey: 'cmpChannelId', as: 'cmpChannels' });
+    CmpChannel.belongsToMany(models.User, {
+      through: models.UserChannel, foreignKey: 'cmpChannelId', as: 'users',
+    });
   };
 
   return CmpChannel;

@@ -3,7 +3,9 @@ export default (container) => {
 
   const getById = async (cmpChannelId, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const { CmpApplication, CmpApiKey, CmpChannel } = container.databaseService.models;
+      const {
+        CmpApplication, CmpApiKey, CmpChannel, User, UserChannel,
+      } = container.databaseService.models;
       const query = {
         where: {
           id: cmpChannelId,
@@ -22,6 +24,16 @@ export default (container) => {
             model: CmpApiKey,
             as: 'cmpApiKey',
             foreignKey: 'cmpApiKeyId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: User,
+            through: UserChannel,
+            foreignKey: 'cmpChannelId',
+            as: 'users',
             where: {
               deleted: false,
             },
@@ -50,7 +62,9 @@ export default (container) => {
 
   const getByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const { CmpApiKey, CmpApplication, CmpChannel } = container.databaseService.models;
+      const {
+        CmpApiKey, CmpApplication, CmpChannel, User, UserChannel,
+      } = container.databaseService.models;
       const query = {
         where: criteria,
         include: [
@@ -67,6 +81,16 @@ export default (container) => {
             model: CmpApiKey,
             as: 'cmpApiKey',
             foreignKey: 'cmpApiKeyId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: User,
+            through: UserChannel,
+            foreignKey: 'cmpChannelId',
+            as: 'users',
             where: {
               deleted: false,
             },
@@ -152,6 +176,18 @@ export default (container) => {
     }
   };
 
+  const mapUser = (user) => {
+    const userData = user.dataValues;
+
+    const mappedUser = {
+      id: userData.id,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+    };
+
+    return mappedUser;
+  };
+
   const mapCmpApplication = (cmpApplication, excludeSecret = true) => {
     const mappedCmpApplication = cmpApplication.dataValues;
 
@@ -194,6 +230,9 @@ export default (container) => {
         mappedCmpChannel.cmpApplication, excludeSecret,
       );
     }
+
+    mappedCmpChannel.users = (mappedCmpChannel.users || [])
+      .map(mapUser);
 
     delete mappedCmpChannel.deleted;
     delete mappedCmpChannel.createdAt;
