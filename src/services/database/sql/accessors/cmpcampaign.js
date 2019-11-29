@@ -4,12 +4,23 @@ export default (container) => {
   const getById = async (cmpCampaignId, excludeDeleted = true) => {
     try {
       const {
-        CmpCampaign,
+        CmpCampaign, CmpCampaignStatusAudit,
       } = container.databaseService.models;
       const query = {
         where: {
           id: cmpCampaignId,
         },
+        include: [
+          {
+            model: CmpCampaignStatusAudit,
+            as: 'cmpCampaignStatusAudits',
+            foreignKey: 'cmpCampaignId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+        ],
       };
 
       // Check Deleted
@@ -33,10 +44,21 @@ export default (container) => {
   const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
       const {
-        CmpCampaign,
+        CmpCampaign, CmpCampaignStatusAudit,
       } = container.databaseService.models;
       const query = {
         where: criteria,
+        include: [
+          {
+            model: CmpCampaignStatusAudit,
+            as: 'cmpCampaignStatusAudits',
+            foreignKey: 'cmpCampaignId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+        ],
       };
 
       // Check Deleted
@@ -116,8 +138,24 @@ export default (container) => {
     }
   };
 
+  const mapCmpCampaignStatusAudit = (cmpCampaignStatusAudit) => {
+    const mappedCmpCampaignStatusAudit = cmpCampaignStatusAudit.dataValues;
+
+    delete mappedCmpCampaignStatusAudit.deleted;
+    delete mappedCmpCampaignStatusAudit.createdAt;
+    delete mappedCmpCampaignStatusAudit.updatedAt;
+
+    return mappedCmpCampaignStatusAudit;
+  };
+
   const mapCmpCampaign = (cmpCampaign) => {
     const mappedCmpCampaign = cmpCampaign.dataValues;
+
+    if (mappedCmpCampaign.cmpCampaignStatusAudits) {
+      const cmpCampaignStatusAudits = mappedCmpCampaign.cmpCampaignStatusAudits || [];
+      mappedCmpCampaign.cmpCampaignStatusAudits = cmpCampaignStatusAudits
+        .map(mapCmpCampaignStatusAudit);
+    }
 
     delete mappedCmpCampaign.deleted;
     delete mappedCmpCampaign.createdAt;
