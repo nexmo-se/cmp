@@ -104,10 +104,19 @@ export default (container) => {
     }
   };
 
-  const updateCampaignStatus = async (record) => {
+  const updateCampaignStatuses = async (cmpCampaignIds) => {
+    try {
+      const promises = cmpCampaignIds.map(updateCampaignStatus);
+      const results = await Promise.all(promises);
+      return Promise.resolve(results);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const updateCampaignStatus = async (cmpCampaignId) => {
     try {
       const { CmpCampaign, CmpRecord } = container.persistenceService;
-      const { cmpCampaignId } = record;
       const campaign = await CmpCampaign.readCampaign(cmpCampaignId);
 
       const changes = {};
@@ -297,7 +306,6 @@ export default (container) => {
 
       await updateRecordSendTime(record);
       await createRecordMessages(record, result);
-      await updateCampaignStatus(record);
       return Promise.resolve(result);
     } catch (error) {
       return Promise.reject(error);
@@ -322,6 +330,19 @@ export default (container) => {
 
   const wait = duration => new Promise(resolve => setTimeout(resolve, duration));
 
+  const getUniqueCampaigns = (records) => {
+    const campaignsMap = {};
+
+    for (let i = 0; i < records.length; i += 1) {
+      const record = records[i];
+      const { cmpCampaignId } = record;
+      campaignsMap[cmpCampaignId] = true;
+    }
+
+    const campaigns = Object.keys(campaignsMap);
+    return campaigns;
+  };
+
   const runIndefinitely = async (blastTime, blastsMade) => {
     try {
       const { recordsPerBatch, secondsPerBatch } = container.config.blaster;
@@ -345,6 +366,14 @@ export default (container) => {
       const blastsEnd = new Date().getTime();
       L.debug('Blasts made');
       L.debug(`Time Taken (Wait for Blasts): ${blastsEnd - blastsStart}`);
+
+
+      const campaignUpdateStart = new Date().getTime();
+      const campaigns = getUniqueCampaigns(records);
+      await updateCampaignStatuses(campaigns);
+      const campaignUpdateEnd = new Date().getTime();
+      L.debug('Campaign Updates made');
+      L.debug(`Time Taken (Campaign Updates): ${campaignUpdateEnd - campaignUpdateStart}`);
 
       const newBlast = records.length;
       const totalBlastsMade = blastsMade + newBlast;
