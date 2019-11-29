@@ -119,24 +119,26 @@ export default (container) => {
       const { CmpCampaign, CmpRecord } = container.persistenceService;
       const campaign = await CmpCampaign.readCampaign(cmpCampaignId);
 
+      const currentTime = new Date();
+
       const changes = {};
       if (campaign.status === 'pending') {
         // Start, first record
         changes.status = 'started';
-        changes.statusTime = new Date();
-        changes.actualStartDate = new Date();
+        changes.statusTime = currentTime;
+        changes.actualStartDate = currentTime;
 
         await publishCampaignStatusAudit(campaign, 'started');
       }
 
       const recordsCount = await CmpRecord.countPendingRecordsByCampaignId(cmpCampaignId);
       if (recordsCount === 0) {
-        const actualStartDate = campaign.actualStartDate || new Date();
+        const actualStartDate = campaign.actualStartDate || currentTime;
         // End, last record
         changes.status = 'completed';
-        changes.statusTime = new Date();
-        changes.actualEndDate = new Date();
-        changes.actualDuration = new Date().getTime() - actualStartDate.getTime();
+        changes.statusTime = currentTime;
+        changes.actualEndDate = currentTime;
+        changes.actualDuration = currentTime.getTime() - actualStartDate.getTime();
 
         await publishCampaignStatusAudit(campaign, 'completed');
       }
