@@ -92,6 +92,18 @@ export default (container) => {
     }
   };
 
+  const publishCampaignStatusAudit = async (campaign, status) => {
+    try {
+      const { CmpCampaignStatusAudit } = container.persistenceService;
+      const statusTime = new Date();
+      const cmpCampaignStatusAudit = await CmpCampaignStatusAudit
+        .createCampaignStatusAudit(campaign.id, status, statusTime);
+      return Promise.resolve(cmpCampaignStatusAudit);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const updateCampaignStatus = async (record) => {
     try {
       const { CmpCampaign, CmpRecord } = container.persistenceService;
@@ -104,6 +116,8 @@ export default (container) => {
         changes.status = 'started';
         changes.statusTime = new Date();
         changes.actualStartDate = new Date();
+
+        await publishCampaignStatusAudit(campaign, 'started');
       }
 
       const recordsCount = await CmpRecord.countPendingRecordsByCampaignId(cmpCampaignId);
@@ -114,6 +128,8 @@ export default (container) => {
         changes.statusTime = new Date();
         changes.actualEndDate = new Date();
         changes.actualDuration = new Date().getTime() - actualStartDate.getTime();
+
+        await publishCampaignStatusAudit(campaign, 'completed');
       }
 
       const result = await CmpCampaign.updateCampaign(cmpCampaignId, changes);

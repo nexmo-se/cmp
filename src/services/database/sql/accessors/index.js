@@ -8,6 +8,7 @@ import CmpMedia from './cmpmedia';
 import CmpParameter from './cmpparameter';
 import CmpRecord from './cmprecord';
 import CmpCampaign from './cmpcampaign';
+import CmpCampaignStatusAudit from './cmpcampaignstatusaudit';
 import CmpRecordMessage from './cmprecordmessage';
 import CmpRecordMessageStatusAudit from './cmprecordmessagestatusaudit';
 
@@ -32,6 +33,7 @@ export default container => ({
   CmpParameter: CmpParameter(container),
   CmpRecord: CmpRecord(container),
   CmpCampaign: CmpCampaign(container),
+  CmpCampaignStatusAudit: CmpCampaignStatusAudit(container),
   CmpRecordMessage: CmpRecordMessage(container),
   CmpRecordMessageStatusAudit: CmpRecordMessageStatusAudit(container),
 

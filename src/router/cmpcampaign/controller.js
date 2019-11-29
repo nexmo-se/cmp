@@ -1,6 +1,18 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Campaign Controller');
 
+  const publishCampaignStatusAudit = async (campaignId, status) => {
+    try {
+      const { CmpCampaignStatusAudit } = container.persistenceService;
+      const statusTime = new Date();
+      const cmpCampaignStatusAudit = await CmpCampaignStatusAudit
+        .createCampaignStatusAudit(campaignId, status, statusTime);
+      return Promise.resolve(cmpCampaignStatusAudit);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const listAllCampaigns = async (req, res, next) => {
     try {
       const { CmpCampaign } = container.persistenceService;
@@ -117,6 +129,7 @@ export default (container) => {
 
       if (status && status !== '') {
         changes.status = status;
+        await publishCampaignStatusAudit(cmpCampaignId, status);
       }
 
       if (statusTime) {
