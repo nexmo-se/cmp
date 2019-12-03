@@ -1,7 +1,7 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Channel Model Accessor');
 
-  const getById = async (cmpChannelId, excludeSecret = true, excludeDeleted = true) => {
+  const getByIdUser = async (cmpChannelId, userId, excludeSecret = true, excludeDeleted = true) => {
     try {
       const {
         CmpApplication, CmpApiKey, CmpChannel, User, UserChannel,
@@ -31,7 +31,79 @@ export default (container) => {
           },
           {
             model: User,
-            through: UserChannel,
+            through: {
+              model: UserChannel,
+              where: {
+                deleted: false,
+              },
+              required: true,
+            },
+            foreignKey: 'cmpChannelId',
+            as: 'users',
+            where: {
+              id: userId,
+              deleted: false,
+            },
+            required: true,
+          },
+        ],
+      };
+
+      // Check Deleted
+      if (excludeDeleted) {
+        query.where.deleted = false;
+      }
+
+      const rawCmpChannel = await CmpChannel.findOne(query);
+      if (rawCmpChannel == null) {
+        L.debug('Null result for Get By Id, returning null');
+        return Promise.resolve(null);
+      }
+
+      const cmpChannel = mapCmpChannel(rawCmpChannel, excludeSecret);
+      return Promise.resolve(cmpChannel);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const getByIdAdmin = async (cmpChannelId, excludeSecret = true, excludeDeleted = true) => {
+    try {
+      const {
+        CmpApplication, CmpApiKey, CmpChannel, User, UserChannel,
+      } = container.databaseService.models;
+      const query = {
+        where: {
+          id: cmpChannelId,
+        },
+        include: [
+          {
+            model: CmpApplication,
+            as: 'cmpApplication',
+            foreignKey: 'cmpApplicationId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpApiKey,
+            as: 'cmpApiKey',
+            foreignKey: 'cmpApiKeyId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: User,
+            through: {
+              model: UserChannel,
+              where: {
+                deleted: false,
+              },
+              required: false,
+            },
             foreignKey: 'cmpChannelId',
             as: 'users',
             where: {
@@ -60,7 +132,9 @@ export default (container) => {
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const getByCriteriaUser = async (
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
       const {
         CmpApiKey, CmpApplication, CmpChannel, User, UserChannel,
@@ -88,7 +162,73 @@ export default (container) => {
           },
           {
             model: User,
-            through: UserChannel,
+            through: {
+              model: UserChannel,
+              where: {
+                deleted: false,
+              },
+              required: true,
+            },
+            foreignKey: 'cmpChannelId',
+            as: 'users',
+            where: {
+              id: userId,
+              deleted: false,
+            },
+            required: true,
+          },
+        ],
+      };
+
+      // Check Deleted
+      if (excludeDeleted) {
+        query.where.deleted = false;
+      }
+
+      const rawCmpChannels = await CmpChannel.findAll(query);
+      const cmpChannels = rawCmpChannels
+        .map(cmpChannel => mapCmpChannel(cmpChannel, excludeSecret));
+      return Promise.resolve(cmpChannels);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const getByCriteriaAdmin = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+    try {
+      const {
+        CmpApiKey, CmpApplication, CmpChannel, User, UserChannel,
+      } = container.databaseService.models;
+      const query = {
+        where: criteria,
+        include: [
+          {
+            model: CmpApplication,
+            as: 'cmpApplication',
+            foreignKey: 'cmpApplicationId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpApiKey,
+            as: 'cmpApiKey',
+            foreignKey: 'cmpApiKeyId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: User,
+            through: {
+              model: UserChannel,
+              where: {
+                deleted: false,
+              },
+              required: false,
+            },
             foreignKey: 'cmpChannelId',
             as: 'users',
             where: {
@@ -113,9 +253,13 @@ export default (container) => {
     }
   };
 
-  const getOneByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const getOneByCriteria = async (
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
-      const cmpChannels = await getByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpChannels = userId ? await getByCriteriaUser(
+        criteria, userId, excludeSecret, excludeDeleted,
+      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted);
       if (cmpChannels == null || cmpChannels.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -129,7 +273,7 @@ export default (container) => {
   };
 
   const updateById = async (
-    cmpChannelId, changes = {}, excludeSecret = true, excludeDeleted = true,
+    cmpChannelId, userId, changes = {}, excludeSecret = true, excludeDeleted = true,
   ) => {
     try {
       const { CmpChannel } = container.databaseService.models;
@@ -147,7 +291,9 @@ export default (container) => {
       const result = await CmpChannel.update(changes, query);
       L.debug('CmpChannel Update Result', result);
 
-      const cmpChannel = await getById(cmpChannelId, excludeSecret, excludeDeleted);
+      const cmpChannel = userId ? await getByIdUser(
+        cmpChannelId, userId, excludeSecret, excludeDeleted,
+      ) : await getByIdAdmin(cmpChannelId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpChannel);
     } catch (error) {
       return Promise.reject(error);
@@ -155,7 +301,7 @@ export default (container) => {
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, userId, changes = {}, excludeSecret = true, excludeDeleted = true,
   ) => {
     try {
       const { CmpChannel } = container.databaseService.models;
@@ -169,7 +315,9 @@ export default (container) => {
       const result = await CmpChannel.update(changes, query);
       L.debug('CmpChannel Update Result', result);
 
-      const cmpChannels = await getByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpChannels = userId ? await getByCriteriaUser(
+        criteria, userId, excludeSecret, excludeDeleted,
+      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpChannels);
     } catch (error) {
       return Promise.reject(error);
@@ -241,9 +389,11 @@ export default (container) => {
     return mappedCmpChannel;
   };
 
-  const listChannels = async (excludeSecret = true) => {
+  const listChannels = async (userId, excludeSecret = true) => {
     try {
-      const cmpChannels = await getByCriteria({}, excludeSecret, true);
+      const cmpChannels = userId ? await getByCriteriaUser(
+        {}, userId, excludeSecret, true,
+      ) : await getByCriteriaAdmin({}, excludeSecret, true);
       return Promise.resolve(cmpChannels);
     } catch (error) {
       return Promise.reject(error);
@@ -279,65 +429,73 @@ export default (container) => {
     }
   };
 
-  const readChannel = async (cmpChannelId, excludeSecret = true) => {
+  const readChannel = async (cmpChannelId, userId, excludeSecret = true) => {
     try {
-      const cmpChannel = await getById(cmpChannelId, excludeSecret, false);
+      const cmpChannel = userId ? await getByIdUser(
+        cmpChannelId, userId, excludeSecret, false,
+      ) : await getByIdAdmin(cmpChannelId, excludeSecret, false);
       return Promise.resolve(cmpChannel);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateChannel = async (cmpChannelId, changes, excludeSecret = true) => {
+  const updateChannel = async (cmpChannelId, userId, changes, excludeSecret = true) => {
     try {
-      const cmpChannel = await updateById(cmpChannelId, changes, excludeSecret, true);
+      const cmpChannel = await updateById(cmpChannelId, userId, changes, excludeSecret, true);
       return Promise.resolve(cmpChannel);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateChannels = async (criteria, changes, excludeSecret = true) => {
+  const updateChannels = async (criteria, userId, changes, excludeSecret = true) => {
     try {
-      const cmpChannels = await updateByCriteria(criteria, changes, excludeSecret, true);
+      const cmpChannels = await updateByCriteria(criteria, userId, changes, excludeSecret, true);
       return Promise.resolve(cmpChannels);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteChannel = async (cmpChannelId, excludeSecret = true) => {
+  const deleteChannel = async (cmpChannelId, userId, excludeSecret = true) => {
     try {
       const changes = { deleted: true };
-      const cmpChannel = await updateById(cmpChannelId, changes, excludeSecret, true);
+      const cmpChannel = await updateById(cmpChannelId, userId, changes, excludeSecret, true);
       return Promise.resolve(cmpChannel);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteChannels = async (criteria = {}, excludeSecret = true) => {
+  const deleteChannels = async (criteria = {}, userId, excludeSecret = true) => {
     try {
       const changes = { deleted: true };
-      const cmpChannels = await updateByCriteria(criteria, changes, excludeSecret, true);
+      const cmpChannels = await updateByCriteria(criteria, userId, changes, excludeSecret, true);
       return Promise.resolve(cmpChannels);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findChannel = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const findChannel = async (
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
-      const cmpChannel = await getOneByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpChannel = await getOneByCriteria(criteria, userId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpChannel);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findChannels = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const findChannels = async (
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
-      const cmpChannels = await getByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpChannels = userId ? await getByCriteriaUser(
+        criteria, userId, excludeSecret, excludeDeleted,
+      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpChannels);
     } catch (error) {
       return Promise.reject(error);

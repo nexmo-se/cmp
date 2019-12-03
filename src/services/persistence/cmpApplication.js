@@ -1,10 +1,10 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Application Persistence Accessor');
 
-  const listApplications = async (excludeSecret = true) => {
+  const listApplications = async (userId, excludeSecret = true) => {
     try {
       const { CmpApplication } = container.databaseService.accessors;
-      const cmpApplications = await CmpApplication.listApplications(excludeSecret);
+      const cmpApplications = await CmpApplication.listApplications(userId, excludeSecret);
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);
@@ -33,21 +33,11 @@ export default (container) => {
     }
   };
 
-  const readApplication = async (cmpApplicationId, excludeSecret = true) => {
+  const readApplication = async (cmpApplicationId, userId, excludeSecret = true) => {
     try {
       const { CmpApplication } = container.databaseService.accessors;
-      const cmpApplication = await CmpApplication.readApplication(cmpApplicationId, excludeSecret);
-      return Promise.resolve(cmpApplication);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const updateApplication = async (cmpApplicationId, changes, excludeSecret = true) => {
-    try {
-      const { CmpApplication } = container.databaseService.accessors;
-      const cmpApplication = await CmpApplication.updateApplication(
-        cmpApplicationId, changes, excludeSecret,
+      const cmpApplication = await CmpApplication.readApplication(
+        cmpApplicationId, userId, excludeSecret,
       );
       return Promise.resolve(cmpApplication);
     } catch (error) {
@@ -55,30 +45,48 @@ export default (container) => {
     }
   };
 
-  const updateApplications = async (criteria, changes, excludeSecret = true) => {
+  const updateApplication = async (cmpApplicationId, userId, changes, excludeSecret = true) => {
     try {
       const { CmpApplication } = container.databaseService.accessors;
-      const cmpApplications = await CmpApplication.updateApplications(criteria, changes, excludeSecret);
-      return Promise.resolve(cmpApplications);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const deleteApplication = async (cmpApplicationId, excludeSecret = true) => {
-    try {
-      const { CmpApplication } = container.databaseService.accessors;
-      const cmpApplication = await CmpApplication.deleteApplication(cmpApplicationId, excludeSecret);
+      const cmpApplication = await CmpApplication.updateApplication(
+        cmpApplicationId, userId, changes, excludeSecret,
+      );
       return Promise.resolve(cmpApplication);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteApplications = async (criteria, excludeSecret = true) => {
+  const updateApplications = async (criteria, userId, changes, excludeSecret = true) => {
     try {
       const { CmpApplication } = container.databaseService.accessors;
-      const cmpApplications = await CmpApplication.deleteApplications(criteria, excludeSecret);
+      const cmpApplications = await CmpApplication.updateApplications(
+        criteria, userId, changes, excludeSecret,
+      );
+      return Promise.resolve(cmpApplications);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const deleteApplication = async (cmpApplicationId, userId, excludeSecret = true) => {
+    try {
+      const { CmpApplication } = container.databaseService.accessors;
+      const cmpApplication = await CmpApplication.deleteApplication(
+        cmpApplicationId, userId, excludeSecret,
+      );
+      return Promise.resolve(cmpApplication);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const deleteApplications = async (criteria, userId, excludeSecret = true) => {
+    try {
+      const { CmpApplication } = container.databaseService.accessors;
+      const cmpApplications = await CmpApplication.deleteApplications(
+        criteria, userId, excludeSecret,
+      );
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);

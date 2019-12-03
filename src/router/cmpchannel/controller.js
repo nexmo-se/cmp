@@ -14,8 +14,10 @@ export default (container) => {
   const listMyChannels = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Channels');
+      const { user } = req;
+      const userId = user.id;
       const { CmpChannel } = container.persistenceService;
-      const cmpChannels = await CmpChannel.listChannels();
+      const cmpChannels = await CmpChannel.listChannels(userId);
       res.status(200).json(cmpChannels);
     } catch (error) {
       next(error);
@@ -68,10 +70,12 @@ export default (container) => {
   const readMyChannel = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Channels');
+      const { user } = req;
+      const userId = user.id;
       const { cmpChannelId } = req.params;
       const { CmpChannel } = container.persistenceService;
 
-      const cmpChannel = await CmpChannel.readChannel(cmpChannelId);
+      const cmpChannel = await CmpChannel.readChannel(cmpChannelId, userId);
       res.status(200).json(cmpChannel);
     } catch (error) {
       next(error);
@@ -118,7 +122,7 @@ export default (container) => {
 
       const { CmpChannel } = container.persistenceService;
       const cmpChannel = await CmpChannel.updateChannel(
-        cmpChannelId, changes,
+        cmpChannelId, null, changes,
       );
       res.status(200).json(cmpChannel);
     } catch (error) {

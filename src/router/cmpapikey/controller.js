@@ -125,7 +125,7 @@ export default (container) => {
       }
 
       const { CmpApiKey } = container.persistenceService;
-      const cmpApiKey = await CmpApiKey.updateApiKey(cmpApiKeyId, changes);
+      const cmpApiKey = await CmpApiKey.updateApiKey(cmpApiKeyId, null, changes);
       res.status(200).json(cmpApiKey);
     } catch (error) {
       next(error);

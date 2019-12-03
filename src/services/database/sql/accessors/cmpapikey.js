@@ -29,7 +29,13 @@ export default (container) => {
           },
           {
             model: User,
-            through: UserApiKey,
+            through: {
+              model: UserApiKey,
+              where: {
+                deleted: false,
+              },
+              required: true,
+            },
             foreignKey: 'cmpApiKeyId',
             as: 'users',
             where: {
@@ -87,7 +93,12 @@ export default (container) => {
           },
           {
             model: User,
-            through: UserApiKey,
+            through: {
+              model: UserApiKey,
+              where: {
+                deleted: false,
+              },
+            },
             foreignKey: 'cmpApiKeyId',
             as: 'users',
             where: {
@@ -144,7 +155,13 @@ export default (container) => {
           },
           {
             model: User,
-            through: UserApiKey,
+            through: {
+              model: UserApiKey,
+              where: {
+                deleted: false,
+              },
+              required: true,
+            },
             foreignKey: 'cmpApiKeyId',
             as: 'users',
             where: {
@@ -196,7 +213,12 @@ export default (container) => {
           },
           {
             model: User,
-            through: UserApiKey,
+            through: {
+              model: UserApiKey,
+              where: {
+                deleted: false,
+              },
+            },
             foreignKey: 'cmpApiKeyId',
             as: 'users',
             where: {
