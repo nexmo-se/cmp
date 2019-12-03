@@ -45,8 +45,10 @@ export default (container) => {
   const listMyApiKeys = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all API Keys');
+      const { user } = req;
+      const userId = user.id;
       const { CmpApiKey } = container.persistenceService;
-      const cmpApiKeys = await CmpApiKey.listApiKeys();
+      const cmpApiKeys = await CmpApiKey.listApiKeys(userId);
       res.status(200).json(cmpApiKeys);
     } catch (error) {
       next(error);
@@ -78,10 +80,12 @@ export default (container) => {
 
   const readMyApiKey = async (req, res, next) => {
     try {
+      const { user } = req;
+      const userId = user.id;
       const { cmpApiKeyId } = req.params;
       const { CmpApiKey } = container.persistenceService;
 
-      const cmpApiKey = await CmpApiKey.readApiKey(cmpApiKeyId);
+      const cmpApiKey = await CmpApiKey.readApiKey(cmpApiKeyId, userId);
       res.status(200).json(cmpApiKey);
     } catch (error) {
       next(error);
