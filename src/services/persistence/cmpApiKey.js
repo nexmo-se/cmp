@@ -1,11 +1,38 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp ApiKey Persistence Accessor');
 
+  const filterApiKeys = (userId, cmpApiKeys) => cmpApiKeys
+    .filter((cmpApiKey) => {
+      if (userId == null) {
+        return true;
+      }
+
+      let found = false;
+      L.debug(userId);
+
+      // Check Application Users
+      L.debug('Check ApiKey Users');
+      if (cmpApiKey.users) {
+        L.debug(cmpApiKey.users);
+        for (let i = 0; i < cmpApiKey.users.length; i += 1) {
+          const user = cmpApiKey.users[i];
+          L.debug(user.id);
+          if (user.id === userId) {
+            found = true;
+            break;
+          }
+        }
+      }
+
+      return found;
+    });
+
   const listApiKeys = async (userId, excludeSecret = true) => {
     try {
       const { CmpApiKey } = container.databaseService.accessors;
       const cmpApiKeys = await CmpApiKey.listApiKeys(userId, excludeSecret);
-      return Promise.resolve(cmpApiKeys);
+      const filteredApiKeys = filterApiKeys(userId, cmpApiKeys);
+      return Promise.resolve(filteredApiKeys);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -55,7 +82,8 @@ export default (container) => {
     try {
       const { CmpApiKey } = container.databaseService.accessors;
       const cmpApiKeys = await CmpApiKey.updateApiKeys(criteria, userId, changes, excludeSecret);
-      return Promise.resolve(cmpApiKeys);
+      const filteredApiKeys = filterApiKeys(userId, cmpApiKeys);
+      return Promise.resolve(filteredApiKeys);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -74,8 +102,9 @@ export default (container) => {
   const deleteApiKeys = async (criteria, userId, excludeSecret = true) => {
     try {
       const { CmpApiKey } = container.databaseService.accessors;
-      const cmpApiKey = await CmpApiKey.deleteApiKeys(criteria, userId, excludeSecret);
-      return Promise.resolve(cmpApiKey);
+      const cmpApiKeys = await CmpApiKey.deleteApiKeys(criteria, userId, excludeSecret);
+      const filteredApiKeys = filterApiKeys(userId, cmpApiKeys);
+      return Promise.resolve(filteredApiKeys);
     } catch (error) {
       return Promise.reject(error);
     }

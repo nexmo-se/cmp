@@ -42,7 +42,7 @@ export default (container) => {
               id: userId,
               deleted: false,
             },
-            required: true,
+            required: false,
           },
         ],
       };
@@ -168,7 +168,7 @@ export default (container) => {
               id: userId,
               deleted: false,
             },
-            required: true,
+            required: false,
           },
         ],
       };

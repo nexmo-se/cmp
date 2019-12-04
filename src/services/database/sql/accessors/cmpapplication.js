@@ -6,7 +6,7 @@ export default (container) => {
   ) => {
     try {
       const {
-        CmpApiKey, CmpApplication, CmpChannel, User, UserApplication,
+        CmpApiKey, CmpApplication, CmpChannel, User, UserApplication, UserApiKey,
       } = container.databaseService.models;
       const query = {
         where: {
@@ -19,6 +19,25 @@ export default (container) => {
             where: {
               deleted: false,
             },
+            include: [
+              {
+                model: User,
+                through: {
+                  model: UserApiKey,
+                  where: {
+                    deleted: false,
+                  },
+                  required: true,
+                },
+                foreignKey: 'cmpApiKeyId',
+                as: 'users',
+                where: {
+                  id: userId,
+                  deleted: false,
+                },
+                required: false,
+              },
+            ],
             required: false,
           },
           {
@@ -44,7 +63,7 @@ export default (container) => {
               id: userId,
               deleted: false,
             },
-            required: true,
+            required: false,
           },
         ],
       };
@@ -70,7 +89,7 @@ export default (container) => {
   const getByIdAdmin = async (cmpApplicationId, excludeSecret = true, excludeDeleted = true) => {
     try {
       const {
-        CmpApiKey, CmpApplication, CmpChannel, User, UserApplication,
+        CmpApiKey, CmpApplication, CmpChannel, User, UserApplication, UserApiKey,
       } = container.databaseService.models;
       const query = {
         where: {
@@ -80,6 +99,24 @@ export default (container) => {
           {
             model: CmpApiKey,
             as: 'cmpApiKey',
+            include: [
+              {
+                model: User,
+                through: {
+                  model: UserApiKey,
+                  where: {
+                    deleted: false,
+                  },
+                  required: true,
+                },
+                foreignKey: 'cmpApiKeyId',
+                as: 'users',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+            ],
             where: {
               deleted: false,
             },
@@ -134,7 +171,7 @@ export default (container) => {
   ) => {
     try {
       const {
-        CmpApiKey, CmpApplication, CmpChannel, User, UserApplication,
+        CmpApiKey, CmpApplication, CmpChannel, User, UserApplication, UserApiKey,
       } = container.databaseService.models;
       const query = {
         where: criteria,
@@ -142,6 +179,25 @@ export default (container) => {
           {
             model: CmpApiKey,
             as: 'cmpApiKey',
+            include: [
+              {
+                model: User,
+                through: {
+                  model: UserApiKey,
+                  where: {
+                    deleted: false,
+                  },
+                  required: true,
+                },
+                foreignKey: 'cmpApiKeyId',
+                as: 'users',
+                where: {
+                  id: userId,
+                  deleted: false,
+                },
+                required: false,
+              },
+            ],
             where: {
               deleted: false,
             },
@@ -170,7 +226,7 @@ export default (container) => {
               id: userId,
               deleted: false,
             },
-            required: true,
+            required: false,
           },
         ],
       };
@@ -192,7 +248,7 @@ export default (container) => {
   const getByCriteriaAdmin = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
       const {
-        CmpApiKey, CmpApplication, CmpChannel, User, UserApplication,
+        CmpApiKey, CmpApplication, CmpChannel, User, UserApplication, UserApiKey,
       } = container.databaseService.models;
       const query = {
         where: criteria,
@@ -200,6 +256,24 @@ export default (container) => {
           {
             model: CmpApiKey,
             as: 'cmpApiKey',
+            include: [
+              {
+                model: User,
+                through: {
+                  model: UserApiKey,
+                  where: {
+                    deleted: false,
+                  },
+                  required: true,
+                },
+                foreignKey: 'cmpApiKeyId',
+                as: 'users',
+                where: {
+                  deleted: false,
+                },
+                required: false,
+              },
+            ],
             where: {
               deleted: false,
             },
@@ -328,11 +402,32 @@ export default (container) => {
     return mappedUser;
   };
 
+  const mapApiKey = (cmpApiKey, excludeSecret = true) => {
+    const mappedCmpApiKey = cmpApiKey.dataValues;
+
+    mappedCmpApiKey.users = (mappedCmpApiKey.users || [])
+      .map(mapUser);
+
+    if (excludeSecret) {
+      delete mappedCmpApiKey.apiSecret;
+    }
+
+    delete mappedCmpApiKey.deleted;
+    delete mappedCmpApiKey.createdAt;
+    delete mappedCmpApiKey.updatedAt;
+
+    return mappedCmpApiKey;
+  };
+
   const mapCmpApplication = (cmpApplication, excludeSecret = true) => {
     const mappedCmpApplication = cmpApplication.dataValues;
 
     if (excludeSecret) {
       delete mappedCmpApplication.privateKey;
+    }
+
+    if (mappedCmpApplication.cmpApiKey) {
+      mappedCmpApplication.cmpApiKey = mapApiKey(mappedCmpApplication.cmpApiKey, excludeSecret);
     }
 
     mappedCmpApplication.users = (mappedCmpApplication.users || [])
