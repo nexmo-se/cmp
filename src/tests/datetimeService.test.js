@@ -60,4 +60,44 @@ describe('DateTimeService', () => {
     assert.equal(utcDate.getUTCHours(), 13);
     assert.equal(utcDate.getUTCMinutes(), 23);
   });
+
+  it('should be correct current time', () => {
+    const container = MockContainer();
+    container.moment = moment;
+    container.momentTimezone = momentTimezone;
+    const dateTimeService = DateTimeService(container);
+
+    const date = new Date();
+    date.setFullYear(2019, 11, 23);
+    date.setHours(15, 24, 38, 21);
+
+    const utcDate = dateTimeService.getCurrentTimeInUtc(date);
+    assert.equal(utcDate.getUTCFullYear(), 2019);
+    assert.equal(utcDate.getUTCMonth(), 11);
+    assert.equal(utcDate.getUTCDate(), 23);
+    assert.equal(utcDate.getUTCHours(), 7);
+    assert.equal(utcDate.getUTCMinutes(), 24);
+    assert.equal(utcDate.getUTCSeconds(), 38);
+    assert.equal(utcDate.getUTCMilliseconds(), 21);
+  });
+
+  it('should be correct current time (one day earlier)', () => {
+    const container = MockContainer();
+    container.moment = moment;
+    container.momentTimezone = momentTimezone;
+    const dateTimeService = DateTimeService(container);
+
+    const date = new Date();
+    date.setFullYear(2019, 11, 23);
+    date.setHours(5, 24, 38, 21);
+
+    const utcDate = dateTimeService.getCurrentTimeInUtc(date);
+    assert.equal(utcDate.getUTCFullYear(), 2019);
+    assert.equal(utcDate.getUTCMonth(), 11);
+    assert.equal(utcDate.getUTCDate(), 22);
+    assert.equal(utcDate.getUTCHours(), 21);
+    assert.equal(utcDate.getUTCMinutes(), 24);
+    assert.equal(utcDate.getUTCSeconds(), 38);
+    assert.equal(utcDate.getUTCMilliseconds(), 21);
+  });
 });

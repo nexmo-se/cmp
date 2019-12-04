@@ -41,7 +41,16 @@ export default (container) => {
     return utcDate;
   };
 
+  const getCurrentTimeInUtc = (currentTime) => {
+    const localMomentDate = container.moment(currentTime);
+    const utcMomentDate = localMomentDate.clone().tz(tzUTC);
+    const utcDate = utcMomentDate.toDate();
+    return utcDate;
+  };
+
   return {
     getDateInUtc,
+    getCurrentTimeInUtc,
+    tzUTC,
   };
 };
