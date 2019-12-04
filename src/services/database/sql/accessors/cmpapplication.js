@@ -397,6 +397,10 @@ export default (container) => {
       id: userData.id,
       firstName: userData.firstName,
       lastName: userData.lastName,
+
+      userApiKeyId: userData.UserApiKey ? userData.UserApiKey.dataValues.id : null,
+      userApplicationId: userData.UserApplication ? userData.UserApplication.dataValues.id : null,
+      userChannelId: userData.UserChannel ? userData.UserChannel.dataValues.id : null,
     };
 
     return mappedUser;

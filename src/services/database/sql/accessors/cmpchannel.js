@@ -470,11 +470,16 @@ export default (container) => {
 
   const mapUser = (user) => {
     const userData = user.dataValues;
+    L.debug(userData);
 
     const mappedUser = {
       id: userData.id,
       firstName: userData.firstName,
       lastName: userData.lastName,
+
+      userApiKeyId: userData.UserApiKey ? userData.UserApiKey.dataValues.id : null,
+      userApplicationId: userData.UserApplication ? userData.UserApplication.dataValues.id : null,
+      userChannelId: userData.UserChannel ? userData.UserChannel.dataValues.id : null,
     };
 
     return mappedUser;
