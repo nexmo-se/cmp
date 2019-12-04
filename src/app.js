@@ -9,8 +9,8 @@ import cookieParser from 'cookie-parser';
 import container from './container';
 import Router from './router';
 
-// Always use Singapore Timezone
-process.env.TZ = 'Asia/Singapore';
+// Always use UTC Timezone
+process.env.TZ = 'Etc/UTC';
 
 // Config
 const {

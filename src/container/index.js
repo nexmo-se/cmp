@@ -12,6 +12,8 @@ import bcrypt from 'bcrypt';
 import jsonwebtoken from 'jsonwebtoken';
 import nexmo from 'nexmo';
 import rateLimit from 'axios-rate-limit';
+import moment from 'moment';
+import momentTimezone from 'moment-timezone';
 
 import AuthenticationError from '../errors/authError';
 import ForbiddenError from '../errors/forbiddenError';
@@ -61,6 +63,8 @@ container.bcrypt = bcrypt;
 container.jsonwebtoken = jsonwebtoken;
 container.nexmo = nexmo;
 container.rateLimit = rateLimit;
+container.moment = moment;
+container.momentTimezone = momentTimezone;
 
 // Errors
 container.AuthenticationError = AuthenticationError;
