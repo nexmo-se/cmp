@@ -470,7 +470,6 @@ export default (container) => {
 
   const mapUser = (user) => {
     const userData = user.dataValues;
-    L.debug(userData);
 
     const mappedUser = {
       id: userData.id,
