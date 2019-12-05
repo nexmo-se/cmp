@@ -949,7 +949,14 @@ export default (container) => {
               campaignEndDate: {
                 [Op.gt]: currentTime,
               },
-              status: 'pending',
+              [Op.or]: [
+                {
+                  status: 'pending',
+                },
+                {
+                  status: 'started',
+                },
+              ],
               deleted: false,
             },
             required: true,
