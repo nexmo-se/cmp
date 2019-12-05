@@ -21,11 +21,19 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(45),
       allowNull: true,
     },
+    activeStart: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     activeStartHour: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },
     activeStartMinute: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    activeEnd: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },

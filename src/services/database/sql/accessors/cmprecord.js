@@ -781,6 +781,9 @@ export default (container) => {
     excludeSecret = true,
   ) => {
     try {
+      const activeStart = (activeStartHour * 60) + activeStartMinute;
+      const activeEnd = (activeEndHour * 60) + activeEndMinute;
+
       const { CmpRecord } = container.databaseService.models;
       const rawCmpRecord = await CmpRecord.create({
         id: container.uuid(),
@@ -788,8 +791,10 @@ export default (container) => {
         cmpCampaignId,
         cmpTemplateId,
         cmpMediaId,
+        activeStart,
         activeStartHour,
         activeStartMinute,
+        activeEnd,
         activeEndHour,
         activeEndMinute,
         activeOnWeekends,
@@ -889,32 +894,42 @@ export default (container) => {
         CmpMediaFile, CmpMediaLocation, CmpMediaViberTemplate,
       } = container.databaseService.models;
 
-      const { Op } = container.Sequelize;
-      const currentHour = currentTime.getHours();
-      const currentMinute = currentTime.getMinutes();
-      const currentDay = currentTime.getDay();
+      const { Op, col } = container.Sequelize;
+
+      const utcDate = container.dateTimeService
+        .getCurrentTimeInUtc(currentTime);
+
+      const currentHour = utcDate.getUTCHours();
+      const currentMinute = utcDate.getUTCMinutes();
+      const currentDay = utcDate.getUTCDay();
+
+      const minutes = (currentHour * 60) + currentMinute;
 
       const query = {
         where: {
           [Op.or]: [
             {
-              activeStartHour: {
-                [Op.lt]: currentHour,
+              activeStart: {
+                [Op.lt]: col('activeEnd'),
+                [Op.lte]: minutes,
               },
-              activeEndHour: {
-                [Op.gt]: currentHour,
+              activeEnd: {
+                [Op.gt]: minutes,
+              },
+            },
+
+            {
+              activeStart: {
+                [Op.gt]: col('activeEnd'),
+                [Op.lte]: minutes,
               },
             },
             {
-              activeStartHour: currentHour,
-              activeStartMinute: {
-                [Op.lte]: currentMinute,
+              activeStart: {
+                [Op.gt]: col('activeEnd'),
               },
-            },
-            {
-              activeEndHour: currentHour,
-              activeEndMinute: {
-                [Op.gt]: currentMinute,
+              activeEnd: {
+                [Op.gt]: minutes,
               },
             },
           ],

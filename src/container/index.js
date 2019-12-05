@@ -32,6 +32,7 @@ import PersistenceService from '../services/persistence';
 import JwtService from '../services/jwt';
 import TemplateService from '../services/template';
 import RateLimiterService from '../services/rateLimiter';
+import DateTimeService from '../services/datetime';
 
 import Logger from '../services/logger';
 import Authenticator from '../services/authenticator';
@@ -89,6 +90,7 @@ container.authService = AuthService(container);
 container.persistenceService = PersistenceService(container);
 container.templateService = TemplateService(container);
 container.rateLimiterService = RateLimiterService(container);
+container.dateTimeService = DateTimeService(container);
 
 // Process
 container.blasterProcess = BlasterProcess(container);

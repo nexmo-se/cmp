@@ -122,17 +122,23 @@ export default (container) => {
         actualCmpMediaId = actualCmpMedia.id;
       }
 
+
+      const sanitizedStart = container.dateTimeService
+        .getDateInUtc(activeStartHour, activeStartMinute, timezone);
+      const sanitizedEnd = container.dateTimeService
+        .getDateInUtc(activeEndHour, activeEndMinute, timezone);
+
       const cmpRecord = await CmpRecord.createRecord(
         recipient,
         cmpCampaignId,
         cmpTemplateId,
         actualCmpMediaId,
-        activeStartHour,
-        activeStartMinute,
-        activeEndHour,
-        activeEndMinute,
+        sanitizedStart.getUTCHours(),
+        sanitizedStart.getUTCMinutes(),
+        sanitizedEnd.getUTCHours(),
+        sanitizedEnd.getUTCMinutes(),
         activeOnWeekends,
-        timezone,
+        container.dateTimeService.tzUTC,
       );
 
       if (cmpParameters) {
