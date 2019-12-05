@@ -21,8 +21,6 @@
     "seed": "sequelize-cli db:seed:all",
     "build": "npm run clean && babel src -D -d build",
     "test": "mocha \"./{,!(node_modules)/**/}*.test.js\" --require babel-polyfill --require esm",
-    "decodePrivateKey": "echo $KEY_PRIVATE_KEY | base64 --decode > private.key",
-    "heroku-postbuild": "npm run decodePrivateKey && npm run build",
     "bundleServer": "nexe build/index.js -o \"xcmp/server\" -r \"build/**/*\" --verbose",
     "bundleBlaster": "nexe build/blastIndex.js -o \"xcmp/blaster\" -r \"build/**/*\" --verbose",
     "bundle": "npm run bundleServer && npm run bundleBlaster",
@@ -32,7 +30,7 @@
     "copyEssentialFiles": "npm run copyPackageJson && npm run copyEnvExample && npm run copyReadme",
     "zip": "zip -r -X xcmp.zip xcmp",
     "distributeClean": "rm -rf xcmp && rm -rf xcmp.zip",
-    "distribute": "npm run distributeClean && npm run build && npm run bundle && npm run copyEssentialFiles && npm run zip"
+    "distribute": "npm test && npm run distributeClean && npm run build && npm run bundle && npm run copyEssentialFiles && npm run zip"
   },
   "author": "Yee Hui Poh <yhpoh91@gmail.com>",
   "license": "ISC",
