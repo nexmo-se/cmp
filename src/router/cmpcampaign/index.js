@@ -33,6 +33,14 @@ export default (container) => {
       controller.deleteAllCampaigns,
     );
 
+  router.route('/:cmpCampaignId/status')
+    .put(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.updateCampaignStatus),
+      controller.updateCampaignStatus,
+    );
+
   router.route('/:cmpCampaignId')
     .get(
       checkAuthentication,

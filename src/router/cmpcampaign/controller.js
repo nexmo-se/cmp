@@ -87,6 +87,27 @@ export default (container) => {
     }
   };
 
+  const updateCampaignStatus = async (req, res, next) => {
+    try {
+      const { cmpCampaignId } = req.params;
+      const { status } = req.body;
+
+      const changes = {};
+
+      if (status && status !== '') {
+        changes.status = status;
+      }
+
+      const { CmpCampaign } = container.persistenceService;
+      const cmpCampaign = await CmpCampaign.updateCampaign(
+        cmpCampaignId, changes,
+      );
+      res.status(200).json(cmpCampaign);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   const updateCampaign = async (req, res, next) => {
     try {
       const { cmpCampaignId } = req.params;
@@ -167,5 +188,7 @@ export default (container) => {
     readMyCampaign,
     updateCampaign,
     deleteCampaign,
+
+    updateCampaignStatus,
   };
 };

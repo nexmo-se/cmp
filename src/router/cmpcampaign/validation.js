@@ -38,8 +38,8 @@ export default {
       campaignEndDate: Joi.date().min(Joi.ref('campaignStartDate')),
       actualStartDate: Joi.date(),
       actualEndDate: Joi.date().min(Joi.ref('actualStartDate')),
-      actualDuration: Joi.number,
-      status: Joi.string(),
+      actualDuration: Joi.number(),
+      status: Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed'),
       statusTime: Joi.date(),
     },
   },
@@ -49,5 +49,14 @@ export default {
       cmpCampaignId: Joi.string().min(1).required(),
     },
     body: {},
+  },
+  updateCampaignStatus: {
+    query: {},
+    params: {
+      cmpCampaignId: Joi.string().min(1).required(),
+    },
+    body: {
+      status: Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed'),
+    },
   },
 };
