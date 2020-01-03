@@ -9,5 +9,7 @@ xcmp/
 output.zip
 xcmp.zip
 .env
+.env.local
+.env.heroku
 private.key
 vcmp.key
