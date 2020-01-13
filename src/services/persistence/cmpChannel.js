@@ -73,6 +73,7 @@ export default (container) => {
     tps,
     cmpApplicationId,
     cmpApiKeyId,
+    smsUseSignature,
     excludeSecret = true,
   ) => {
     try {
@@ -84,6 +85,7 @@ export default (container) => {
         tps,
         cmpApplicationId,
         cmpApiKeyId,
+        smsUseSignature,
         excludeSecret,
       );
       return Promise.resolve(cmpChannel);

@@ -561,6 +561,7 @@ export default (container) => {
     tps,
     cmpApplicationId,
     cmpApiKeyId,
+    smsUseSignature,
     excludeSecret = true,
   ) => {
     try {
@@ -573,6 +574,7 @@ export default (container) => {
         tps,
         cmpApplicationId,
         cmpApiKeyId,
+        smsUseSignature,
         deleted: false,
       });
 

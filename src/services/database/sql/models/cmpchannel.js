@@ -23,6 +23,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       default: 5,
     },
+    smsUseSignature: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      default: false,
+    },
     cmpApplicationId: {
       type: DataTypes.STRING(45),
       allowNull: true,
