@@ -18,6 +18,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(45),
       allowNull: false,
     },
+    signatureSecret: {
+      type: DataTypes.STRING(150),
+      allowNull: true,
+    },
+    signatureMethod: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
     deleted: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

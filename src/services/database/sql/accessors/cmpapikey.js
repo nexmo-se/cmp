@@ -365,6 +365,8 @@ export default (container) => {
 
     if (excludeSecret) {
       delete mappedCmpApiKey.apiSecret;
+      delete mappedCmpApiKey.signatureSecret;
+      delete mappedCmpApiKey.signatureMethod;
     }
 
     delete mappedCmpApiKey.deleted;
@@ -388,6 +390,8 @@ export default (container) => {
     name,
     apiKey,
     apiSecret,
+    signatureSecret,
+    signatureMethod,
     excludeSecret = true,
   ) => {
     try {
@@ -397,6 +401,8 @@ export default (container) => {
         name,
         apiKey,
         apiSecret,
+        signatureSecret,
+        signatureMethod,
         deleted: false,
       });
 

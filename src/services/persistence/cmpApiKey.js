@@ -42,6 +42,8 @@ export default (container) => {
     name,
     apiKey,
     apiSecret,
+    signatureSecret,
+    signatureMethod,
     excludeSecret = true,
   ) => {
     try {
@@ -50,6 +52,8 @@ export default (container) => {
         name,
         apiKey,
         apiSecret,
+        signatureSecret,
+        signatureMethod,
         excludeSecret,
       );
       return Promise.resolve(cmpApiKey);
