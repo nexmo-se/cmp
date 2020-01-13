@@ -67,10 +67,14 @@ export default (container) => {
 
   const createApiKey = async (req, res, next) => {
     try {
-      const { name, apiKey, apiSecret } = req.body;
+      const {
+        name, apiKey, apiSecret, signatureSecret, signatureMethod,
+      } = req.body;
       const { CmpApiKey } = container.persistenceService;
 
-      const cmpApiKey = await CmpApiKey.createApiKey(name, apiKey, apiSecret);
+      const cmpApiKey = await CmpApiKey.createApiKey(
+        name, apiKey, apiSecret, signatureSecret, signatureMethod,
+      );
       await updateWebhook(apiKey, apiSecret);
       res.status(200).json(cmpApiKey);
     } catch (error) {
@@ -108,7 +112,9 @@ export default (container) => {
   const updateApiKey = async (req, res, next) => {
     try {
       const { cmpApiKeyId } = req.params;
-      const { name, apiKey, apiSecret } = req.body;
+      const {
+        name, apiKey, apiSecret, signatureSecret, signatureMethod,
+      } = req.body;
 
       const changes = {};
 
@@ -122,6 +128,14 @@ export default (container) => {
 
       if (apiSecret && apiSecret !== '') {
         changes.apiSecret = apiSecret;
+      }
+
+      if (signatureSecret && signatureSecret !== '') {
+        changes.signatureSecret = signatureSecret;
+      }
+
+      if (signatureMethod && signatureMethod !== '') {
+        changes.signatureMethod = signatureMethod;
       }
 
       const { CmpApiKey } = container.persistenceService;

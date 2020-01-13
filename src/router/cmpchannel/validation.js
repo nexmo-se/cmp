@@ -21,6 +21,7 @@ export default {
       tps: Joi.number().integer().required(),
       cmpApiKeyId: Joi.string().min(1).required(),
       cmpApplicationId: Joi.string(),
+      smsUseSignature: Joi.boolean(),
     },
   },
   readChannel: {
@@ -42,6 +43,7 @@ export default {
       tps: Joi.number().min(0),
       cmpApiKeyId: Joi.string().forbidden(),
       cmpApplicationId: Joi.string().forbidden(),
+      smsUseSignature: Joi.boolean(),
     },
   },
   deleteChannel: {

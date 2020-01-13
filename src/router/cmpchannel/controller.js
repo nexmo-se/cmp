@@ -41,13 +41,14 @@ export default (container) => {
         channel,
         senderId,
         tps,
+        smsUseSignature,
         cmpApplicationId,
         cmpApiKeyId,
       } = req.body;
       const { CmpChannel } = container.persistenceService;
 
       const cmpApiKey = await CmpChannel.createChannel(
-        name, channel, senderId, tps, cmpApplicationId, cmpApiKeyId,
+        name, channel, senderId, tps, cmpApplicationId, cmpApiKeyId, smsUseSignature,
       );
       res.status(200).json(cmpApiKey);
     } catch (error) {
@@ -92,6 +93,7 @@ export default (container) => {
         tps,
         cmpApplicationId,
         cmpApiKeyId,
+        smsUseSignature,
       } = req.body;
 
       const changes = {};
@@ -118,6 +120,10 @@ export default (container) => {
 
       if (cmpApiKeyId && cmpApiKeyId !== '') {
         changes.cmpApiKeyId = cmpApiKeyId;
+      }
+
+      if (smsUseSignature != null) {
+        changes.smsUseSignature = smsUseSignature;
       }
 
       const { CmpChannel } = container.persistenceService;

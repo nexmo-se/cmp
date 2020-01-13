@@ -25,6 +25,8 @@ export default {
       name: Joi.string().min(1).required(),
       apiKey: Joi.string().min(1).required(),
       apiSecret: Joi.string().min(1).required(),
+      signatureSecret: Joi.string(),
+      signatureMethod: Joi.string().valid('md5hash', 'md5', 'sha1', 'sha256', 'sha512'),
     },
   },
   readApiKey: {
@@ -43,6 +45,8 @@ export default {
       name: Joi.string(),
       apiKey: Joi.string().forbidden(),
       apiSecret: Joi.string().forbidden(),
+      signatureSecret: Joi.string().forbidden(),
+      signatureMethod: Joi.string().forbidden(),
     },
   },
   deleteApiKey: {
