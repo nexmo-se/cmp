@@ -68,10 +68,12 @@ export default (container) => {
           whatsappTemplateNamespace, whatsappTemplateName, body, cmpChannel,
         } = cmpTemplate;
         const {
-          channel, senderId, cmpApiKey, cmpApplication,
+          channel, senderId, cmpApiKey, cmpApplication, smsUseSignature,
         } = cmpChannel;
         const { applicationId, privateKey } = cmpApplication || {};
-        const { apiKey, apiSecret } = cmpApiKey;
+        const {
+          apiKey, apiSecret, signatureSecret, signatureMethod,
+        } = cmpApiKey;
 
         let result;
         if (channel === 'sms') {
@@ -81,6 +83,7 @@ export default (container) => {
           const text = container.templateService.getText(body, parameters);
           result = await container.nexmoService.sms.sendText(
             recipient, text, 'text', senderId, apiKey, apiSecret,
+            smsUseSignature, signatureSecret, signatureMethod,
           );
         } else if (channel === 'whatsapp') {
           const parameters = cmpParameters

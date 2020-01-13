@@ -154,8 +154,10 @@ export default (container) => {
     try {
       const { recipient, cmpTemplate, cmpParameters } = record;
       const { body, cmpChannel } = cmpTemplate;
-      const { senderId, cmpApiKey } = cmpChannel;
-      const { apiKey, apiSecret } = cmpApiKey;
+      const { senderId, cmpApiKey, smsUseSignature } = cmpChannel;
+      const {
+        apiKey, apiSecret, signatureSecret, signatureMethod,
+      } = cmpApiKey;
 
       const parameters = cmpParameters
         .sort((a, b) => a.order - b.order)
@@ -163,7 +165,8 @@ export default (container) => {
       const text = container.templateService.getText(body, parameters);
 
       const result = await container.nexmoService.sms.sendText(
-        recipient, text, 'text', senderId, apiKey, apiSecret, axios,
+        recipient, text, 'text', senderId, apiKey, apiSecret,
+        smsUseSignature, signatureSecret, signatureMethod, axios,
       );
 
       const messageIds = result.messages.map(message => message['message-id']);
