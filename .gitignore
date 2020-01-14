@@ -11,5 +11,6 @@ xcmp.zip
 .env
 .env.local
 .env.heroku
+.env.ec2
 private.key
 vcmp.key

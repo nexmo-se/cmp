@@ -1,15 +1,23 @@
 export default (container) => {
   const { L } = container.defaultLogger('Nexmo SMS Service');
 
+  const getUrl = () => {
+    const { restHost, useMockSms } = container.config.nexmo;
+    if (useMockSms) {
+      L.debug('Using Mock SMS Endpoint');
+      return 'https://mockymocky.herokuapp.com/sms';
+    }
+
+    return `${restHost}/sms/json`;
+  };
+
   const sendText = async (
     to, text, type, senderId,
     apiKey, apiSecret,
     smsUseSignature, signatureSecret, signatureMethod,
     axios = container.axios) => {
     try {
-      const { restHost } = container.config.nexmo;
-
-      const url = `${restHost}/sms/json`;
+      const url = getUrl();
       const body = {
         api_key: apiKey,
         from: senderId,

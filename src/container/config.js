@@ -17,6 +17,7 @@ export default {
     host: process.env.NEXMO_API,
     restHost: process.env.NEXMO_REST_API,
     useWhatsappSandbox: (process.env.USE_SANDBOX_WHATSAPP || 'false') === 'true',
+    useMockSms: (process.env.USE_MOCK_SMS || 'false') === 'true',
   },
   log4js: {
     appenders: {
