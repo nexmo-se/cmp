@@ -16,7 +16,7 @@ process.env.TZ = 'Etc/UTC';
 const {
   config, log4js, socketIoService, errorHandler,
 } = container;
-const { host, port, environment } = config;
+const { hostUrl, port, environment } = config;
 const { L } = container.defaultLogger('Application');
 
 const app = express();
@@ -41,5 +41,5 @@ const httpServer = http.createServer(app);
 socketIoService.init(httpServer);
 
 httpServer.listen(port, () => {
-  L.info(`Server (${environment}) running at ${host}:${port}`);
+  L.info(`Server (${environment}) running at ${hostUrl}`);
 });
