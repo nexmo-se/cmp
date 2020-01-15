@@ -6,12 +6,16 @@ const config = {
   host: process.env.DATABASE_HOST || '',
   port: process.env.DATABASE_PORT || 5432,
   dialect: process.env.DATABASE_DIALECT || 'postgres',
+  define: {
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_unicode_ci',
+  },
 };
 
 // Check SSL
 const useSsl = (process.env.DATABASE_USE_SSL || 'false').toLowerCase() === 'true';
 if (useSsl) {
-  config.dialectOptions = { ssl: true };
+  config.dialectOptions = { ssl: true, collate: 'utf8mb4_unicode_ci' };
 }
 
 // Export
