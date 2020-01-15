@@ -2,10 +2,11 @@ export default (container) => {
   const { L } = container.defaultLogger('Nexmo SMS Service');
 
   const getUrl = () => {
-    const { restHost, useMockSms } = container.config.nexmo;
+    const { restHost, useMockSms, mockSmsUrl } = container.config.nexmo;
     if (useMockSms) {
       L.debug('Using Mock SMS Endpoint');
-      return 'https://mockymocky.herokuapp.com/sms';
+      L.debug(mockSmsUrl);
+      return mockSmsUrl;
     }
 
     return `${restHost}/sms/json`;
