@@ -19,8 +19,6 @@ export default (container) => {
       mediaData = media.cmpMediaViberTemplate;
     }
 
-    console.log(mediaData);
-
     mediaData.typeId = mediaData.id;
     mediaData.id = media.id;
     mediaData.type = media.mediaType;
