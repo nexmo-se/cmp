@@ -3,6 +3,7 @@ export default {
   port: process.env.PORT || 8080,
   ip: process.env.IP || '0.0.0.0',
   host: process.env.HOST || 'http://localhost',
+  customPort: (process.env.CUSTOM_PORT || 'false') === 'true',
   jwt: {
     secret: process.env.JWT_SECRET,
   },
@@ -16,6 +17,7 @@ export default {
   nexmo: {
     host: process.env.NEXMO_API,
     restHost: process.env.NEXMO_REST_API,
+    mockSmsUrl: process.env.MOCK_SMS_URL,
     useWhatsappSandbox: (process.env.USE_SANDBOX_WHATSAPP || 'false') === 'true',
     useMockSms: (process.env.USE_MOCK_SMS || 'false') === 'true',
   },

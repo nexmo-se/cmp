@@ -52,18 +52,18 @@ export default (container) => {
       // Inbound Url
       if (inboundRoute && inboundRoute !== '') {
         if (body === '') {
-          body += `moCallBackUrl=${container.config.host}${inboundRoute}`;
+          body += `moCallBackUrl=${container.config.hostUrl}${inboundRoute}`;
         } else {
-          body += `&moCallBackUrl=${container.config.host}${inboundRoute}`;
+          body += `&moCallBackUrl=${container.config.hostUrl}${inboundRoute}`;
         }
       }
 
       // Delivery Url
       if (deliveryRoute && deliveryRoute !== '') {
         if (body === '') {
-          body += `drCallBackUrl=${container.config.host}${deliveryRoute}`;
+          body += `drCallBackUrl=${container.config.hostUrl}${deliveryRoute}`;
         } else {
-          body += `&drCallBackUrl=${container.config.host}${deliveryRoute}`;
+          body += `&drCallBackUrl=${container.config.hostUrl}${deliveryRoute}`;
         }
       }
 
@@ -92,7 +92,7 @@ export default (container) => {
       // Event Url
       if (eventRoute && eventRoute !== '') {
         application.capabilities.rtc.webhooks.event_url = {
-          address: `${container.config.host}${eventRoute}`,
+          address: `${container.config.hostUrl}${eventRoute}`,
           http_method: 'POST',
         };
       }
@@ -125,7 +125,7 @@ export default (container) => {
       // Inbound Url
       if (inboundRoute && inboundRoute !== '') {
         application.capabilities.messages.webhooks.inbound_url = {
-          address: `${container.config.host}${inboundRoute}`,
+          address: `${container.config.hostUrl}${inboundRoute}`,
           http_method: 'POST',
         };
       }
@@ -133,7 +133,7 @@ export default (container) => {
       // Status Url
       if (statusRoute && statusRoute !== '') {
         application.capabilities.messages.webhooks.status_url = {
-          address: `${container.config.host}${statusRoute}`,
+          address: `${container.config.hostUrl}${statusRoute}`,
           http_method: 'POST',
         };
       }
@@ -166,7 +166,7 @@ export default (container) => {
       // Event Url
       if (eventRoute && eventRoute !== '') {
         application.capabilities.voice.webhooks.event_url = {
-          address: `${container.config.host}${eventRoute}`,
+          address: `${container.config.hostUrl}${eventRoute}`,
           http_method: 'POST',
         };
       }
@@ -174,7 +174,7 @@ export default (container) => {
       // Answer Url
       if (answerRoute && answerRoute !== '') {
         application.capabilities.voice.webhooks.answer_url = {
-          address: `${container.config.host}${answerRoute}`,
+          address: `${container.config.hostUrl}${answerRoute}`,
           http_method: 'POST',
         };
       }
@@ -182,7 +182,7 @@ export default (container) => {
       // Fallback Answer Url
       if (fallbackAnswerRoute && fallbackAnswerRoute !== '') {
         application.capabilities.voice.webhooks.fallback_answer_url = {
-          address: `${container.config.host}${fallbackAnswerRoute}`,
+          address: `${container.config.hostUrl}${fallbackAnswerRoute}`,
           http_method: 'POST',
         };
       }
