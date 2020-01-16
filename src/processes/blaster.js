@@ -3,12 +3,16 @@ export default (container) => {
 
   const getRecords = async (recordSize) => {
     try {
+      const startTime = new Date().getTime();
       const { CmpRecord } = container.persistenceService;
       const currentTime = new Date();
       const records = await CmpRecord.getActiveRecords(
         recordSize, currentTime, false,
       );
       L.debug(`Records Retrieved: ${records.length}`);
+
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Get Records): ${endTime - startTime}ms`);
       return Promise.resolve(records);
     } catch (error) {
       return Promise.reject(error);
@@ -45,6 +49,31 @@ export default (container) => {
       const endTime = new Date().getTime();
       const duration = endTime - startTime;
       L.debug(`Time Taken (Prepare Records): ${duration}ms`);
+      return Promise.resolve(results);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const prepareRecordsBulk = async (records) => {
+    try {
+      const { CmpRecord } = container.persistenceService;
+      const changes = {
+        status: 'queuing',
+        statusTime: new Date(),
+      };
+
+      const ids = records.map(record => record.id);
+      const criteria = {
+        id: ids,
+      };
+
+      const startTime = new Date().getTime();
+      const results = await CmpRecord.updateRecords(criteria, changes, true);
+      const endTime = new Date().getTime();
+      const duration = endTime - startTime;
+      L.debug(`Time Taken (Prepare Records Bulk): ${duration}ms`);
+
       return Promise.resolve(results);
     } catch (error) {
       return Promise.reject(error);
@@ -350,18 +379,22 @@ export default (container) => {
 
   const runIndefinitely = async (blastTime, blastsMade) => {
     try {
+      const startTime = new Date().getTime();
       const { recordsPerBatch, secondsPerBatch } = container.config.blaster;
       const records = await getRecords(recordsPerBatch);
       L.debug(`Number of Records: ${records.length}`);
 
       // Prepare
-      await prepareRecords(records);
+      await prepareRecordsBulk(records);
 
       // Wait
       const currentTime = new Date().getTime();
       const waitTime = blastTime - currentTime;
       if (waitTime > 0) {
+        const waitStart = new Date().getTime();
         await wait(waitTime);
+        const waitEnd = new Date().getTime();
+        L.debug(`Time Taken (Wait): ${waitEnd - waitStart}ms`);
       }
       L.debug('Wait Over');
 
@@ -370,7 +403,7 @@ export default (container) => {
       await blastRecords(records);
       const blastsEnd = new Date().getTime();
       L.debug('Blasts made');
-      L.debug(`Time Taken (Wait for Blasts): ${blastsEnd - blastsStart}`);
+      L.debug(`Time Taken (Wait for Blasts): ${blastsEnd - blastsStart}ms`);
 
 
       const campaignUpdateStart = new Date().getTime();
@@ -378,7 +411,10 @@ export default (container) => {
       await updateCampaignStatuses(campaigns);
       const campaignUpdateEnd = new Date().getTime();
       L.debug('Campaign Updates made');
-      L.debug(`Time Taken (Campaign Updates): ${campaignUpdateEnd - campaignUpdateStart}`);
+      L.debug(`Time Taken (Campaign Updates): ${campaignUpdateEnd - campaignUpdateStart}ms`);
+
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Iteration): ${endTime - startTime}ms`);
 
       const newBlast = records.length;
       const totalBlastsMade = blastsMade + newBlast;
