@@ -16,7 +16,7 @@ export default (container) => {
       port,
       dialect,
       pool: {
-        max: 100,
+        max: 10,
         min: 0,
         acquire: 30000,
         idle: 10000,
