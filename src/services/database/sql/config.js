@@ -9,13 +9,21 @@ const config = {
   define: {
     charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci',
+    dialectOptions: {
+      charset: 'utf8mb4',
+      collate: 'utf8mb4_unicode_ci',
+    },
   },
 };
 
 // Check SSL
 const useSsl = (process.env.DATABASE_USE_SSL || 'false').toLowerCase() === 'true';
 if (useSsl) {
-  config.dialectOptions = { ssl: true, collate: 'utf8mb4_unicode_ci' };
+  config.dialectOptions = {
+    ssl: true,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_unicode_ci',
+  };
 }
 
 // Export
