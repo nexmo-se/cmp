@@ -465,7 +465,7 @@ export default (container) => {
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, changes = {}, excludeSecret = true, excludeDeleted = true, includeGet = false,
   ) => {
     try {
       const { CmpRecord } = container.databaseService.models;
@@ -479,8 +479,11 @@ export default (container) => {
       const result = await CmpRecord.update(changes, query);
       L.debug('CmpRecord Update Result', result);
 
-      const cmpRecords = await getByCriteria(criteria, null, null, excludeSecret, excludeDeleted);
-      return Promise.resolve(cmpRecords);
+      if (includeGet) {
+        const cmpRecords = await getByCriteria(criteria, null, null, excludeSecret, excludeDeleted);
+        return Promise.resolve(cmpRecords);
+      }
+      return Promise.resolve([]);
     } catch (error) {
       return Promise.reject(error);
     }
