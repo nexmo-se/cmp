@@ -377,6 +377,29 @@ export default (container) => {
     return campaigns;
   };
 
+  const runSingle = async (records) => {
+    try {
+      // Make Blasts
+      const blastsStart = new Date().getTime();
+      await blastRecords(records);
+      const blastsEnd = new Date().getTime();
+      L.debug('Blasts made');
+      L.debug(`Time Taken (Wait for Blasts): ${blastsEnd - blastsStart}ms`);
+
+      // Update Campaign
+      const campaignUpdateStart = new Date().getTime();
+      const campaigns = getUniqueCampaigns(records);
+      await updateCampaignStatuses(campaigns);
+      const campaignUpdateEnd = new Date().getTime();
+      L.debug('Campaign Updates made');
+      L.debug(`Time Taken (Campaign Updates): ${campaignUpdateEnd - campaignUpdateStart}ms`);
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const runIndefinitely = async (blastTime, blastsMade) => {
     try {
       const startTime = new Date().getTime();
@@ -398,25 +421,19 @@ export default (container) => {
       }
       L.debug('Wait Over');
 
-      // Make Blasts
       const blastsStart = new Date().getTime();
-      await blastRecords(records);
-      const blastsEnd = new Date().getTime();
-      L.debug('Blasts made');
-      L.debug(`Time Taken (Wait for Blasts): ${blastsEnd - blastsStart}ms`);
-
-
-      const campaignUpdateStart = new Date().getTime();
-      const campaigns = getUniqueCampaigns(records);
-      await updateCampaignStatuses(campaigns);
-      const campaignUpdateEnd = new Date().getTime();
-      L.debug('Campaign Updates made');
-      L.debug(`Time Taken (Campaign Updates): ${campaignUpdateEnd - campaignUpdateStart}ms`);
+      const newBlast = records.length;
+      runSingle(records)
+        .then(() => console.log('Single Ended'))
+        .catch((error) => {
+          console.error(error);
+          throw error;
+        });
 
       const endTime = new Date().getTime();
       L.debug(`Time Taken (Iteration): ${endTime - startTime}ms`);
 
-      const newBlast = records.length;
+
       const totalBlastsMade = blastsMade + newBlast;
 
       const nextBlastTime = blastsStart + (secondsPerBatch * 1000);
