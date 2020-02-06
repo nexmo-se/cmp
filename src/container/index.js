@@ -14,6 +14,7 @@ import nexmo from 'nexmo';
 import rateLimit from 'axios-rate-limit';
 import moment from 'moment';
 import momentTimezone from 'moment-timezone';
+import Bottleneck from 'bottleneck';
 
 import AuthenticationError from '../errors/authError';
 import ForbiddenError from '../errors/forbiddenError';
@@ -69,6 +70,7 @@ container.nexmo = nexmo;
 container.rateLimit = rateLimit;
 container.moment = moment;
 container.momentTimezone = momentTimezone;
+container.Bottleneck = Bottleneck;
 
 // Errors
 container.AuthenticationError = AuthenticationError;
