@@ -342,6 +342,15 @@ export default (container) => {
       await createRecordMessages(record, result);
       return Promise.resolve(result);
     } catch (error) {
+      if (error.response != null) {
+        L.error(error.message);
+        if (error.response.status === 429) {
+          L.error('Too many request (429) detected, put back into queue');
+          return blastRecord(record);
+        }
+      } else {
+        L.error(error.message, error);
+      }
       return Promise.reject(error);
     }
   };

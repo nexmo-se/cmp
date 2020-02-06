@@ -113,7 +113,7 @@ export default (container) => {
       return res;
     });
 
-    const minTime = 1000 / tps;
+    const minTime = Math.ceil(1000 / tps);
     const bottleneckInstance = new container.Bottleneck({ minTime });
 
     return {
