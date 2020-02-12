@@ -68,6 +68,8 @@ export default (container) => {
 
   const createApplication = async (req, res, next) => {
     try {
+      const { user } = req;
+      const userId = user.id;
       const {
         name, cmpApiKeyId, applicationId, privateKey,
       } = req.body;
@@ -78,7 +80,8 @@ export default (container) => {
       );
 
       // Setup Webhook
-      const cmpApplication = CmpApplication.readApplication(createdCmpApplication.id, false);
+      const cmpApplication = await CmpApplication
+        .readApplication(createdCmpApplication.id, userId, false);
       const { cmpApiKey } = cmpApplication;
       const { apiKey, apiSecret } = cmpApiKey;
       await updateWebhook(apiKey, apiSecret, applicationId);
@@ -91,10 +94,12 @@ export default (container) => {
 
   const readApplication = async (req, res, next) => {
     try {
+      const { user } = req;
+      const userId = user.id;
       const { cmpApplicationId } = req.params;
       const { CmpApplication } = container.persistenceService;
 
-      const cmpApplication = await CmpApplication.readApplication(cmpApplicationId);
+      const cmpApplication = await CmpApplication.readApplication(cmpApplicationId, userId);
       res.status(200).json(cmpApplication);
     } catch (error) {
       next(error);
@@ -118,6 +123,8 @@ export default (container) => {
 
   const updateApplication = async (req, res, next) => {
     try {
+      const { user } = req;
+      const userId = user.id;
       const { cmpApplicationId } = req.params;
       const {
         name, cmpApiKeyId, applicationId, privateKey,
@@ -143,7 +150,7 @@ export default (container) => {
 
       const { CmpApplication } = container.persistenceService;
       const cmpApplication = await CmpApplication.updateApplication(
-        cmpApplicationId, null, changes,
+        cmpApplicationId, userId, changes,
       );
       res.status(200).json(cmpApplication);
     } catch (error) {
@@ -153,9 +160,11 @@ export default (container) => {
 
   const deleteApplication = async (req, res, next) => {
     try {
+      const { user } = req;
+      const userId = user.id;
       const { cmpApplicationId } = req.params;
       const { CmpApplication } = container.persistenceService;
-      const cmpApplication = await CmpApplication.deleteApplication(cmpApplicationId);
+      const cmpApplication = await CmpApplication.deleteApplication(cmpApplicationId, userId);
       res.status(200).json(cmpApplication);
     } catch (error) {
       next(error);
