@@ -69,7 +69,7 @@ export default (container) => {
       };
 
       const startTime = new Date().getTime();
-      const results = await CmpRecord.updateRecords(criteria, changes, true);
+      const results = await CmpRecord.updateRecords(criteria, changes, true, {});
       const endTime = new Date().getTime();
       const duration = endTime - startTime;
       L.debug(`Time Taken (Prepare Records Bulk): ${duration}ms`);
