@@ -44,6 +44,35 @@ export default (container) => {
     }
   };
 
+  const findRecord = async (criteria = {}, excludeSecret = true) => {
+    try {
+      const { CmpRecord } = container.databaseService.accessors;
+      const cmpRecord = await CmpRecord.findRecord(
+        criteria, excludeSecret, true,
+      );
+      if (cmpRecord == null) {
+        return Promise.resolve(null);
+      }
+      const mappedCmpRecord = mapRecord(cmpRecord);
+      return Promise.resolve(mappedCmpRecord);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findRecords = async (criteria = {}, excludeSecret = true, options = {}) => {
+    try {
+      const { CmpRecord } = container.databaseService.accessors;
+      const cmpRecords = await CmpRecord.findRecords(
+        criteria, excludeSecret, true, options,
+      );
+      const mappedCmpRecords = cmpRecords.map(mapRecord);
+      return Promise.resolve(mappedCmpRecords);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const getActiveRecords = async (numberOfRecords, currentTime, excludeSecret = true) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
@@ -172,5 +201,8 @@ export default (container) => {
 
     deleteRecord,
     deleteRecords,
+
+    findRecord,
+    findRecords,
   };
 };

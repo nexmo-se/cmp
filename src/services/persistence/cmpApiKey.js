@@ -38,6 +38,35 @@ export default (container) => {
     }
   };
 
+  const findApiKey = async (userId, criteria, excludeSecret = true) => {
+    try {
+      const { CmpApiKey } = container.databaseService.accessors;
+      const cmpApiKeys = await CmpApiKey.findApiKey(
+        criteria, userId, excludeSecret, true,
+      );
+      const filteredApiKeys = filterApiKeys(userId, [cmpApiKeys]);
+      if (filteredApiKeys.length > 0) {
+        return Promise.resolve(filteredApiKeys[0]);
+      }
+      return Promise.resolve(null);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findApiKeys = async (userId, criteria, excludeSecret = true, options = {}) => {
+    try {
+      const { CmpApiKey } = container.databaseService.accessors;
+      const cmpApiKeys = await CmpApiKey.findApiKeys(
+        criteria, userId, excludeSecret, true, options,
+      );
+      const filteredApiKeys = filterApiKeys(userId, cmpApiKeys);
+      return Promise.resolve(filteredApiKeys);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createApiKey = async (
     name,
     apiKey,
@@ -128,5 +157,8 @@ export default (container) => {
 
     deleteApiKey,
     deleteApiKeys,
+
+    findApiKey,
+    findApiKeys,
   };
 };

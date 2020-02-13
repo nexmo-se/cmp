@@ -11,6 +11,26 @@ export default (container) => {
     }
   };
 
+  const findTemplate = async (criteria, excludeSecret = true) => {
+    try {
+      const { CmpTemplate } = container.databaseService.accessors;
+      const cmpTemplate = await CmpTemplate.findTemplate(criteria, excludeSecret, true);
+      return Promise.resolve(cmpTemplate);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findTemplates = async (criteria, excludeSecret = true, options = {}) => {
+    try {
+      const { CmpTemplate } = container.databaseService.accessors;
+      const cmpTemplates = await CmpTemplate.findTemplates(criteria, excludeSecret, true, options);
+      return Promise.resolve(cmpTemplates);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createTemplate = async (
     name,
     cmpChannelId,
@@ -109,5 +129,8 @@ export default (container) => {
 
     deleteTemplate,
     deleteTemplates,
+
+    findTemplate,
+    findTemplates,
   };
 };

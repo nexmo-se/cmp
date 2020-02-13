@@ -11,6 +11,26 @@ export default (container) => {
     }
   };
 
+  const findCampaign = async (criteria, excludeDeleted = true) => {
+    try {
+      const { CmpCampaign } = container.databaseService.accessors;
+      const cmpCampaign = await CmpCampaign.findCampaign(criteria, excludeDeleted);
+      return Promise.resolve(cmpCampaign);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findCampaigns = async (criteria, excludeDeleted = true, options = {}) => {
+    try {
+      const { CmpCampaign } = container.databaseService.accessors;
+      const cmpCampaigns = await CmpCampaign.findCampaigns(criteria, excludeDeleted, options);
+      return Promise.resolve(cmpCampaigns);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createCampaign = async (
     name,
     campaignStartDate,
@@ -93,5 +113,8 @@ export default (container) => {
 
     deleteCampaign,
     deleteCampaigns,
+
+    findCampaign,
+    findCampaigns,
   };
 };

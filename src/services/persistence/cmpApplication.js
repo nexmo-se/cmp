@@ -52,6 +52,35 @@ export default (container) => {
     }
   };
 
+  const findApplication = async (userId, criteria = {}, excludeSecret = true) => {
+    try {
+      const { CmpApplication } = container.databaseService.accessors;
+      const cmpApplications = await CmpApplication.findApplication(
+        criteria, userId, excludeSecret, true,
+      );
+      const filteredApplications = filterApplications(userId, [cmpApplications]);
+      if (filteredApplications.length > 0) {
+        return Promise.resolve(filteredApplications[0]);
+      }
+      return Promise.resolve(null);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findApplications = async (userId, criteria = {}, excludeSecret = true, options = {}) => {
+    try {
+      const { CmpApplication } = container.databaseService.accessors;
+      const cmpApplications = await CmpApplication.findApplications(
+        criteria, userId, excludeSecret, true, options,
+      );
+      const filteredApplications = filterApplications(userId, cmpApplications);
+      return Promise.resolve(filteredApplications);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createApplication = async (
     name,
     cmpApiKeyId,
@@ -150,5 +179,8 @@ export default (container) => {
 
     deleteApplication,
     deleteApplications,
+
+    findApplication,
+    findApplications,
   };
 };

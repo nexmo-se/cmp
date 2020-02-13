@@ -11,6 +11,26 @@ export default (container) => {
     }
   };
 
+  const findUser = async (criteria = {}, excludePassword = true) => {
+    try {
+      const { User } = container.databaseService.accessors;
+      const user = await User.findUser(criteria, excludePassword, true);
+      return Promise.resolve(user);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findUsers = async (criteria = {}, excludePassword = true, options = {}) => {
+    try {
+      const { User } = container.databaseService.accessors;
+      const users = await User.findUsers(criteria, excludePassword, true, options);
+      return Promise.resolve(users);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const getUserByUsername = async (username, excludePassword = true, excludeDeleted = true) => {
     try {
       const { User } = container.databaseService.accessors;
@@ -180,6 +200,9 @@ export default (container) => {
 
     deleteUser,
     deleteUsers,
+
+    findUser,
+    findUsers,
 
     listUserRoles,
     assignRoleToUser,

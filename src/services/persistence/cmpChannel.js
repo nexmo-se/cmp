@@ -66,6 +66,35 @@ export default (container) => {
     }
   };
 
+  const findChannel = async (userId, criteria = {}, excludeSecret = true) => {
+    try {
+      const { CmpChannel } = container.databaseService.accessors;
+      const cmpChannels = await CmpChannel.findChannel(
+        criteria, userId, excludeSecret, true,
+      );
+      const filteredChannels = filterChannels(userId, [cmpChannels]);
+      if (filteredChannels.length > 0) {
+        return Promise.resolve(filteredChannels[0]);
+      }
+      return Promise.resolve(null);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findChannels = async (userId, criteria = {}, excludeSecret = true, options = {}) => {
+    try {
+      const { CmpChannel } = container.databaseService.accessors;
+      const cmpChannels = await CmpChannel.findChannels(
+        criteria, userId, excludeSecret, true, options,
+      );
+      const filteredChannels = filterChannels(userId, cmpChannels);
+      return Promise.resolve(filteredChannels);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createChannel = async (
     name,
     channel,
@@ -164,5 +193,8 @@ export default (container) => {
 
     deleteChannel,
     deleteChannels,
+
+    findChannel,
+    findChannels,
   };
 };
