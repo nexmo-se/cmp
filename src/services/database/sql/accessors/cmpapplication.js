@@ -167,7 +167,7 @@ export default (container) => {
   };
 
   const getByCriteriaUser = async (
-    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true, options = {},
   ) => {
     try {
       const {
@@ -236,6 +236,16 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      // Check Limit
+      if (options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      // Check Offset
+      if (options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpApplications = await CmpApplication.findAll(query);
       const cmpApplications = rawCmpApplications
         .map(cmpApplication => mapCmpApplication(cmpApplication, excludeSecret));
@@ -245,7 +255,9 @@ export default (container) => {
     }
   };
 
-  const getByCriteriaAdmin = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const getByCriteriaAdmin = async (
+    criteria = {}, excludeSecret = true, excludeDeleted = true, options = {},
+  ) => {
     try {
       const {
         CmpApiKey, CmpApplication, CmpChannel, User, UserApplication, UserApiKey,
@@ -310,6 +322,16 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      // Check Limit
+      if (options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      // Check Offset
+      if (options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpApplications = await CmpApplication.findAll(query);
       const cmpApplications = rawCmpApplications
         .map(cmpApplication => mapCmpApplication(cmpApplication, excludeSecret));
@@ -320,12 +342,12 @@ export default (container) => {
   };
 
   const getOneByCriteria = async (
-    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true, options = {},
   ) => {
     try {
       const cmpApplications = userId ? await getByCriteriaUser(
-        criteria, userId, excludeSecret, excludeDeleted,
-      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted);
+        criteria, userId, excludeSecret, excludeDeleted, options,
+      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       if (cmpApplications == null || cmpApplications.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -367,7 +389,7 @@ export default (container) => {
   };
 
   const updateByCriteria = async (
-    criteria = {}, userId, changes = {}, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, userId, changes = {}, excludeSecret = true, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpApplication } = container.databaseService.models;
@@ -382,8 +404,8 @@ export default (container) => {
       L.debug('CmpApplication Update Result', result);
 
       const cmpApplications = userId ? await getByCriteriaUser(
-        criteria, userId, excludeSecret, excludeDeleted,
-      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted);
+        criteria, userId, excludeSecret, excludeDeleted, options,
+      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);
@@ -444,10 +466,11 @@ export default (container) => {
     return mappedCmpApplication;
   };
 
-  const listApplications = async (userId, excludeSecret = true) => {
+  const listApplications = async (userId, excludeSecret = true, options = {}) => {
     try {
-      const cmpApplications = userId ? await getByCriteriaUser({}, userId, excludeSecret, true)
-        : await getByCriteriaAdmin({}, excludeSecret, true);
+      const cmpApplications = userId ? await getByCriteriaUser(
+        {}, userId, excludeSecret, true, options,
+      ) : await getByCriteriaAdmin({}, excludeSecret, true, options);
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);
@@ -550,12 +573,12 @@ export default (container) => {
   };
 
   const findApplications = async (
-    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true, options = {},
   ) => {
     try {
       const cmpApplications = userId ? await getByCriteriaUser(
-        criteria, userId, excludeSecret, excludeDeleted,
-      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted);
+        criteria, userId, excludeSecret, excludeDeleted, options,
+      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpApplications);
     } catch (error) {
       return Promise.reject(error);

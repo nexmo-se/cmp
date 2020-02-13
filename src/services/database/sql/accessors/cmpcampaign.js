@@ -41,7 +41,9 @@ export default (container) => {
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (
+    criteria = {}, excludeDeleted = true, options = {},
+  ) => {
     try {
       const {
         CmpCampaign, CmpCampaignStatusAudit,
@@ -66,6 +68,16 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      // Check Limit
+      if (options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      // Check Offset
+      if (options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpCampaigns = await CmpCampaign.findAll(query);
       const cmpCampaigns = rawCmpCampaigns
         .map(cmpCampaign => mapCmpCampaign(cmpCampaign));
@@ -75,9 +87,9 @@ export default (container) => {
     }
   };
 
-  const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getOneByCriteria = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
-      const cmpCampaigns = await getByCriteria(criteria, excludeDeleted);
+      const cmpCampaigns = await getByCriteria(criteria, excludeDeleted, options);
       if (cmpCampaigns == null || cmpCampaigns.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -117,7 +129,7 @@ export default (container) => {
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludeDeleted = true,
+    criteria = {}, changes = {}, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpCampaign } = container.databaseService.models;
@@ -131,7 +143,7 @@ export default (container) => {
       const result = await CmpCampaign.update(changes, query);
       L.debug('CmpCampaign Update Result', result);
 
-      const cmpCampaigns = await getByCriteria(criteria, excludeDeleted);
+      const cmpCampaigns = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpCampaigns);
     } catch (error) {
       return Promise.reject(error);
@@ -164,9 +176,9 @@ export default (container) => {
     return mappedCmpCampaign;
   };
 
-  const listCampaigns = async () => {
+  const listCampaigns = async (options = {}) => {
     try {
-      const cmpCampaigns = await getByCriteria({}, true);
+      const cmpCampaigns = await getByCriteria({}, true, options);
       return Promise.resolve(cmpCampaigns);
     } catch (error) {
       return Promise.reject(error);
@@ -253,9 +265,9 @@ export default (container) => {
     }
   };
 
-  const findCampaigns = async (criteria = {}, excludeDeleted = true) => {
+  const findCampaigns = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
-      const cmpCampaigns = await getByCriteria(criteria, excludeDeleted);
+      const cmpCampaigns = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpCampaigns);
     } catch (error) {
       return Promise.reject(error);

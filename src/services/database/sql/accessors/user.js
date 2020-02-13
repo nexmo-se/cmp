@@ -38,7 +38,9 @@ export default (container) => {
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludePassword = true, excludeDeleted = true) => {
+  const getByCriteria = async (
+    criteria = {}, excludePassword = true, excludeDeleted = true, options = {},
+  ) => {
     try {
       const { User, UserRole } = container.databaseService.models;
       const query = {
@@ -60,6 +62,16 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      // Check Limit
+      if (options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      // Check Offset
+      if (options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawUsers = await User.findAll(query);
       const users = rawUsers.map(user => mapUser(user, excludePassword));
       return Promise.resolve(users);
@@ -68,9 +80,11 @@ export default (container) => {
     }
   };
 
-  const getOneByCriteria = async (criteria = {}, excludePassword = true, excludeDeleted = true) => {
+  const getOneByCriteria = async (
+    criteria = {}, excludePassword = true, excludeDeleted = true, options = {},
+  ) => {
     try {
-      const users = await getByCriteria(criteria, excludePassword, excludeDeleted);
+      const users = await getByCriteria(criteria, excludePassword, excludeDeleted, options);
       if (users == null || users.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -108,7 +122,7 @@ export default (container) => {
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludePassword = true, excludeDeleted = true,
+    criteria = {}, changes = {}, excludePassword = true, excludeDeleted = true, options = {},
   ) => {
     try {
       const { User } = container.databaseService.models;
@@ -122,7 +136,7 @@ export default (container) => {
       const result = await User.update(changes, query);
       L.debug('User Update Result', result);
 
-      const users = await getByCriteria(criteria, excludePassword, excludeDeleted);
+      const users = await getByCriteria(criteria, excludePassword, excludeDeleted, options);
       return Promise.resolve(users);
     } catch (error) {
       return Promise.reject(error);
@@ -155,9 +169,9 @@ export default (container) => {
     return mappedUser;
   };
 
-  const listUsers = async (excludePassword = true) => {
+  const listUsers = async (excludePassword = true, options = {}) => {
     try {
-      const users = await getByCriteria({}, excludePassword, true);
+      const users = await getByCriteria({}, excludePassword, true, options);
       return Promise.resolve(users);
     } catch (error) {
       return Promise.reject(error);
@@ -238,18 +252,22 @@ export default (container) => {
     }
   };
 
-  const findUser = async (criteria = {}, excludePassword = true, excludeDeleted = true) => {
+  const findUser = async (
+    criteria = {}, excludePassword = true, excludeDeleted = true, options = {},
+  ) => {
     try {
-      const user = await getOneByCriteria(criteria, excludePassword, excludeDeleted);
+      const user = await getOneByCriteria(criteria, excludePassword, excludeDeleted, options);
       return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findUsers = async (criteria = {}, excludePassword = true, excludeDeleted = true) => {
+  const findUsers = async (
+    criteria = {}, excludePassword = true, excludeDeleted = true, options = {},
+  ) => {
     try {
-      const users = await getByCriteria(criteria, excludePassword, excludeDeleted);
+      const users = await getByCriteria(criteria, excludePassword, excludeDeleted, options);
       return Promise.resolve(users);
     } catch (error) {
       return Promise.reject(error);

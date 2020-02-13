@@ -128,7 +128,7 @@ export default (container) => {
   };
 
   const getByCriteriaUser = async (
-    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true, options = {},
   ) => {
     try {
       const {
@@ -178,6 +178,16 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      // Check Limit
+      if (options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      // Check Offset
+      if (options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpApiKeys = await CmpApiKey.findAll(query);
       const cmpApiKeys = rawCmpApiKeys
         .map(cmpApiKey => mapCmpApiKey(cmpApiKey, excludeSecret));
@@ -187,7 +197,9 @@ export default (container) => {
     }
   };
 
-  const getByCriteriaAdmin = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const getByCriteriaAdmin = async (
+    criteria = {}, excludeSecret = true, excludeDeleted = true, options = {},
+  ) => {
     try {
       const {
         CmpApiKey, CmpApplication, CmpChannel, User, UserApiKey,
@@ -234,6 +246,16 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      // Check Limit
+      if (options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      // Check Offset
+      if (options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpApiKeys = await CmpApiKey.findAll(query);
       const cmpApiKeys = rawCmpApiKeys
         .map(cmpApiKey => mapCmpApiKey(cmpApiKey, excludeSecret));
@@ -244,12 +266,12 @@ export default (container) => {
   };
 
   const getOneByCriteria = async (
-    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true, options = {},
   ) => {
     try {
       const cmpApiKeys = userId ? await getByCriteriaUser(
-        criteria, userId, excludeSecret, excludeDeleted,
-      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted);
+        criteria, userId, excludeSecret, excludeDeleted, options,
+      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       if (cmpApiKeys == null || cmpApiKeys.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -290,7 +312,7 @@ export default (container) => {
   };
 
   const updateByCriteria = async (
-    criteria = {}, userId, changes = {}, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, userId, changes = {}, excludeSecret = true, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpApiKey } = container.databaseService.models;
@@ -305,8 +327,8 @@ export default (container) => {
       L.debug('CmpApiKey Update Result', result);
 
       const cmpApiKeys = userId ? await getByCriteriaUser(
-        criteria, userId, excludeSecret, excludeDeleted,
-      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted);
+        criteria, userId, excludeSecret, excludeDeleted, options,
+      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
       return Promise.reject(error);
@@ -376,10 +398,10 @@ export default (container) => {
     return mappedCmpApiKey;
   };
 
-  const listApiKeys = async (userId, excludeSecret = true) => {
+  const listApiKeys = async (userId, excludeSecret = true, options = {}) => {
     try {
-      const apiKeys = userId ? await getByCriteriaUser({}, userId, excludeSecret, true)
-        : await getByCriteriaAdmin({}, excludeSecret, true);
+      const apiKeys = userId ? await getByCriteriaUser({}, userId, excludeSecret, true, options)
+        : await getByCriteriaAdmin({}, excludeSecret, true, options);
       return Promise.resolve(apiKeys);
     } catch (error) {
       return Promise.reject(error);
@@ -471,12 +493,12 @@ export default (container) => {
   };
 
   const findApiKeys = async (
-    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true, options = {},
   ) => {
     try {
       const cmpApiKeys = userId ? await getByCriteriaUser(
-        criteria, userId, excludeSecret, excludeDeleted,
-      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted);
+        criteria, userId, excludeSecret, excludeDeleted, options,
+      ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
       return Promise.reject(error);

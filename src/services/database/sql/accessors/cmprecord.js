@@ -213,9 +213,8 @@ export default (container) => {
 
   const getByCriteria = async (
     criteria = {},
-    limit,
-    offset,
     excludeSecret = true, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const {
@@ -228,8 +227,6 @@ export default (container) => {
       } = container.databaseService.models;
       const query = {
         where: criteria,
-        limit,
-        offset,
         include: [
           {
             model: CmpCampaign,
@@ -411,6 +408,16 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      // Check Limit
+      if (options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      // Check Offset
+      if (options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpRecords = await CmpRecord.findAll(query);
       const cmpRecords = rawCmpRecords
         .map(cmpRecord => mapCmpRecord(cmpRecord, excludeSecret));
@@ -421,11 +428,14 @@ export default (container) => {
   };
 
   const getOneByCriteria = async (
-    criteria = {}, offset,
+    criteria = {},
     excludeSecret = true, excludeDeleted = true,
+    options = {},
   ) => {
     try {
-      const cmpRecords = await getByCriteria(criteria, null, offset, excludeSecret, excludeDeleted);
+      const cmpRecords = await getByCriteria(
+        criteria, excludeSecret, excludeDeleted, options,
+      );
       if (cmpRecords == null || cmpRecords.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -465,7 +475,9 @@ export default (container) => {
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludeSecret = true, excludeDeleted = true, includeGet = false,
+    criteria = {}, changes = {},
+    excludeSecret = true, excludeDeleted = true, includeGet = false,
+    options = {},
   ) => {
     try {
       const { CmpRecord } = container.databaseService.models;
@@ -480,7 +492,9 @@ export default (container) => {
       L.debug('CmpRecord Update Result', result);
 
       if (includeGet) {
-        const cmpRecords = await getByCriteria(criteria, null, null, excludeSecret, excludeDeleted);
+        const cmpRecords = await getByCriteria(
+          criteria, excludeSecret, excludeDeleted, options,
+        );
         return Promise.resolve(cmpRecords);
       }
       return Promise.resolve([]);
@@ -761,9 +775,9 @@ export default (container) => {
     return mappedCmpRecord;
   };
 
-  const listRecords = async (limit, offset, excludeSecret = true) => {
+  const listRecords = async (excludeSecret = true, options = {}) => {
     try {
-      const cmpRecords = await getByCriteria({}, limit, offset, excludeSecret, true);
+      const cmpRecords = await getByCriteria({}, excludeSecret, true, options);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
@@ -861,9 +875,9 @@ export default (container) => {
     }
   };
 
-  const findRecord = async (criteria = {}, offset, excludeSecret = true, excludeDeleted = true) => {
+  const findRecord = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
     try {
-      const cmpRecord = await getOneByCriteria(criteria, offset, excludeSecret, excludeDeleted);
+      const cmpRecord = await getOneByCriteria(criteria, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
@@ -872,12 +886,12 @@ export default (container) => {
 
   const findRecords = async (
     criteria = {},
-    limit, offset,
     excludeSecret = true, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const cmpRecords = await getByCriteria(
-        criteria, limit, offset, excludeSecret, excludeDeleted,
+        criteria, excludeSecret, excludeDeleted, options,
       );
       return Promise.resolve(cmpRecords);
     } catch (error) {

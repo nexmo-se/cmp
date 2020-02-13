@@ -61,7 +61,9 @@ export default (container) => {
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const getByCriteria = async (
+    criteria = {}, excludeSecret = true, excludeDeleted = true, options = {},
+  ) => {
     try {
       const {
         CmpApiKey, CmpApplication, CmpChannel, CmpTemplate,
@@ -106,6 +108,16 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      // Check Limit
+      if (options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      // Check Offset
+      if (options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpTemplates = await CmpTemplate.findAll(query);
       const cmpTemplates = rawCmpTemplates
         .map(cmpTemplate => mapCmpTemplate(cmpTemplate, excludeSecret));
@@ -115,9 +127,11 @@ export default (container) => {
     }
   };
 
-  const getOneByCriteria = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const getOneByCriteria = async (
+    criteria = {}, excludeSecret = true, excludeDeleted = true, options = {},
+  ) => {
     try {
-      const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted, options);
       if (cmpTemplates == null || cmpTemplates.length === 0) {
         L.debug('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -157,7 +171,7 @@ export default (container) => {
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludeSecret = true, excludeDeleted = true,
+    criteria = {}, changes = {}, excludeSecret = true, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpTemplate } = container.databaseService.models;
@@ -171,7 +185,7 @@ export default (container) => {
       const result = await CmpTemplate.update(changes, query);
       L.debug('CmpTemplate Update Result', result);
 
-      const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);
@@ -244,9 +258,9 @@ export default (container) => {
     return mappedCmpTemplate;
   };
 
-  const listTemplates = async (excludeSecret = true) => {
+  const listTemplates = async (excludeSecret = true, options = {}) => {
     try {
-      const cmpTemplates = await getByCriteria({}, excludeSecret, true);
+      const cmpTemplates = await getByCriteria({}, excludeSecret, true, options);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);
@@ -344,9 +358,11 @@ export default (container) => {
     }
   };
 
-  const findTemplates = async (criteria = {}, excludeSecret = true, excludeDeleted = true) => {
+  const findTemplates = async (
+    criteria = {}, excludeSecret = true, excludeDeleted = true, options = {},
+  ) => {
     try {
-      const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted);
+      const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);

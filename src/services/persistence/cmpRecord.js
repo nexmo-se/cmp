@@ -36,7 +36,8 @@ export default (container) => {
   const listRecords = async (limit, offset, excludeSecret = true) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecords = await CmpRecord.listRecords(limit, offset, excludeSecret);
+      const options = { limit, offset };
+      const cmpRecords = await CmpRecord.listRecords(excludeSecret, options);
       const mappedCmpRecords = cmpRecords.map(mapRecord);
       return Promise.resolve(mappedCmpRecords);
     } catch (error) {
