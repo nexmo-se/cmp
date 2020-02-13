@@ -1,6 +1,99 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Template Controller');
 
+  const findAllTemplates = async (req, res, next) => {
+    try {
+      const {
+        limit, offset,
+        name, cmpChannelId,
+        whatsappTemplateNamespace, whatsappTemplateName,
+        viberTtl, facebookTag, category,
+        mediaType, body,
+      } = req.body;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (cmpChannelId) {
+        criteria.cmpChannelId = cmpChannelId;
+      }
+      if (whatsappTemplateNamespace) {
+        criteria.whatsappTemplateNamespace = whatsappTemplateNamespace;
+      }
+      if (whatsappTemplateName) {
+        criteria.whatsappTemplateName = whatsappTemplateName;
+      }
+      if (viberTtl) {
+        criteria.viberTtl = viberTtl;
+      }
+      if (facebookTag) {
+        criteria.facebookTag = facebookTag;
+      }
+      if (category) {
+        criteria.category = category;
+      }
+      if (mediaType) {
+        criteria.mediaType = mediaType;
+      }
+      if (body) {
+        criteria.body = body;
+      }
+      const options = { limit, offset };
+      const { CmpTemplate } = container.persistenceService;
+      const cmpTemplates = await CmpTemplate.findTemplates(criteria, true, options);
+      res.status(200).json(cmpTemplates);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  const findMyTemplates = async (req, res, next) => {
+    try {
+      L.warn('Temporary: User can read all Templates');
+      const {
+        limit, offset,
+        name, cmpChannelId,
+        whatsappTemplateNamespace, whatsappTemplateName,
+        viberTtl, facebookTag, category,
+        mediaType, body,
+      } = req.body;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (cmpChannelId) {
+        criteria.cmpChannelId = cmpChannelId;
+      }
+      if (whatsappTemplateNamespace) {
+        criteria.whatsappTemplateNamespace = whatsappTemplateNamespace;
+      }
+      if (whatsappTemplateName) {
+        criteria.whatsappTemplateName = whatsappTemplateName;
+      }
+      if (viberTtl) {
+        criteria.viberTtl = viberTtl;
+      }
+      if (facebookTag) {
+        criteria.facebookTag = facebookTag;
+      }
+      if (category) {
+        criteria.category = category;
+      }
+      if (mediaType) {
+        criteria.mediaType = mediaType;
+      }
+      if (body) {
+        criteria.body = body;
+      }
+      const options = { limit, offset };
+      const { CmpTemplate } = container.persistenceService;
+      const cmpTemplates = await CmpTemplate.findTemplates(criteria, true, options);
+      res.status(200).json(cmpTemplates);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   const listAllTemplates = async (req, res, next) => {
     try {
       const { limit, offset } = req.query;
@@ -138,6 +231,9 @@ export default (container) => {
   };
 
   return {
+    findAllTemplates,
+    findMyTemplates,
+
     listAllTemplates,
     listMyTemplates,
     deleteAllTemplates,

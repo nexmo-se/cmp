@@ -33,6 +33,55 @@ export default (container) => {
     }
   };
 
+  const findAllApplications = async (req, res, next) => {
+    try {
+      const {
+        limit, offset,
+        name, cmpApiKeyId,
+      } = req.body;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (cmpApiKeyId) {
+        criteria.cmpApiKeyId = cmpApiKeyId;
+      }
+      const options = { limit, offset };
+      const { CmpApplication } = container.persistenceService;
+      const cmpApplications = await CmpApplication.findApplications(null, criteria, true, options);
+      res.status(200).json(cmpApplications);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  const findMyApplications = async (req, res, next) => {
+    try {
+      L.warn('Temporary: User can read all Applications');
+      const {
+        limit, offset,
+        name, cmpApiKeyId,
+      } = req.body;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (cmpApiKeyId) {
+        criteria.cmpApiKeyId = cmpApiKeyId;
+      }
+      const options = { limit, offset };
+      const { user } = req;
+      const userId = user.id;
+      const { CmpApplication } = container.persistenceService;
+      const cmpApplications = await CmpApplication.findApplications(
+        userId, criteria, true, options,
+      );
+      res.status(200).json(cmpApplications);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   const listAllApplications = async (req, res, next) => {
     try {
       const { limit, offset } = req.query;
@@ -177,6 +226,9 @@ export default (container) => {
 
   return {
     setWebhook,
+
+    findAllApplications,
+    findMyApplications,
 
     listAllApplications,
     listMyApplications,

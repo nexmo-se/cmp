@@ -13,6 +13,62 @@ export default (container) => {
     }
   };
 
+  const findAllCampaigns = async (req, res, next) => {
+    try {
+      const {
+        limit, offset,
+        name, campaignStartDate, campaignEndDate, status,
+      } = req.body;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (campaignStartDate) {
+        criteria.campaignStartDate = campaignStartDate;
+      }
+      if (campaignEndDate) {
+        criteria.campaignEndDate = campaignEndDate;
+      }
+      if (status) {
+        criteria.status = status;
+      }
+      const options = { limit, offset };
+      const { CmpCampaign } = container.persistenceService;
+      const cmpCampaigns = await CmpCampaign.findCampaigns(criteria, true, options);
+      res.status(200).json(cmpCampaigns);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  const findMyCampaigns = async (req, res, next) => {
+    try {
+      L.warn('Temporary: User can read all Campaigns');const {
+        limit, offset,
+        name, campaignStartDate, campaignEndDate, status,
+      } = req.body;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (campaignStartDate) {
+        criteria.campaignStartDate = campaignStartDate;
+      }
+      if (campaignEndDate) {
+        criteria.campaignEndDate = campaignEndDate;
+      }
+      if (status) {
+        criteria.status = status;
+      }
+      const options = { limit, offset };
+      const { CmpCampaign } = container.persistenceService;
+      const cmpCampaigns = await CmpCampaign.findCampaigns(criteria, true, options);
+      res.status(200).json(cmpCampaigns);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   const listAllCampaigns = async (req, res, next) => {
     try {
       const { limit, offset } = req.query;
@@ -183,6 +239,9 @@ export default (container) => {
   };
 
   return {
+    findAllCampaigns,
+    findMyCampaigns,
+
     listAllCampaigns,
     listMyCampaigns,
     deleteAllCampaigns,

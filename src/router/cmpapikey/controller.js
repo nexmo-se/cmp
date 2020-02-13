@@ -32,6 +32,53 @@ export default (container) => {
     }
   };
 
+  const findAllApiKeys = async (req, res, next) => {
+    try {
+      const {
+        limit, offset,
+        name, signatureMethod,
+      } = req.body;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (signatureMethod) {
+        criteria.signatureMethod = signatureMethod;
+      }
+      const options = { limit, offset };
+      const { CmpApiKey } = container.persistenceService;
+      const cmpApiKeys = await CmpApiKey.findApiKeys(null, criteria, true, options);
+      res.status(200).json(cmpApiKeys);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  const findMyApiKeys = async (req, res, next) => {
+    try {
+      L.warn('Temporary: User can read all API Keys');
+      const {
+        limit, offset,
+        name, signatureMethod,
+      } = req.body;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (signatureMethod) {
+        criteria.signatureMethod = signatureMethod;
+      }
+      const options = { limit, offset };
+      const { user } = req;
+      const userId = user.id;
+      const { CmpApiKey } = container.persistenceService;
+      const cmpApiKeys = await CmpApiKey.findApiKeys(userId, criteria, true, options);
+      res.status(200).json(cmpApiKeys);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   const listAllApiKeys = async (req, res, next) => {
     try {
       const { limit, offset } = req.query;
@@ -163,6 +210,9 @@ export default (container) => {
 
   return {
     setWebhook,
+
+    findAllApiKeys,
+    findMyApiKeys,
 
     listAllApiKeys,
     listMyApiKeys,

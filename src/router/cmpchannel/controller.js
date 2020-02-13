@@ -1,6 +1,85 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Channel Controller');
 
+  const findAllChannels = async (req, res, next) => {
+    try {
+      const {
+        limit, offset,
+        name, channel, senderId, tps,
+        cmpApiKeyId, cmpApplicationId, smsUseSignature,
+      } = req.body;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (channel) {
+        criteria.channel = channel;
+      }
+      if (senderId) {
+        criteria.senderId = senderId;
+      }
+      if (tps) {
+        criteria.tps = tps;
+      }
+      if (cmpApiKeyId) {
+        criteria.cmpApiKeyId = cmpApiKeyId;
+      }
+      if (cmpApplicationId) {
+        criteria.cmpApplicationId = cmpApplicationId;
+      }
+      if (smsUseSignature != null) {
+        criteria.smsUseSignature = smsUseSignature;
+      }
+      const options = { limit, offset };
+      const { CmpChannel } = container.persistenceService;
+      const cmpChannels = await CmpChannel.findChannels(null, criteria, true, options);
+      res.status(200).json(cmpChannels);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  const findMyChannels = async (req, res, next) => {
+    try {
+      L.warn('Temporary: User can read all Channels');
+      const {
+        limit, offset,
+        name, channel, senderId, tps,
+        cmpApiKeyId, cmpApplicationId, smsUseSignature,
+      } = req.body;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (channel) {
+        criteria.channel = channel;
+      }
+      if (senderId) {
+        criteria.senderId = senderId;
+      }
+      if (tps) {
+        criteria.tps = tps;
+      }
+      if (cmpApiKeyId) {
+        criteria.cmpApiKeyId = cmpApiKeyId;
+      }
+      if (cmpApplicationId) {
+        criteria.cmpApplicationId = cmpApplicationId;
+      }
+      if (smsUseSignature != null) {
+        criteria.smsUseSignature = smsUseSignature;
+      }
+      const options = { limit, offset };
+      const { user } = req;
+      const userId = user.id;
+      const { CmpChannel } = container.persistenceService;
+      const cmpChannels = await CmpChannel.findChannels(userId, criteria, true, options);
+      res.status(200).json(cmpChannels);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   const listAllChannels = async (req, res, next) => {
     try {
       const { limit, offset } = req.query;
@@ -152,6 +231,9 @@ export default (container) => {
   };
 
   return {
+    findAllChannels,
+    findMyChannels,
+
     listAllChannels,
     listMyChannels,
     deleteAllChannels,
