@@ -5,6 +5,13 @@ export default {
     query: {
       limit: Joi.number().integer(),
       offset: Joi.number().integer(),
+      name: Joi.string(),
+      channel: Joi.string(),
+      senderId: Joi.string(),
+      tps: Joi.number().integer(),
+      cmpApiKeyId: Joi.string(),
+      cmpApplicationId: Joi.string(),
+      smsUseSignature: Joi.boolean(),
     },
     params: {},
     body: {},

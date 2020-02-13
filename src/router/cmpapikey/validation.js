@@ -12,6 +12,8 @@ export default {
     query: {
       limit: Joi.number().integer(),
       offset: Joi.number().integer(),
+      name: Joi.string(),
+      signatureMethod: Joi.string(),
     },
     params: {},
     body: {},

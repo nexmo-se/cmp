@@ -5,6 +5,10 @@ export default {
     query: {
       limit: Joi.number().integer(),
       offset: Joi.number().integer(),
+      name: Joi.string(),
+      campaignStartDate: Joi.date(),
+      campaignEndDate: Joi.date(),
+      status: Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed'),
     },
     params: {},
     body: {},

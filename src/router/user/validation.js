@@ -5,6 +5,9 @@ export default {
     query: {
       limit: Joi.number().integer(),
       offset: Joi.number().integer(),
+      username: Joi.string(),
+      firstName: Joi.string(),
+      lastName: Joi.string(),
     },
     params: {},
     body: {},
