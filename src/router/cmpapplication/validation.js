@@ -18,6 +18,22 @@ export default {
     params: {},
     body: {},
   },
+  searchApplications: {
+    query: {},
+    params: {},
+    body: {
+      limit: Joi.number().integer(),
+      offset: Joi.number().integer(),
+      name: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      cmpApiKeyId: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+    },
+  },
   deleteAllApplications: {
     query: {},
     params: {},

@@ -16,6 +16,36 @@ export default {
     params: {},
     body: {},
   },
+  searchChannels: {
+    query: {},
+    params: {},
+    body: {
+      limit: Joi.number().integer(),
+      offset: Joi.number().integer(),
+      name: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      channel: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      senderId: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      tps: Joi.number().integer(),
+      cmpApiKeyId: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      cmpApplicationId: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      smsUseSignature: Joi.boolean(),
+    },
+  },
   deleteAllChannels: {
     query: {},
     params: {},

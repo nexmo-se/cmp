@@ -13,6 +13,24 @@ export default {
     params: {},
     body: {},
   },
+  searchCampaigns: {
+    query: {},
+    params: {},
+    body: {
+      limit: Joi.number().integer(),
+      offset: Joi.number().integer(),
+      name: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      campaignStartDate: Joi.date(),
+      campaignEndDate: Joi.date(),
+      status: Joi.alternatives().try(
+        Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed'),
+        Joi.array().items(Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed')),
+      ),
+    },
+  },
   deleteAllCampaigns: {
     query: {},
     params: {},

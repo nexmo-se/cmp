@@ -18,6 +18,47 @@ export default {
     params: {},
     body: {},
   },
+  searchTemplates: {
+    query: {},
+    params: {},
+    body: {
+      limit: Joi.number().integer(),
+      offset: Joi.number().integer(),
+      name: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      cmpChannelId: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      whatsappTemplateNamespace: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      whatsappTemplateName: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      viberTtl: Joi.number().integer(),
+      facebookTag: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      category: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      mediaType: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      body: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+    },
+  },
   deleteAllTemplates: {
     query: {},
     params: {},

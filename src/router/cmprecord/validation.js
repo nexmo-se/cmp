@@ -20,6 +20,43 @@ export default {
     params: {},
     body: {},
   },
+  searchRecords: {
+    query: {
+      limit: Joi.number().integer(),
+      offset: Joi.number().integer(),
+      recipient: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      cmpCampaignId: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      cmpTemplateId: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      cmpMediaId: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      activeStartHour: Joi.number().integer(),
+      activeStartMinute: Joi.number().integer(),
+      activeEndHour: Joi.number().integer(),
+      activeEndMinute: Joi.number().integer(),
+      activeOnWeekends: Joi.boolean(),
+      timezone: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      status: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+    },
+    params: {},
+    body: {},
+  },
   listActiveRecords: {
     query: {
       limit: Joi.number().integer().default(30),

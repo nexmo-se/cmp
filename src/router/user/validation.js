@@ -12,6 +12,26 @@ export default {
     params: {},
     body: {},
   },
+  searchUsers: {
+    query: {},
+    params: {},
+    body: {
+      limit: Joi.number().integer(),
+      offset: Joi.number().integer(),
+      username: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      firstName: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      lastName: Joi.alternatives().try(
+        Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+    },
+  },
   deleteAllUsers: {
     query: {},
     params: {},
