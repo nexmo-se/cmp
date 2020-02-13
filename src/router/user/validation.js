@@ -2,7 +2,10 @@ import Joi from 'joi';
 
 export default {
   listUsers: {
-    query: {},
+    query: {
+      limit: Joi.number().integer(),
+      offset: Joi.number().integer(),
+    },
     params: {},
     body: {},
   },

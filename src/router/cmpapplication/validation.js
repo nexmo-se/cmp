@@ -9,7 +9,10 @@ export default {
     body: {},
   },
   listApplications: {
-    query: {},
+    query: {
+      limit: Joi.number().integer(),
+      offset: Joi.number().integer(),
+    },
     params: {},
     body: {},
   },
