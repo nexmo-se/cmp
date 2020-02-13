@@ -227,9 +227,9 @@ export default (container) => {
     }
   };
 
-  const updateCampaigns = async (criteria, changes) => {
+  const updateCampaigns = async (criteria, changes, options = {}) => {
     try {
-      const cmpCampaigns = await updateByCriteria(criteria, changes, true);
+      const cmpCampaigns = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpCampaigns);
     } catch (error) {
       return Promise.reject(error);

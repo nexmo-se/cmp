@@ -1,10 +1,10 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Template Persistence Accessor');
 
-  const listTemplates = async (excludeSecret = true) => {
+  const listTemplates = async (excludeSecret = true, options = {}) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
-      const cmpTemplates = await CmpTemplate.listTemplates(excludeSecret);
+      const cmpTemplates = await CmpTemplate.listTemplates(excludeSecret, options);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);
@@ -65,10 +65,12 @@ export default (container) => {
     }
   };
 
-  const updateTemplates = async (criteria, changes, excludeSecret = true) => {
+  const updateTemplates = async (criteria, changes, excludeSecret = true, options = {}) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
-      const cmpTemplates = await CmpTemplate.updateTemplates(criteria, changes, excludeSecret);
+      const cmpTemplates = await CmpTemplate.updateTemplates(
+        criteria, changes, excludeSecret, options,
+      );
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);

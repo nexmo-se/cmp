@@ -454,9 +454,11 @@ export default (container) => {
     }
   };
 
-  const updateApiKeys = async (criteria, userId, changes, excludeSecret = true) => {
+  const updateApiKeys = async (criteria, userId, changes, excludeSecret = true, options = {}) => {
     try {
-      const cmpApiKeys = await updateByCriteria(criteria, userId, changes, excludeSecret, true);
+      const cmpApiKeys = await updateByCriteria(
+        criteria, userId, changes, excludeSecret, true, options,
+      );
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
       return Promise.reject(error);

@@ -1,10 +1,10 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Campaign Persistence Accessor');
 
-  const listCampaigns = async () => {
+  const listCampaigns = async (options = {}) => {
     try {
       const { CmpCampaign } = container.databaseService.accessors;
-      const cmpCampaigns = await CmpCampaign.listCampaigns();
+      const cmpCampaigns = await CmpCampaign.listCampaigns(options);
       return Promise.resolve(cmpCampaigns);
     } catch (error) {
       return Promise.reject(error);
@@ -51,10 +51,10 @@ export default (container) => {
     }
   };
 
-  const updateCampaigns = async (criteria, changes) => {
+  const updateCampaigns = async (criteria, changes, options = {}) => {
     try {
       const { CmpCampaign } = container.databaseService.accessors;
-      const cmpCampaigns = await CmpCampaign.updateCampaigns(criteria, changes);
+      const cmpCampaigns = await CmpCampaign.updateCampaigns(criteria, changes, options);
       return Promise.resolve(cmpCampaigns);
     } catch (error) {
       return Promise.reject(error);
@@ -95,4 +95,3 @@ export default (container) => {
     deleteCampaigns,
   };
 };
- 

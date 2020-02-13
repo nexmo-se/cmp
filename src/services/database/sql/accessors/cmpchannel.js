@@ -627,9 +627,13 @@ export default (container) => {
     }
   };
 
-  const updateChannels = async (criteria, userId, changes, excludeSecret = true) => {
+  const updateChannels = async (
+    criteria, userId, changes, excludeSecret = true, options = {},
+  ) => {
     try {
-      const cmpChannels = await updateByCriteria(criteria, userId, changes, excludeSecret, true);
+      const cmpChannels = await updateByCriteria(
+        criteria, userId, changes, excludeSecret, true, options,
+      );
       return Promise.resolve(cmpChannels);
     } catch (error) {
       return Promise.reject(error);

@@ -846,9 +846,9 @@ export default (container) => {
     }
   };
 
-  const updateRecords = async (criteria, changes, excludeSecret = true) => {
+  const updateRecords = async (criteria, changes, excludeSecret = true, options = {}) => {
     try {
-      const cmpRecords = await updateByCriteria(criteria, changes, excludeSecret, true);
+      const cmpRecords = await updateByCriteria(criteria, changes, excludeSecret, true, options);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);

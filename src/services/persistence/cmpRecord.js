@@ -33,10 +33,9 @@ export default (container) => {
     return mappedCmpRecord;
   };
 
-  const listRecords = async (limit, offset, excludeSecret = true) => {
+  const listRecords = async (excludeSecret = true, options = {}) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const options = { limit, offset };
       const cmpRecords = await CmpRecord.listRecords(excludeSecret, options);
       const mappedCmpRecords = cmpRecords.map(mapRecord);
       return Promise.resolve(mappedCmpRecords);
@@ -126,10 +125,10 @@ export default (container) => {
     }
   };
 
-  const updateRecords = async (criteria, changes, excludeSecret = true) => {
+  const updateRecords = async (criteria, changes, excludeSecret = true, options = {}) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecords = await CmpRecord.updateRecords(criteria, changes, excludeSecret);
+      const cmpRecords = await CmpRecord.updateRecords(criteria, changes, excludeSecret, options);
       const mappedCmpRecords = cmpRecords.map(mapRecord);
       return Promise.resolve(mappedCmpRecords);
     } catch (error) {

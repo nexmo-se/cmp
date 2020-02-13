@@ -41,10 +41,10 @@ export default (container) => {
       return found;
     });
 
-  const listApplications = async (userId, excludeSecret = true) => {
+  const listApplications = async (userId, excludeSecret = true, options = {}) => {
     try {
       const { CmpApplication } = container.databaseService.accessors;
-      const cmpApplications = await CmpApplication.listApplications(userId, excludeSecret);
+      const cmpApplications = await CmpApplication.listApplications(userId, excludeSecret, options);
       const filteredApplications = filterApplications(userId, cmpApplications);
       return Promise.resolve(filteredApplications);
     } catch (error) {
@@ -98,11 +98,13 @@ export default (container) => {
     }
   };
 
-  const updateApplications = async (criteria, userId, changes, excludeSecret = true) => {
+  const updateApplications = async (
+    criteria, userId, changes, excludeSecret = true, options = {},
+  ) => {
     try {
       const { CmpApplication } = container.databaseService.accessors;
       const cmpApplications = await CmpApplication.updateApplications(
-        criteria, userId, changes, excludeSecret,
+        criteria, userId, changes, excludeSecret, options,
       );
       const filteredApplications = filterApplications(userId, cmpApplications);
       return Promise.resolve(filteredApplications);

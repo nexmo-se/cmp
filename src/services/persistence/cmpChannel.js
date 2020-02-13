@@ -55,10 +55,10 @@ export default (container) => {
       return found;
     });
 
-  const listChannels = async (userId, excludeSecret = true) => {
+  const listChannels = async (userId, excludeSecret = true, options = {}) => {
     try {
       const { CmpChannel } = container.databaseService.accessors;
-      const cmpChannels = await CmpChannel.listChannels(userId, excludeSecret);
+      const cmpChannels = await CmpChannel.listChannels(userId, excludeSecret, options);
       const filteredChannels = filterChannels(userId, cmpChannels);
       return Promise.resolve(filteredChannels);
     } catch (error) {
@@ -116,10 +116,14 @@ export default (container) => {
     }
   };
 
-  const updateChannels = async (criteria, userId, changes, excludeSecret = true) => {
+  const updateChannels = async (
+    criteria, userId, changes, excludeSecret = true, options = {},
+  ) => {
     try {
       const { CmpChannel } = container.databaseService.accessors;
-      const cmpChannels = await CmpChannel.updateChannels(criteria, userId, changes, excludeSecret);
+      const cmpChannels = await CmpChannel.updateChannels(
+        criteria, userId, changes, excludeSecret, options,
+      );
       const filteredChannels = filterChannels(userId, cmpChannels);
       return Promise.resolve(filteredChannels);
     } catch (error) {

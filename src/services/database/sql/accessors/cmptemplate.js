@@ -320,9 +320,9 @@ export default (container) => {
     }
   };
 
-  const updateTemplates = async (criteria, changes, excludeSecret = true) => {
+  const updateTemplates = async (criteria, changes, excludeSecret = true, options = {}) => {
     try {
-      const cmpTemplates = await updateByCriteria(criteria, changes, excludeSecret, true);
+      const cmpTemplates = await updateByCriteria(criteria, changes, excludeSecret, true, options);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);

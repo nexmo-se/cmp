@@ -27,10 +27,10 @@ export default (container) => {
       return found;
     });
 
-  const listApiKeys = async (userId, excludeSecret = true) => {
+  const listApiKeys = async (userId, excludeSecret = true, options = {}) => {
     try {
       const { CmpApiKey } = container.databaseService.accessors;
-      const cmpApiKeys = await CmpApiKey.listApiKeys(userId, excludeSecret);
+      const cmpApiKeys = await CmpApiKey.listApiKeys(userId, excludeSecret, options);
       const filteredApiKeys = filterApiKeys(userId, cmpApiKeys);
       return Promise.resolve(filteredApiKeys);
     } catch (error) {
@@ -82,10 +82,12 @@ export default (container) => {
     }
   };
 
-  const updateApiKeys = async (criteria, userId, changes, excludeSecret = true) => {
+  const updateApiKeys = async (criteria, userId, changes, excludeSecret = true, options = {}) => {
     try {
       const { CmpApiKey } = container.databaseService.accessors;
-      const cmpApiKeys = await CmpApiKey.updateApiKeys(criteria, userId, changes, excludeSecret);
+      const cmpApiKeys = await CmpApiKey.updateApiKeys(
+        criteria, userId, changes, excludeSecret, options,
+      );
       const filteredApiKeys = filterApiKeys(userId, cmpApiKeys);
       return Promise.resolve(filteredApiKeys);
     } catch (error) {
