@@ -223,9 +223,11 @@ export default (container) => {
     }
   };
 
-  const updateUsers = async (criteria = {}, changes = {}, excludePassword = true) => {
+  const updateUsers = async (
+    criteria = {}, changes = {}, excludePassword = true, options = {},
+  ) => {
     try {
-      const users = await updateByCriteria(criteria, changes, excludePassword, true);
+      const users = await updateByCriteria(criteria, changes, excludePassword, true, options);
       return Promise.resolve(users);
     } catch (error) {
       return Promise.reject(error);

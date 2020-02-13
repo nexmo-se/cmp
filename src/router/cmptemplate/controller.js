@@ -3,8 +3,10 @@ export default (container) => {
 
   const listAllTemplates = async (req, res, next) => {
     try {
+      const { limit, offset } = req.query;
+      const options = { limit, offset };
       const { CmpTemplate } = container.persistenceService;
-      const cmpTemplates = await CmpTemplate.listTemplates();
+      const cmpTemplates = await CmpTemplate.listTemplates(true, options);
       res.status(200).json(cmpTemplates);
     } catch (error) {
       next(error);
@@ -14,8 +16,10 @@ export default (container) => {
   const listMyTemplates = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Templates');
+      const { limit, offset } = req.query;
+      const options = { limit, offset };
       const { CmpTemplate } = container.persistenceService;
-      const cmpTemplates = await CmpTemplate.listTemplates();
+      const cmpTemplates = await CmpTemplate.listTemplates(true, options);
       res.status(200).json(cmpTemplates);
     } catch (error) {
       next(error);

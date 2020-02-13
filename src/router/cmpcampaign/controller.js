@@ -15,8 +15,10 @@ export default (container) => {
 
   const listAllCampaigns = async (req, res, next) => {
     try {
+      const { limit, offset } = req.query;
+      const options = { limit, offset };
       const { CmpCampaign } = container.persistenceService;
-      const cmpCampaigns = await CmpCampaign.listCampaigns();
+      const cmpCampaigns = await CmpCampaign.listCampaigns(options);
       res.status(200).json(cmpCampaigns);
     } catch (error) {
       next(error);
@@ -26,8 +28,10 @@ export default (container) => {
   const listMyCampaigns = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Campaigns');
+      const { limit, offset } = req.query;
+      const options = { limit, offset };
       const { CmpCampaign } = container.persistenceService;
-      const cmpCampaigns = await CmpCampaign.listCampaigns();
+      const cmpCampaigns = await CmpCampaign.listCampaigns(options);
       res.status(200).json(cmpCampaigns);
     } catch (error) {
       next(error);

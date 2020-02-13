@@ -3,8 +3,10 @@ export default (container) => {
 
   const listUsers = async (req, res, next) => {
     try {
+      const { limit, offset } = req.query;
+      const options = { limit, offset };
       const { User } = container.persistenceService;
-      const users = await User.listUsers();
+      const users = await User.listUsers(true, options);
       res.status(200).json(users);
     } catch (error) {
       next(error);

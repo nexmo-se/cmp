@@ -1,10 +1,10 @@
 export default (container) => {
   const { L } = container.defaultLogger('User Persistence Accessor');
 
-  const listUsers = async (excludePassword = true) => {
+  const listUsers = async (excludePassword = true, options = {}) => {
     try {
       const { User } = container.databaseService.accessors;
-      const users = await User.listUsers(excludePassword);
+      const users = await User.listUsers(excludePassword, options);
       return Promise.resolve(users);
     } catch (error) {
       return Promise.reject(error);
@@ -15,7 +15,7 @@ export default (container) => {
     try {
       const { User } = container.databaseService.accessors;
       const criteria = { username };
-      const users = await User.findUsers(criteria, excludePassword, excludeDeleted);
+      const users = await User.findUsers(criteria, excludePassword, excludeDeleted, {});
       if (users == null || users.length === 0) {
         return Promise.resolve(null);
       }
@@ -70,10 +70,10 @@ export default (container) => {
     }
   };
 
-  const updateUsers = async (criteria, changes, excludePassword = true) => {
+  const updateUsers = async (criteria, changes, excludePassword = true, options = {}) => {
     try {
       const { User } = container.databaseService.accessors;
-      const user = await User.updateUsers(criteria, changes, excludePassword);
+      const user = await User.updateUsers(criteria, changes, excludePassword, options);
       return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);

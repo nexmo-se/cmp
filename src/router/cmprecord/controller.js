@@ -3,8 +3,10 @@ export default (container) => {
 
   const listAllRecords = async (req, res, next) => {
     try {
+      const { limit, offset } = req.query;
+      const options = { limit, offset };
       const { CmpRecord } = container.persistenceService;
-      const cmpRecords = await CmpRecord.listRecords();
+      const cmpRecords = await CmpRecord.listRecords(true, options);
       res.status(200).json(cmpRecords);
     } catch (error) {
       next(error);
@@ -14,8 +16,10 @@ export default (container) => {
   const listMyRecords = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Records');
+      const { limit, offset } = req.query;
+      const options = { limit, offset };
       const { CmpRecord } = container.persistenceService;
-      const cmpRecords = await CmpRecord.listRecords();
+      const cmpRecords = await CmpRecord.listRecords(true, options);
       res.status(200).json(cmpRecords);
     } catch (error) {
       next(error);

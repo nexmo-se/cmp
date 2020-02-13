@@ -34,8 +34,10 @@ export default (container) => {
 
   const listAllApiKeys = async (req, res, next) => {
     try {
+      const { limit, offset } = req.query;
+      const options = { limit, offset };
       const { CmpApiKey } = container.persistenceService;
-      const cmpApiKeys = await CmpApiKey.listApiKeys();
+      const cmpApiKeys = await CmpApiKey.listApiKeys(null, true, options);
       res.status(200).json(cmpApiKeys);
     } catch (error) {
       next(error);
@@ -45,10 +47,12 @@ export default (container) => {
   const listMyApiKeys = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all API Keys');
+      const { limit, offset } = req.query;
+      const options = { limit, offset };
       const { user } = req;
       const userId = user.id;
       const { CmpApiKey } = container.persistenceService;
-      const cmpApiKeys = await CmpApiKey.listApiKeys(userId);
+      const cmpApiKeys = await CmpApiKey.listApiKeys(userId, true, options);
       res.status(200).json(cmpApiKeys);
     } catch (error) {
       next(error);
