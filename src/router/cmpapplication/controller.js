@@ -35,13 +35,20 @@ export default (container) => {
 
   const findAllApplications = async (req, res, next) => {
     try {
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         name, cmpApiKeyId,
       } = req.body;
       const criteria = {};
       if (name) {
-        criteria.name = name;
+        if (typeof name === 'string') {
+          criteria.name = {
+            [Op.like]: `%${name}%`,
+          };
+        } else {
+          criteria.name = name;
+        }
       }
       if (cmpApiKeyId) {
         criteria.cmpApiKeyId = cmpApiKeyId;
@@ -58,13 +65,20 @@ export default (container) => {
   const findMyApplications = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Applications');
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         name, cmpApiKeyId,
       } = req.body;
       const criteria = {};
       if (name) {
-        criteria.name = name;
+        if (typeof name === 'string') {
+          criteria.name = {
+            [Op.like]: `%${name}%`,
+          };
+        } else {
+          criteria.name = name;
+        }
       }
       if (cmpApiKeyId) {
         criteria.cmpApiKeyId = cmpApiKeyId;

@@ -15,13 +15,20 @@ export default (container) => {
 
   const findAllCampaigns = async (req, res, next) => {
     try {
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         name, campaignStartDate, campaignEndDate, status,
       } = req.body;
       const criteria = {};
       if (name) {
-        criteria.name = name;
+        if (typeof name === 'string') {
+          criteria.name = {
+            [Op.like]: `%${name}%`,
+          };
+        } else {
+          criteria.name = name;
+        }
       }
       if (campaignStartDate) {
         criteria.campaignStartDate = campaignStartDate;
@@ -43,13 +50,21 @@ export default (container) => {
 
   const findMyCampaigns = async (req, res, next) => {
     try {
-      L.warn('Temporary: User can read all Campaigns');const {
+      L.warn('Temporary: User can read all Campaigns');
+      const { Op } = container.Sequelize;
+      const {
         limit, offset,
         name, campaignStartDate, campaignEndDate, status,
       } = req.body;
       const criteria = {};
       if (name) {
-        criteria.name = name;
+        if (typeof name === 'string') {
+          criteria.name = {
+            [Op.like]: `%${name}%`,
+          };
+        } else {
+          criteria.name = name;
+        }
       }
       if (campaignStartDate) {
         criteria.campaignStartDate = campaignStartDate;

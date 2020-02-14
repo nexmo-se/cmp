@@ -3,6 +3,7 @@ export default (container) => {
 
   const findAllChannels = async (req, res, next) => {
     try {
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         name, channel, senderId, tps,
@@ -10,13 +11,25 @@ export default (container) => {
       } = req.body;
       const criteria = {};
       if (name) {
-        criteria.name = name;
+        if (typeof name === 'string') {
+          criteria.name = {
+            [Op.like]: `%${name}%`,
+          };
+        } else {
+          criteria.name = name;
+        }
       }
       if (channel) {
         criteria.channel = channel;
       }
       if (senderId) {
-        criteria.senderId = senderId;
+        if (typeof senderId === 'string') {
+          criteria.senderId = {
+            [Op.like]: `%${senderId}%`,
+          };
+        } else {
+          criteria.senderId = senderId;
+        }
       }
       if (tps) {
         criteria.tps = tps;
@@ -42,6 +55,7 @@ export default (container) => {
   const findMyChannels = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Channels');
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         name, channel, senderId, tps,
@@ -49,13 +63,25 @@ export default (container) => {
       } = req.body;
       const criteria = {};
       if (name) {
-        criteria.name = name;
+        if (typeof name === 'string') {
+          criteria.name = {
+            [Op.like]: `%${name}%`,
+          };
+        } else {
+          criteria.name = name;
+        }
       }
       if (channel) {
         criteria.channel = channel;
       }
       if (senderId) {
-        criteria.senderId = senderId;
+        if (typeof senderId === 'string') {
+          criteria.senderId = {
+            [Op.like]: `%${senderId}%`,
+          };
+        } else {
+          criteria.senderId = senderId;
+        }
       }
       if (tps) {
         criteria.tps = tps;

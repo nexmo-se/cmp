@@ -3,6 +3,7 @@ export default (container) => {
 
   const findAllRecords = async (req, res, next) => {
     try {
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         recipient,
@@ -12,7 +13,13 @@ export default (container) => {
       } = req.body;
       const criteria = {};
       if (recipient) {
-        criteria.recipient = recipient;
+        if (typeof recipient === 'string') {
+          criteria.recipient = {
+            [Op.like]: `%${recipient}%`,
+          };
+        } else {
+          criteria.recipient = recipient;
+        }
       }
       if (cmpCampaignId) {
         criteria.cmpCampaignId = cmpCampaignId;
@@ -56,6 +63,7 @@ export default (container) => {
   const findMyRecords = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Records');
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         recipient,
@@ -65,7 +73,13 @@ export default (container) => {
       } = req.body;
       const criteria = {};
       if (recipient) {
-        criteria.recipient = recipient;
+        if (typeof recipient === 'string') {
+          criteria.recipient = {
+            [Op.like]: `%${recipient}%`,
+          };
+        } else {
+          criteria.recipient = recipient;
+        }
       }
       if (cmpCampaignId) {
         criteria.cmpCampaignId = cmpCampaignId;

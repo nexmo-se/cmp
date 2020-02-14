@@ -15,19 +15,38 @@ export default (container) => {
 
   const findUsers = async (req, res, next) => {
     try {
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         username, firstName, lastName,
       } = req.body;
       const criteria = {};
       if (username) {
-        criteria.username = username;
+        if (typeof username === 'string') {
+          criteria.username = {
+            [Op.like]: `%${username}%`,
+          };
+        } else {
+          criteria.username = username;
+        }
       }
       if (firstName) {
-        criteria.firstName = firstName;
+        if (typeof firstName === 'string') {
+          criteria.firstName = {
+            [Op.like]: `%${firstName}%`,
+          };
+        } else {
+          criteria.firstName = firstName;
+        }
       }
       if (lastName) {
-        criteria.lastName = lastName;
+        if (typeof lastName === 'string') {
+          criteria.lastName = {
+            [Op.like]: `%${lastName}%`,
+          };
+        } else {
+          criteria.lastName = lastName;
+        }
       }
       const options = { limit, offset };
       const { User } = container.persistenceService;

@@ -34,13 +34,20 @@ export default (container) => {
 
   const findAllApiKeys = async (req, res, next) => {
     try {
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         name, signatureMethod,
       } = req.body;
       const criteria = {};
       if (name) {
-        criteria.name = name;
+        if (typeof name === 'string') {
+          criteria.name = {
+            [Op.like]: `%${name}%`,
+          };
+        } else {
+          criteria.name = name;
+        }
       }
       if (signatureMethod) {
         criteria.signatureMethod = signatureMethod;
@@ -56,6 +63,7 @@ export default (container) => {
 
   const findMyApiKeys = async (req, res, next) => {
     try {
+      const { Op } = container.Sequelize;
       L.warn('Temporary: User can read all API Keys');
       const {
         limit, offset,
@@ -63,7 +71,13 @@ export default (container) => {
       } = req.body;
       const criteria = {};
       if (name) {
-        criteria.name = name;
+        if (typeof name === 'string') {
+          criteria.name = {
+            [Op.like]: `%${name}%`,
+          };
+        } else {
+          criteria.name = name;
+        }
       }
       if (signatureMethod) {
         criteria.signatureMethod = signatureMethod;

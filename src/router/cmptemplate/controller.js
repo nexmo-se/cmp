@@ -3,6 +3,7 @@ export default (container) => {
 
   const findAllTemplates = async (req, res, next) => {
     try {
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         name, cmpChannelId,
@@ -12,31 +13,73 @@ export default (container) => {
       } = req.body;
       const criteria = {};
       if (name) {
-        criteria.name = name;
+        if (typeof name === 'string') {
+          criteria.name = {
+            [Op.like]: `%${name}%`,
+          };
+        } else {
+          criteria.name = name;
+        }
       }
       if (cmpChannelId) {
         criteria.cmpChannelId = cmpChannelId;
       }
       if (whatsappTemplateNamespace) {
-        criteria.whatsappTemplateNamespace = whatsappTemplateNamespace;
+        if (typeof whatsappTemplateNamespace === 'string') {
+          criteria.whatsappTemplateNamespace = {
+            [Op.like]: `%${whatsappTemplateNamespace}%`,
+          };
+        } else {
+          criteria.whatsappTemplateNamespace = whatsappTemplateNamespace;
+        }
       }
       if (whatsappTemplateName) {
-        criteria.whatsappTemplateName = whatsappTemplateName;
+        if (typeof whatsappTemplateName === 'string') {
+          criteria.whatsappTemplateName = {
+            [Op.like]: `%${whatsappTemplateName}%`,
+          };
+        } else {
+          criteria.whatsappTemplateName = whatsappTemplateName;
+        }
       }
       if (viberTtl) {
         criteria.viberTtl = viberTtl;
       }
       if (facebookTag) {
-        criteria.facebookTag = facebookTag;
+        if (typeof facebookTag === 'string') {
+          criteria.facebookTag = {
+            [Op.like]: `%${facebookTag}%`,
+          };
+        } else {
+          criteria.facebookTag = facebookTag;
+        }
       }
       if (category) {
-        criteria.category = category;
+        if (typeof category === 'string') {
+          criteria.category = {
+            [Op.like]: `%${category}%`,
+          };
+        } else {
+          criteria.category = category;
+        }
       }
       if (mediaType) {
-        criteria.mediaType = mediaType;
+        if (typeof mediaType === 'string') {
+          criteria.mediaType = {
+            [Op.like]: `%${mediaType}%`,
+          };
+        } else {
+          criteria.mediaType = mediaType;
+        }
       }
       if (body) {
-        criteria.body = body;
+        if (typeof body === 'string') {
+          criteria.body = {
+            [Op.like]: `%${body}%`,
+          };
+        } else {
+          criteria.body = body;
+        }
       }
       const options = { limit, offset };
       const { CmpTemplate } = container.persistenceService;
@@ -50,6 +93,7 @@ export default (container) => {
   const findMyTemplates = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Templates');
+      const { Op } = container.Sequelize;
       const {
         limit, offset,
         name, cmpChannelId,
@@ -59,31 +103,73 @@ export default (container) => {
       } = req.body;
       const criteria = {};
       if (name) {
-        criteria.name = name;
+        if (typeof name === 'string') {
+          criteria.name = {
+            [Op.like]: `%${name}%`,
+          };
+        } else {
+          criteria.name = name;
+        }
       }
       if (cmpChannelId) {
         criteria.cmpChannelId = cmpChannelId;
       }
       if (whatsappTemplateNamespace) {
-        criteria.whatsappTemplateNamespace = whatsappTemplateNamespace;
+        if (typeof whatsappTemplateNamespace === 'string') {
+          criteria.whatsappTemplateNamespace = {
+            [Op.like]: `%${whatsappTemplateNamespace}%`,
+          };
+        } else {
+          criteria.whatsappTemplateNamespace = whatsappTemplateNamespace;
+        }
       }
       if (whatsappTemplateName) {
-        criteria.whatsappTemplateName = whatsappTemplateName;
+        if (typeof whatsappTemplateName === 'string') {
+          criteria.whatsappTemplateName = {
+            [Op.like]: `%${whatsappTemplateName}%`,
+          };
+        } else {
+          criteria.whatsappTemplateName = whatsappTemplateName;
+        }
       }
       if (viberTtl) {
         criteria.viberTtl = viberTtl;
       }
       if (facebookTag) {
-        criteria.facebookTag = facebookTag;
+        if (typeof facebookTag === 'string') {
+          criteria.facebookTag = {
+            [Op.like]: `%${facebookTag}%`,
+          };
+        } else {
+          criteria.facebookTag = facebookTag;
+        }
       }
       if (category) {
-        criteria.category = category;
+        if (typeof category === 'string') {
+          criteria.category = {
+            [Op.like]: `%${category}%`,
+          };
+        } else {
+          criteria.category = category;
+        }
       }
       if (mediaType) {
-        criteria.mediaType = mediaType;
+        if (typeof mediaType === 'string') {
+          criteria.mediaType = {
+            [Op.like]: `%${mediaType}%`,
+          };
+        } else {
+          criteria.mediaType = mediaType;
+        }
       }
       if (body) {
-        criteria.body = body;
+        if (typeof body === 'string') {
+          criteria.body = {
+            [Op.like]: `%${body}%`,
+          };
+        } else {
+          criteria.body = body;
+        }
       }
       const options = { limit, offset };
       const { CmpTemplate } = container.persistenceService;
