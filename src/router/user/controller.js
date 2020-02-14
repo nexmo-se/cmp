@@ -3,10 +3,23 @@ export default (container) => {
 
   const listUsers = async (req, res, next) => {
     try {
-      const { limit, offset } = req.query;
+      const {
+        limit, offset,
+        username, firstName, lastName,
+      } = req.query;
+      const criteria = {};
+      if (username) {
+        criteria.username = username;
+      }
+      if (firstName) {
+        criteria.firstName = firstName;
+      }
+      if (lastName) {
+        criteria.lastName = lastName;
+      }
       const options = { limit, offset };
       const { User } = container.persistenceService;
-      const users = await User.listUsers(true, options);
+      const users = await User.findUsers(criteria, true, options);
       res.status(200).json(users);
     } catch (error) {
       next(error);

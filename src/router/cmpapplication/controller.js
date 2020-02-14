@@ -98,10 +98,20 @@ export default (container) => {
 
   const listAllApplications = async (req, res, next) => {
     try {
-      const { limit, offset } = req.query;
+      const {
+        limit, offset,
+        name, cmpApiKeyId,
+      } = req.query;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (cmpApiKeyId) {
+        criteria.cmpApiKeyId = cmpApiKeyId;
+      }
       const options = { limit, offset };
       const { CmpApplication } = container.persistenceService;
-      const cmpApplications = await CmpApplication.listApplications(null, true, options);
+      const cmpApplications = await CmpApplication.findApplications(null, criteria, true, options);
       res.status(200).json(cmpApplications);
     } catch (error) {
       next(error);
@@ -111,12 +121,24 @@ export default (container) => {
   const listMyApplications = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Applications');
-      const { limit, offset } = req.query;
+      const {
+        limit, offset,
+        name, cmpApiKeyId,
+      } = req.query;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (cmpApiKeyId) {
+        criteria.cmpApiKeyId = cmpApiKeyId;
+      }
       const options = { limit, offset };
       const { user } = req;
       const userId = user.id;
       const { CmpApplication } = container.persistenceService;
-      const cmpApplications = await CmpApplication.listApplications(userId, true, options);
+      const cmpApplications = await CmpApplication.findApplications(
+        userId, criteria, true, options,
+      );
       res.status(200).json(cmpApplications);
     } catch (error) {
       next(error);

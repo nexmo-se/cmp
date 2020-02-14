@@ -86,10 +86,26 @@ export default (container) => {
 
   const listAllCampaigns = async (req, res, next) => {
     try {
-      const { limit, offset } = req.query;
+      const {
+        limit, offset,
+        name, campaignStartDate, campaignEndDate, status,
+      } = req.query;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (campaignStartDate) {
+        criteria.campaignStartDate = campaignStartDate;
+      }
+      if (campaignEndDate) {
+        criteria.campaignEndDate = campaignEndDate;
+      }
+      if (status) {
+        criteria.status = status;
+      }
       const options = { limit, offset };
       const { CmpCampaign } = container.persistenceService;
-      const cmpCampaigns = await CmpCampaign.listCampaigns(options);
+      const cmpCampaigns = await CmpCampaign.findCampaigns(criteria, true, options);
       res.status(200).json(cmpCampaigns);
     } catch (error) {
       next(error);
@@ -99,10 +115,26 @@ export default (container) => {
   const listMyCampaigns = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Campaigns');
-      const { limit, offset } = req.query;
+      const {
+        limit, offset,
+        name, campaignStartDate, campaignEndDate, status,
+      } = req.query;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (campaignStartDate) {
+        criteria.campaignStartDate = campaignStartDate;
+      }
+      if (campaignEndDate) {
+        criteria.campaignEndDate = campaignEndDate;
+      }
+      if (status) {
+        criteria.status = status;
+      }
       const options = { limit, offset };
       const { CmpCampaign } = container.persistenceService;
-      const cmpCampaigns = await CmpCampaign.listCampaigns(options);
+      const cmpCampaigns = await CmpCampaign.findCampaigns(criteria, true, options);
       res.status(200).json(cmpCampaigns);
     } catch (error) {
       next(error);

@@ -122,10 +122,50 @@ export default (container) => {
 
   const listAllRecords = async (req, res, next) => {
     try {
-      const { limit, offset } = req.query;
+      const {
+        limit, offset,
+        recipient,
+        cmpCampaignId, cmpTemplateId, cmpMediaId,
+        activeStartHour, activeStartMinute, activeEndHour, activeEndMinute,
+        activeOnWeekends, timezone, status,
+      } = req.query;
+      const criteria = {};
+      if (recipient) {
+        criteria.recipient = recipient;
+      }
+      if (cmpCampaignId) {
+        criteria.cmpCampaignId = cmpCampaignId;
+      }
+      if (cmpTemplateId) {
+        criteria.cmpTemplateId = cmpTemplateId;
+      }
+      if (cmpMediaId) {
+        criteria.cmpMediaId = cmpMediaId;
+      }
+      if (activeStartHour) {
+        criteria.activeStartHour = activeStartHour;
+      }
+      if (activeStartMinute) {
+        criteria.activeStartMinute = activeStartMinute;
+      }
+      if (activeEndHour) {
+        criteria.activeEndHour = activeEndHour;
+      }
+      if (activeEndMinute) {
+        criteria.activeEndMinute = activeEndMinute;
+      }
+      if (activeOnWeekends != null) {
+        criteria.activeOnWeekends = activeOnWeekends;
+      }
+      if (timezone) {
+        criteria.timezone = timezone;
+      }
+      if (status) {
+        criteria.status = status;
+      }
       const options = { limit, offset };
       const { CmpRecord } = container.persistenceService;
-      const cmpRecords = await CmpRecord.listRecords(true, options);
+      const cmpRecords = await CmpRecord.findRecords(criteria, true, options);
       res.status(200).json(cmpRecords);
     } catch (error) {
       next(error);
@@ -135,10 +175,50 @@ export default (container) => {
   const listMyRecords = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all Records');
-      const { limit, offset } = req.query;
+      const {
+        limit, offset,
+        recipient,
+        cmpCampaignId, cmpTemplateId, cmpMediaId,
+        activeStartHour, activeStartMinute, activeEndHour, activeEndMinute,
+        activeOnWeekends, timezone, status,
+      } = req.query;
+      const criteria = {};
+      if (recipient) {
+        criteria.recipient = recipient;
+      }
+      if (cmpCampaignId) {
+        criteria.cmpCampaignId = cmpCampaignId;
+      }
+      if (cmpTemplateId) {
+        criteria.cmpTemplateId = cmpTemplateId;
+      }
+      if (cmpMediaId) {
+        criteria.cmpMediaId = cmpMediaId;
+      }
+      if (activeStartHour) {
+        criteria.activeStartHour = activeStartHour;
+      }
+      if (activeStartMinute) {
+        criteria.activeStartMinute = activeStartMinute;
+      }
+      if (activeEndHour) {
+        criteria.activeEndHour = activeEndHour;
+      }
+      if (activeEndMinute) {
+        criteria.activeEndMinute = activeEndMinute;
+      }
+      if (activeOnWeekends != null) {
+        criteria.activeOnWeekends = activeOnWeekends;
+      }
+      if (timezone) {
+        criteria.timezone = timezone;
+      }
+      if (status) {
+        criteria.status = status;
+      }
       const options = { limit, offset };
       const { CmpRecord } = container.persistenceService;
-      const cmpRecords = await CmpRecord.listRecords(true, options);
+      const cmpRecords = await CmpRecord.findRecords(criteria, true, options);
       res.status(200).json(cmpRecords);
     } catch (error) {
       next(error);

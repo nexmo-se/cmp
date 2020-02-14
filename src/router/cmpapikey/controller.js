@@ -95,10 +95,20 @@ export default (container) => {
 
   const listAllApiKeys = async (req, res, next) => {
     try {
-      const { limit, offset } = req.query;
+      const {
+        limit, offset,
+        name, signatureMethod,
+      } = req.query;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (signatureMethod) {
+        criteria.signatureMethod = signatureMethod;
+      }
       const options = { limit, offset };
       const { CmpApiKey } = container.persistenceService;
-      const cmpApiKeys = await CmpApiKey.listApiKeys(null, true, options);
+      const cmpApiKeys = await CmpApiKey.findApiKeys(null, criteria, true, options);
       res.status(200).json(cmpApiKeys);
     } catch (error) {
       next(error);
@@ -108,12 +118,22 @@ export default (container) => {
   const listMyApiKeys = async (req, res, next) => {
     try {
       L.warn('Temporary: User can read all API Keys');
-      const { limit, offset } = req.query;
+      const {
+        limit, offset,
+        name, signatureMethod,
+      } = req.query;
+      const criteria = {};
+      if (name) {
+        criteria.name = name;
+      }
+      if (signatureMethod) {
+        criteria.signatureMethod = signatureMethod;
+      }
       const options = { limit, offset };
       const { user } = req;
       const userId = user.id;
       const { CmpApiKey } = container.persistenceService;
-      const cmpApiKeys = await CmpApiKey.listApiKeys(userId, true, options);
+      const cmpApiKeys = await CmpApiKey.findApiKeys(userId, criteria, true, options);
       res.status(200).json(cmpApiKeys);
     } catch (error) {
       next(error);
