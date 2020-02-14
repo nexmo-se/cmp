@@ -33,6 +33,17 @@ export default (container) => {
       controller.deleteAllTemplates,
     );
 
+  router.route('/search')
+    .post(
+      checkAuthentication,
+      authorize(['user', 'admin']),
+      validate(validator.searchTemplates),
+      map([
+        { roles: ['admin'], controller: controller.findAllTemplates },
+        { roles: ['user'], controller: controller.findMyTemplates },
+      ]),
+    );
+
   router.route('/:cmpTemplateId')
     .get(
       checkAuthentication,

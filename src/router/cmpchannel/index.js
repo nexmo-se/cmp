@@ -33,6 +33,17 @@ export default (container) => {
       controller.deleteAllChannels,
     );
 
+  router.route('/search')
+    .post(
+      checkAuthentication,
+      authorize(['user', 'admin']),
+      validate(validator.searchChannels),
+      map([
+        { roles: ['admin'], controller: controller.findAllChannels },
+        { roles: ['user'], controller: controller.findMyChannels },
+      ]),
+    );
+
   router.route('/:cmpChannelId')
     .get(
       checkAuthentication,

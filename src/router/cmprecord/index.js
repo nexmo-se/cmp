@@ -33,6 +33,17 @@ export default (container) => {
       controller.deleteAllRecords,
     );
 
+  router.route('/search')
+    .post(
+      checkAuthentication,
+      authorize(['user', 'admin']),
+      validate(validator.searchRecords),
+      map([
+        { roles: ['admin'], controller: controller.findAllRecords },
+        { roles: ['user'], controller: controller.findMyRecords },
+      ]),
+    );
+
   router.route('/active')
     .get(
       checkAuthentication,

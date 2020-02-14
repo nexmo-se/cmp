@@ -33,6 +33,17 @@ export default (container) => {
       controller.deleteAllApiKeys,
     );
 
+  router.route('/search')
+    .post(
+      checkAuthentication,
+      authorize(['user', 'admin']),
+      validate(validator.searchApiKeys),
+      map([
+        { roles: ['admin'], controller: controller.findAllApiKeys },
+        { roles: ['user'], controller: controller.findMyApiKeys },
+      ]),
+    );
+
   router.route('/:cmpApiKeyId/webhook')
     .post(
       checkAuthentication,

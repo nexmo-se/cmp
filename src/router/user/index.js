@@ -23,6 +23,14 @@ export default (container) => {
       controller.deleteAllUsers,
     );
 
+  router.route('/search')
+    .post(
+      checkAuthentication,
+      authorize(['admin']),
+      validate(validator.searchUsers),
+      controller.findUsers,
+    );
+
   router.route('/me')
     .get(
       checkAuthentication,

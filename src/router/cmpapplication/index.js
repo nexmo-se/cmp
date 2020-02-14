@@ -33,6 +33,17 @@ export default (container) => {
       controller.deleteAllApplications,
     );
 
+  router.route('/search')
+    .post(
+      checkAuthentication,
+      authorize(['user', 'admin']),
+      validate(validator.searchApplications),
+      map([
+        { roles: ['admin'], controller: controller.findAllApplications },
+        { roles: ['user'], controller: controller.findMyApplications },
+      ]),
+    );
+
   router.route('/:cmpApplicationId/webhook')
     .post(
       checkAuthentication,

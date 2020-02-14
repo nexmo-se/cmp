@@ -33,6 +33,17 @@ export default (container) => {
       controller.deleteAllCampaigns,
     );
 
+  router.route('/search')
+    .post(
+      checkAuthentication,
+      authorize(['user', 'admin']),
+      validate(validator.searchCampaigns),
+      map([
+        { roles: ['admin'], controller: controller.findAllCampaigns },
+        { roles: ['user'], controller: controller.findMyCampaigns },
+      ]),
+    );
+
   router.route('/:cmpCampaignId/status')
     .put(
       checkAuthentication,
