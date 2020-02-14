@@ -31,6 +31,14 @@ export default (container) => {
   router.use('/webhook', WebhookRouter(container));
 
   router.get(
+    '/test',
+    (req, res) => {
+      console.log(req.query);
+      res.send('ok');
+    },
+  );
+
+  router.get(
     '/generate/password',
     async (req, res, next) => {
       try {
