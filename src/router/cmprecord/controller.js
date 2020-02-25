@@ -424,6 +424,16 @@ export default (container) => {
     }
   };
 
+  const uploadCsv = async (req, res, next) => {
+    try {
+      const { file } = req;
+      console.log(file);
+      res.status(200).json(file);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   return {
     findAllRecords,
     findMyRecords,
@@ -439,5 +449,7 @@ export default (container) => {
     readRecord,
     readMyRecord,
     deleteRecord,
+
+    uploadCsv,
   };
 };

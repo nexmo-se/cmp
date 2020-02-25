@@ -5,6 +5,24 @@ import validator from './validation';
 export default (container) => {
   const router = container.express.Router();
   const controller = Controller(container);
+  const storage = container.multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, container.config.csv.uploadPath);
+    },
+    filename: (req, file, cb) => {
+      const now = new Date();
+      const date = `0${now.getDate()}`.slice(-2);
+      const month = `0${(now.getMonth() + 1)}`.slice(-2);
+      const year = now.getFullYear();
+      const hour = `0${now.getHours()}`.slice(-2);
+      const minute = `0${now.getMinutes()}`.slice(-2);
+      const second = `0${now.getSeconds()}`.slice(-2);
+      const prefix = `${year}${month}${date}${hour}${minute}${second}`;
+      cb(null, `${prefix}-${file.originalname}`);
+    },
+  });
+  // const upload = container.multer({ dest: container.config.csv.uploadPath });
+  const upload = container.multer({ storage });
 
   const { authorize } = container.authorizer;
   const { checkAuthentication } = container.authenticator;
@@ -58,6 +76,14 @@ export default (container) => {
       authorize(['admin']),
       validate(validator.createRecordBatch),
       controller.createRecordBatch,
+    );
+
+  router.route('/csv')
+    .post(
+      checkAuthentication,
+      authorize(['admin']),
+      upload.single('file'),
+      controller.uploadCsv,
     );
 
   router.route('/:cmpRecordId')

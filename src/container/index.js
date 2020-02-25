@@ -15,6 +15,7 @@ import rateLimit from 'axios-rate-limit';
 import moment from 'moment';
 import momentTimezone from 'moment-timezone';
 import Bottleneck from 'bottleneck';
+import multer from 'multer';
 
 import AuthenticationError from '../errors/authError';
 import ForbiddenError from '../errors/forbiddenError';
@@ -71,6 +72,7 @@ container.rateLimit = rateLimit;
 container.moment = moment;
 container.momentTimezone = momentTimezone;
 container.Bottleneck = Bottleneck;
+container.multer = multer;
 
 // Errors
 container.AuthenticationError = AuthenticationError;
