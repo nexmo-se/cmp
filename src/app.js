@@ -16,7 +16,9 @@ process.env.TZ = 'Etc/UTC';
 const {
   config, log4js, socketIoService, errorHandler,
 } = container;
-const { hostUrl, port, environment } = config;
+const {
+  hostUrl, port, environment, requestMaxSize,
+} = config;
 const { L } = container.defaultLogger('Application');
 
 const app = express();
@@ -27,8 +29,8 @@ app.use(helmet());
 app.use(cors());
 
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: requestMaxSize }));
+app.use(bodyParser.json({ limit: requestMaxSize }));
 app.use(cookieParser());
 app.use(compression({ level: 9 }));
 

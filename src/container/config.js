@@ -4,6 +4,11 @@ export default {
   ip: process.env.IP || '0.0.0.0',
   host: process.env.HOST || 'http://localhost',
   customPort: (process.env.CUSTOM_PORT || 'false') === 'true',
+  requestMaxSize: process.env.REQUEST_MAX_SIZE || '150mb',
+  csv: {
+    uploadPath: process.env.CSV_UPLOAD_PATH,
+    archivePath: process.env.CSV_ARCHIVE_PATH,
+  },
   jwt: {
     secret: process.env.JWT_SECRET,
   },
