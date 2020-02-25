@@ -18,10 +18,10 @@ export default (container) => {
       const minute = `0${now.getMinutes()}`.slice(-2);
       const second = `0${now.getSeconds()}`.slice(-2);
       const prefix = `${year}${month}${date}${hour}${minute}${second}`;
-      cb(null, `${prefix}-${file.originalname}`);
+      console.log(req.params);
+      cb(null, `${prefix}_${req.params.cmpCampaignId}_${file.originalname}`);
     },
   });
-  // const upload = container.multer({ dest: container.config.csv.uploadPath });
   const upload = container.multer({ storage });
 
   const { authorize } = container.authorizer;
@@ -78,10 +78,11 @@ export default (container) => {
       controller.createRecordBatch,
     );
 
-  router.route('/csv')
+  router.route('/csv/:cmpCampaignId')
     .post(
       checkAuthentication,
       authorize(['admin']),
+      validate(validator.uploadCsv),
       upload.single('file'),
       controller.uploadCsv,
     );

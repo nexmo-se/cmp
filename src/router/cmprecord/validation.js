@@ -70,6 +70,13 @@ export default {
     params: {},
     body: {},
   },
+  uploadCsv: {
+    query: {},
+    body: {},
+    params: {
+      cmpCampaignId: Joi.string().min(1).required(),
+    },
+  },
   createRecordSingle: {
     query: {},
     params: {},
