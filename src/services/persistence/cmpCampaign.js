@@ -35,6 +35,12 @@ export default (container) => {
     name,
     campaignStartDate,
     campaignEndDate,
+    activeStartHour,
+    activeStartMinute,
+    activeEndHour,
+    activeEndMinute,
+    activeOnWeekends,
+    timezone,
   ) => {
     try {
       const { CmpCampaign } = container.databaseService.accessors;
@@ -42,6 +48,12 @@ export default (container) => {
         name,
         campaignStartDate,
         campaignEndDate,
+        activeStartHour,
+        activeStartMinute,
+        activeEndHour,
+        activeEndMinute,
+        activeOnWeekends,
+        timezone,
       );
       return Promise.resolve(cmpCampaign);
     } catch (error) {

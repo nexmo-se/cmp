@@ -18,6 +18,30 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: false,
     },
+    activeStartHour: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    activeStartMinute: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    activeEndHour: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    activeEndMinute: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    activeOnWeekends: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
+    timezone: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
     actualStartDate: {
       type: DataTypes.DATE,
       allowNull: true,

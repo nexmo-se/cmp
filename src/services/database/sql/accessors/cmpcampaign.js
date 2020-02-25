@@ -189,6 +189,12 @@ export default (container) => {
     name,
     campaignStartDate,
     campaignEndDate,
+    activeStartHour,
+    activeStartMinute,
+    activeEndHour,
+    activeEndMinute,
+    activeOnWeekends,
+    timezone,
   ) => {
     try {
       const { CmpCampaign } = container.databaseService.models;
@@ -197,6 +203,12 @@ export default (container) => {
         name,
         campaignStartDate,
         campaignEndDate,
+        activeStartHour,
+        activeStartMinute,
+        activeEndHour,
+        activeEndMinute,
+        activeOnWeekends,
+        timezone,
         status: 'draft',
         statusTime: new Date(),
         deleted: false,

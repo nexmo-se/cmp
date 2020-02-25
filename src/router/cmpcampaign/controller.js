@@ -157,11 +157,28 @@ export default (container) => {
         name,
         campaignStartDate,
         campaignEndDate,
+        activeStartHour,
+        activeStartMinute,
+        activeEndHour,
+        activeEndMinute,
+        activeOnWeekends,
+        timezone,
       } = req.body;
       const { CmpCampaign } = container.persistenceService;
 
+      const sanitizedStart = container.dateTimeService
+        .getDateInUtc(activeStartHour, activeStartMinute, timezone);
+      const sanitizedEnd = container.dateTimeService
+        .getDateInUtc(activeEndHour, activeEndMinute, timezone);
+
       const cmpCampaign = await CmpCampaign.createCampaign(
         name, campaignStartDate, campaignEndDate,
+        sanitizedStart.getUTCHours(),
+        sanitizedStart.getUTCMinutes(),
+        sanitizedEnd.getUTCHours(),
+        sanitizedEnd.getUTCMinutes(),
+        activeOnWeekends,
+        container.dateTimeService.tzUTC,
       );
       res.status(200).json(cmpCampaign);
     } catch (error) {
