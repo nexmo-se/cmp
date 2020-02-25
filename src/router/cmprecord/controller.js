@@ -427,8 +427,14 @@ export default (container) => {
   const uploadCsv = async (req, res, next) => {
     try {
       const { file } = req;
-      console.log(file);
-      res.status(200).json(file);
+      const uploadedFile = {
+        fieldname: file.fieldname,
+        originalname: file.originalname,
+        mimetype: file.mimetype,
+        filename: file.filename,
+        size: file.size,
+      };
+      res.status(200).json(uploadedFile);
     } catch (error) {
       next(error);
     }
