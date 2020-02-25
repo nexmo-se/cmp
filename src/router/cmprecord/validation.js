@@ -75,6 +75,7 @@ export default {
     body: {},
     params: {
       cmpCampaignId: Joi.string().min(1).required(),
+      cmpTemplateId: Joi.string().min(1).required(),
     },
   },
   createRecordSingle: {

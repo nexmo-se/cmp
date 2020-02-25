@@ -19,7 +19,7 @@ export default (container) => {
       const second = `0${now.getSeconds()}`.slice(-2);
       const prefix = `${year}${month}${date}${hour}${minute}${second}`;
       console.log(req.params);
-      cb(null, `${prefix}_${req.params.cmpCampaignId}_${file.originalname}`);
+      cb(null, `${prefix}_${req.params.cmpCampaignId}_${req.params.cmpTemplateId}_${file.originalname}`);
     },
   });
   const upload = container.multer({ storage });
@@ -78,7 +78,7 @@ export default (container) => {
       controller.createRecordBatch,
     );
 
-  router.route('/csv/:cmpCampaignId')
+  router.route('/csv/:cmpCampaignId/:cmpTemplateId')
     .post(
       checkAuthentication,
       authorize(['admin']),
