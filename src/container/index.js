@@ -16,6 +16,8 @@ import moment from 'moment';
 import momentTimezone from 'moment-timezone';
 import Bottleneck from 'bottleneck';
 import multer from 'multer';
+import csvtojson from 'csvtojson';
+import arraytocsv from 'convert-array-to-csv';
 
 import AuthenticationError from '../errors/authError';
 import ForbiddenError from '../errors/forbiddenError';
@@ -23,6 +25,7 @@ import NotFoundError from '../errors/notFoundError';
 import BadRequestError from '../errors/badRequestError';
 
 import BlasterProcess from '../processes/blaster';
+import PickerProcess from '../processes/picker';
 
 import NexmoService from '../services/nexmo';
 import SocketIoService from '../services/socketIO';
@@ -35,6 +38,8 @@ import JwtService from '../services/jwt';
 import TemplateService from '../services/template';
 import RateLimiterService from '../services/rateLimiter';
 import DateTimeService from '../services/datetime';
+import FileService from '../services/file';
+import CsvService from '../services/csv';
 
 import Logger from '../services/logger';
 import Authenticator from '../services/authenticator';
@@ -73,6 +78,8 @@ container.moment = moment;
 container.momentTimezone = momentTimezone;
 container.Bottleneck = Bottleneck;
 container.multer = multer;
+container.csvtojson = csvtojson;
+container.arraytocsv = arraytocsv;
 
 // Errors
 container.AuthenticationError = AuthenticationError;
@@ -98,8 +105,11 @@ container.persistenceService = PersistenceService(container);
 container.templateService = TemplateService(container);
 container.rateLimiterService = RateLimiterService(container);
 container.dateTimeService = DateTimeService(container);
+container.fileService = FileService(container);
+container.csvService = CsvService(container);
 
 // Process
 container.blasterProcess = BlasterProcess(container);
+container.pickerProcess = PickerProcess(container);
 
 export default container;

@@ -15,6 +15,9 @@ export default {
   hash: {
     saltRounds: parseInt(process.env.HASH_SALT_ROUNDS || '10', 10),
   },
+  picker: {
+    delay: parseInt(process.env.PICKER_DELAY || '5', 10),
+  },
   blaster: {
     rateLimiter: process.env.RATE_LIMITER || 'axiosratelimiter',
     secondsPerBatch: parseInt(process.env.SECONDS_PER_BATCH || '5', 10),
