@@ -55,12 +55,20 @@ export default {
       name: Joi.string().min(1).required(),
       campaignStartDate: Joi.date().required(),
       campaignEndDate: Joi.date().min(Joi.ref('campaignStartDate')).required(),
-      activeStartHour: Joi.number().integer().min(0).max(23),
-      activeStartMinute: Joi.number().integer().min(0).max(59),
-      activeEndHour: Joi.number().integer().min(0).max(23),
-      activeEndMinute: Joi.number().integer().min(0).max(59),
-      activeOnWeekends: Joi.boolean(),
-      timezone: Joi.string(),
+      activeStartHour: Joi.number()
+        .integer().min(0).max(23)
+        .required(),
+      activeStartMinute: Joi.number()
+        .integer().min(0).max(59)
+        .required(),
+      activeEndHour: Joi.number()
+        .integer().min(0).max(23)
+        .required(),
+      activeEndMinute: Joi.number()
+        .integer().min(0).max(59)
+        .required(),
+      activeOnWeekends: Joi.boolean().required(),
+      timezone: Joi.string().required(),
     },
   },
   readCampaign: {
