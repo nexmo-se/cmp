@@ -51,7 +51,7 @@ export default (container) => {
 
   const writeBuffer = async (path, buffer) => {
     try {
-      container.fs.writeFileSync(path, buffer);
+      container.fs.writeFileSync(path, buffer, { flag: 'a' });
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);

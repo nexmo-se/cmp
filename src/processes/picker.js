@@ -2,9 +2,6 @@ export default (container) => {
   const { L } = container.defaultLogger('Picker Process');
 
   const wait = duration => new Promise(resolve => setTimeout(resolve, duration));
-  const waitFor = (promise, duration = 0) => new Promise(resolve => setTimeout(() => {
-    resolve(promise);
-  }, duration));
 
   const mapRecord = (csvRecord) => {
     const record = {
@@ -22,127 +19,109 @@ export default (container) => {
     return record;
   };
 
-  const createParameter = async (cmpRecordId, parameter, order) => {
+  const createRecordsCsv = async (records) => {
     try {
-      const { CmpParameter } = container.persistenceService;
-      const cmpParameter = await CmpParameter.createParameter(
-        cmpRecordId, parameter, order,
-      );
-      return Promise.resolve(cmpParameter);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
+      const creatableRecords = records.map((record) => {
+        const {
+          recipient,
+          cmpCampaignId, cmpTemplateId, actualCmpMediaId,
+          activeStartHour, activeStartMinute,
+          activeEndHour, activeEndMinute,
+          activeOnWeekends, timezone,
+        } = record;
+        const sanitizedStart = container.dateTimeService
+          .getDateInUtc(activeStartHour, activeStartMinute, timezone);
+        const sanitizedEnd = container.dateTimeService
+          .getDateInUtc(activeEndHour, activeEndMinute, timezone);
+        return {
+          id: container.uuid(),
+          recipient,
+          cmpCampaignId,
+          cmpTemplateId,
+          actualCmpMediaId,
+          activeStartHour: sanitizedStart.getUTCHours(),
+          activeStartMinute: sanitizedStart.getUTCMinutes(),
+          activeEndHour: sanitizedEnd.getUTCHours(),
+          activeEndMinute: sanitizedEnd.getUTCMinutes(),
+          activeOnWeekends,
+          timezone: container.dateTimeService.tzUTC,
+          status: 'pending',
+          statusTime: new Date(),
+        };
+      });
 
-  const createParameters = async (cmpRecordId, parameters) => {
-    try {
-      const promises = parameters.map(
-        (parameter, index) => createParameter(cmpRecordId, parameter, index),
-      );
-      const results = await Promise.all(promises);
-      return Promise.resolve(results);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
+      const creatableParameters = [];
+      for (let i = 0; i < records.length; i += 1) {
+        const record = records[i];
+        const creatableRecord = creatableRecords[i];
 
-  const deleteParameters = async (cmpRecordId) => {
-    try {
-      const { CmpParameter } = container.persistenceService;
-      const criteria = {
-        cmpRecordId,
-      };
-      const results = await CmpParameter.deleteParameters(criteria);
-      return Promise.resolve(results);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
+        const { cmpParameters } = record;
+        const { id } = creatableRecord;
 
-  const createMedia = async (media) => {
-    try {
-      const {
-        type, text, url, caption, fileName, latitude, longitude, name, address, actionUrl,
-      } = media;
-      const { CmpMedia } = container.persistenceService;
-
-      const cmpMedia = await CmpMedia.createMedia(
-        type, text, url, caption, fileName, latitude, longitude, name, address, actionUrl,
-      );
-      return Promise.resolve(cmpMedia);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const createRecord = async (record) => {
-    try {
-      const {
-        recipient,
-        cmpCampaignId,
-        cmpTemplateId,
-        cmpMediaId,
-        cmpMedia,
-        cmpParameters,
-        activeStartHour,
-        activeStartMinute,
-        activeEndHour,
-        activeEndMinute,
-        activeOnWeekends,
-        timezone,
-      } = record;
-      const { CmpRecord } = container.persistenceService;
-
-      let actualCmpMediaId = cmpMediaId;
-      if (actualCmpMediaId == null && cmpMedia) {
-        L.debug('Creating New Media');
-        const actualCmpMedia = await createMedia(cmpMedia);
-        actualCmpMediaId = actualCmpMedia.id;
+        for (let j = 0; j < cmpParameters.length; j += 1) {
+          const parameterItem = {
+            id: container.uuid(),
+            cmpRecordId: id,
+            parameter: cmpParameters[j],
+            order: j,
+          };
+          creatableParameters.push(parameterItem);
+        }
       }
 
+      const timePattern = 'YYYY-MM-DD HH:mm:ss';
 
-      const sanitizedStart = container.dateTimeService
-        .getDateInUtc(activeStartHour, activeStartMinute, timezone);
-      const sanitizedEnd = container.dateTimeService
-        .getDateInUtc(activeEndHour, activeEndMinute, timezone);
+      // Create Parameters
+      const createParameterStart = new Date().getTime();
+      const parametersCsvArray = creatableParameters.map(parameter => ([
+        parameter.id,
+        parameter.cmpRecordId,
+        parameter.parameter,
+        parameter.order,
+        0,
+        container.moment().format(timePattern).toUpperCase(),
+        container.moment().format(timePattern).toUpperCase(),
+      ]));
+      const parametersCsvString = await container.csvService.toCsv(parametersCsvArray);
+      await container.fileService.writeContent('/Users/ypoh/vcmp/dataload/parameters.csv', parametersCsvString);
+      const createParameterEnd = new Date().getTime();
+      L.debug(`Time Taken (Create Parameters): ${createParameterEnd - createParameterStart}ms`);
 
-      const cmpRecord = await CmpRecord.createRecord(
-        recipient,
-        cmpCampaignId,
-        cmpTemplateId,
-        actualCmpMediaId,
-        sanitizedStart.getUTCHours(),
-        sanitizedStart.getUTCMinutes(),
-        sanitizedEnd.getUTCHours(),
-        sanitizedEnd.getUTCMinutes(),
-        activeOnWeekends,
-        container.dateTimeService.tzUTC,
-      );
+      // Create Records
+      const createRecordStart = new Date().getTime();
+      const recordsCsvArray = creatableRecords.map(record => ([
+        record.id,
+        record.recipient,
+        record.cmpCampaignId,
+        record.cmpTemplateId,
+        null,
+        record.activeStartHour,
+        record.activeStartMinute,
+        record.activeEndHour,
+        record.activeEndMinute,
+        record.activeOnWeekends,
+        record.timezone,
+        null,
+        record.status,
+        container.moment().format(timePattern).toUpperCase(),
+        0,
+        container.moment().format(timePattern).toUpperCase(),
+        container.moment().format(timePattern).toUpperCase(),
+        (record.activeStartHour * 60) + record.activeStartMinute,
+        (record.activeEndHour * 60) + record.activeEndMinute,
+      ]));
+      const recordsCsvString = await container.csvService.toCsv(recordsCsvArray);
+      await container.fileService.writeContent('/Users/ypoh/vcmp/dataload/records.csv', recordsCsvString);
+      const createRecordEnd = new Date().getTime();
+      L.debug(`Time Taken (Create Records): ${createRecordEnd - createRecordStart}ms`);
 
-      if (cmpParameters) {
-        // Delete Previous Parameters
-        L.debug('Removing Previous Parameters');
-        await deleteParameters(cmpRecord.id);
-
-        // Create New Parameters
-        L.debug('Creating New Parameters');
-        await createParameters(cmpRecord.id, cmpParameters);
-      }
-
-
-      L.debug('Setting Record to Pending');
-      const changes = {
-        status: 'pending',
-        statusTime: new Date(),
-      };
-      const updatedCmpRecord = await CmpRecord.updateRecord(cmpRecord.id, changes, true);
-      return Promise.resolve(updatedCmpRecord);
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const createRecords = async (records) => {
+  const createRecordsDatabase = async (records) => {
     try {
       const { CmpRecord, CmpParameter } = container.persistenceService;
       const creatableRecords = records.map((record) => {
@@ -158,6 +137,7 @@ export default (container) => {
         const sanitizedEnd = container.dateTimeService
           .getDateInUtc(activeEndHour, activeEndMinute, timezone);
         return {
+          id: container.uuid(),
           recipient,
           cmpCampaignId,
           cmpTemplateId,
@@ -168,20 +148,18 @@ export default (container) => {
           activeEndMinute: sanitizedEnd.getUTCMinutes(),
           activeOnWeekends,
           timezone: container.dateTimeService.tzUTC,
+          status: 'pending',
+          statusTime: new Date(),
         };
       });
 
-      // Create Records
-      const createdRecords = await CmpRecord.createRecordBatch(creatableRecords);
-
-      // Create Parameters
       const creatableParameters = [];
       for (let i = 0; i < records.length; i += 1) {
         const record = records[i];
-        const createdRecord = createdRecords[i];
+        const creatableRecord = creatableRecords[i];
 
         const { cmpParameters } = record;
-        const { id } = createdRecord;
+        const { id } = creatableRecord;
 
         for (let j = 0; j < cmpParameters.length; j += 1) {
           const parameterItem = {
@@ -193,19 +171,19 @@ export default (container) => {
         }
       }
 
+      // Create Parameters
+      const createParameterStart = new Date().getTime();
       await CmpParameter.createParameterBatch(creatableParameters);
+      const createParameterEnd = new Date().getTime();
+      L.debug(`Time Taken (Create Parameters): ${createParameterEnd - createParameterStart}ms`);
 
-      const ids = createdRecords.map(record => record.id);
-      const criteria = {
-        id: ids,
-      };
-      const changes = {
-        status: 'pending',
-        statusTime: new Date(),
-      };
+      // Create Records
+      const createRecordStart = new Date().getTime();
+      const createdRecords = await CmpRecord.createRecordBatch(creatableRecords);
+      const createRecordEnd = new Date().getTime();
+      L.debug(`Time Taken (Create Records): ${createRecordEnd - createRecordStart}ms`);
 
-      const results = await CmpRecord.updateRecords(criteria, changes, true, {});
-      return Promise.resolve(results);
+      return Promise.resolve(createdRecords);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -239,7 +217,7 @@ export default (container) => {
           activeOnWeekends,
           timezone,
         }));
-      await createRecords(recordModels);
+      await createRecordsCsv(recordModels);
       const processEnd = new Date().getTime();
       L.debug(`Time Taken (Process File Content): ${processEnd - processStart}ms`);
       return Promise.resolve();
@@ -343,7 +321,7 @@ export default (container) => {
       const fileReader = container.fileService.readNLineBuffer(filePath);
       const options = {
         skipCount: 3,
-        batchSize: 1000,
+        batchSize: 10000,
       };
       const tracker = {
         startTime: new Date().getTime(),

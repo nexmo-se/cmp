@@ -789,6 +789,7 @@ export default (container) => {
       const { CmpRecord } = container.databaseService.models;
       const creatableRecords = records.map((record) => {
         const {
+          id,
           recipient,
           cmpCampaignId,
           cmpTemplateId,
@@ -798,12 +799,14 @@ export default (container) => {
           activeEndHour,
           activeEndMinute,
           activeOnWeekends,
+          status,
+          statusTime,
           timezone,
         } = record;
         const activeStart = (activeStartHour * 60) + activeStartMinute;
         const activeEnd = (activeEndHour * 60) + activeEndMinute;
         return {
-          id: container.uuid(),
+          id: id || container.uuid(),
           recipient,
           cmpCampaignId,
           cmpTemplateId,
@@ -816,8 +819,8 @@ export default (container) => {
           activeEndMinute,
           activeOnWeekends,
           timezone,
-          status: 'draft',
-          statusTime: new Date(),
+          status: status || 'draft',
+          statusTime: statusTime || new Date(),
           deleted: false,
         };
       });
