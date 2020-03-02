@@ -2,6 +2,9 @@ export default (container) => {
   const { L } = container.defaultLogger('Picker Process');
 
   const wait = duration => new Promise(resolve => setTimeout(resolve, duration));
+  const waitFor = (promise, duration = 0) => new Promise(resolve => setTimeout(() => {
+    resolve(promise);
+  }, duration));
 
   const mapRecord = (csvRecord) => {
     const record = {
@@ -157,7 +160,9 @@ export default (container) => {
     }
   };
 
-  const processFileContent = async (jsonContent, cmpCampaignId, cmpTemplateId) => {
+  const processFileContentOld = async (
+    jsonContent, cmpCampaignId, cmpTemplateId, skipHeader = true,
+  ) => {
     try {
       const processStart = new Date().getTime();
       L.debug(`Campaign ID: ${cmpCampaignId}`);
@@ -170,7 +175,12 @@ export default (container) => {
         activeOnWeekends, timezone,
       } = campaign;
       const promises = jsonContent
-        .filter((_, index) => index >= 3)
+        .filter((_, index) => {
+          if (skipHeader) {
+            return true;
+          }
+          return index > 3;
+        })
         .map(mapRecord)
         .map(record => ({
           recipient: record.recipient,
@@ -197,30 +207,135 @@ export default (container) => {
     }
   };
 
-  const readFileContent = async (fileName) => {
+  const processFileContent = async (
+    jsonContent, cmpCampaignId, cmpTemplateId, campaign,
+  ) => {
     try {
-      const readStart = new Date().getTime();
-      const { uploadPath } = container.config.csv;
-      const filePath = `${uploadPath}/${fileName}`;
-      const csvContent = await container.fileService.readContent(filePath);
-      const jsonContent = container.csvService.fromCsv(csvContent);
-      const readEnd = new Date().getTime();
-      L.debug(`Time Taken (Read File): ${readEnd - readStart}ms`);
-      return Promise.resolve(jsonContent);
+      const processStart = new Date().getTime();
+      L.debug(`Campaign ID: ${cmpCampaignId}`);
+      L.debug(`Template ID: ${cmpTemplateId}`);
+      const {
+        activeStartHour, activeStartMinute,
+        activeEndHour, activeEndMinute,
+        activeOnWeekends, timezone,
+      } = campaign;
+      const recordModels = jsonContent
+        .map(mapRecord)
+        .map(record => ({
+          recipient: record.recipient,
+          cmpCampaignId,
+          cmpTemplateId,
+          cmpMediaId: null,
+          cmpMedia: null,
+          cmpParameters: record.cmpParameters,
+          activeStartHour,
+          activeStartMinute,
+          activeEndHour,
+          activeEndMinute,
+          activeOnWeekends,
+          timezone,
+        }));
+      console.log(recordModels);
+      const processEnd = new Date().getTime();
+      L.debug(`Time Taken (Process File Content): ${processEnd - processStart}ms`);
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const processFile = async (fileName) => {
+  const processContentBatch = async (
+    batchContent, cmpCampaignId, cmpTemplateId, campaign,
+  ) => {
+    try {
+      const processStart = new Date().getTime();
+      const result = [];
+      const csvData = container.csvService.fromCsvSync(batchContent);
+      for (let i = 0; i < csvData.length; i += 1) {
+        const csvItem = csvData[i];
+        result.push(csvItem);
+      }
+
+      await processFileContent(result, cmpCampaignId, cmpTemplateId, campaign);
+      // await wait(0);
+
+      const processEnd = new Date().getTime();
+      L.debug(`Time Taken (Process Content Batch): ${processEnd - processStart}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const processNextBatch = async (
+    fileReader,
+    cmpCampaignId,
+    cmpTemplateId,
+    campaign,
+    options = { skipCount: 3, batchSize: 1000 },
+    tracker = { startTime: 0, batchNumber: 0 },
+  ) => {
+    try {
+      let count = 0;
+      let content = '';
+
+      let line = fileReader.next();
+      while (line) {
+        if (count >= options.skipCount) {
+          content += `${line}\n`;
+        }
+        count += 1;
+
+        if (count % options.batchSize === 0) {
+          break;
+        }
+
+        line = fileReader.next();
+      }
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Process Next Batch): [${tracker.batchNumber}][${count}] ${endTime - tracker.startTime}ms`);
+
+      await processContentBatch(content, cmpCampaignId, cmpTemplateId, campaign);
+      if (line) {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            const newTracker = {
+              startTime: new Date().getTime(),
+              batchNumber: tracker.batchNumber + 1,
+            };
+            processNextBatch(
+              fileReader, cmpCampaignId, cmpTemplateId, campaign, options, newTracker,
+            )
+              .then(resolve)
+              .catch(reject);
+          }, 0);
+        });
+      }
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const processFileBatch = async (fileName) => {
     try {
       const processStart = new Date().getTime();
       const metadata = extractMetadataFromFileName(fileName);
       const { cmpCampaignId, cmpTemplateId } = metadata;
-
-      // Read Content
-      const jsonContent = await readFileContent(fileName);
-      await processFileContent(jsonContent, cmpCampaignId, cmpTemplateId);
+      const { CmpCampaign } = container.persistenceService;
+      const campaign = await CmpCampaign.readCampaign(cmpCampaignId);
+      const { uploadPath } = container.config.csv;
+      const filePath = `${uploadPath}/${fileName}`;
+      const fileReader = container.fileService.readNLineBuffer(filePath);
+      const options = {
+        skipCount: 3,
+        batchSize: 1000,
+      };
+      const tracker = {
+        startTime: new Date().getTime(),
+        batchNumber: 1,
+      };
+      await processNextBatch(fileReader, cmpCampaignId, cmpTemplateId, campaign, options, tracker);
 
       const processEnd = new Date().getTime();
       L.debug(`Time Taken (Process File): ${processEnd - processStart}ms`);
@@ -270,7 +385,8 @@ export default (container) => {
       const promises = csvFiles.map(async (csvFile) => {
         try {
           // Process
-          await processFile(csvFile);
+          // await processFile(csvFile);
+          await processFileBatch(csvFile);
 
           // Archive
           await archiveFile(csvFile);

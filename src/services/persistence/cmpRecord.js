@@ -96,6 +96,16 @@ export default (container) => {
     }
   };
 
+  const createRecordBatch = async (records, excludeSecret = true) => {
+    try {
+      const { CmpRecord } = container.databaseService.accessors;
+      const cmpRecords = await CmpRecord.createRecordBatch(records, excludeSecret);
+      return Promise.resolve(cmpRecords);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecord = async (
     recipient,
     cmpCampaignId,
@@ -194,6 +204,7 @@ export default (container) => {
     countPendingRecordsByCampaignId,
 
     createRecord,
+    createRecordBatch,
     readRecord,
 
     updateRecord,

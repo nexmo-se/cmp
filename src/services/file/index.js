@@ -18,6 +18,27 @@ export default (container) => {
     }
   };
 
+  const readLineBuffer = (path, lineListener = () => {}, closeListener = () => {}) => {
+    const { fs, readline } = container;
+    const readInterface = readline.createInterface({
+      input: fs.createReadStream(path),
+    });
+    readInterface.on('line', lineListener);
+    readInterface.on('close', closeListener);
+  };
+
+  const readLineContent = (path, lineListener = () => {}, closeListener = () => {}) => {
+    readLineBuffer(path, (lineBuffer) => {
+      const lineContent = lineBuffer.toString();
+      lineListener(lineContent);
+    }, closeListener);
+  };
+
+  const readNLineBuffer = (path) => {
+    const reader = new container.NReadLines(path);
+    return reader;
+  };
+
   const writeContent = async (path, content) => {
     try {
       const buffer = Buffer.from(content, 'utf8');
@@ -40,6 +61,9 @@ export default (container) => {
   return {
     readContent,
     readBuffer,
+    readLineBuffer,
+    readLineContent,
+    readNLineBuffer,
 
     writeContent,
     writeBuffer,

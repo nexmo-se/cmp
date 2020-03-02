@@ -30,6 +30,8 @@ console.log('NODEJS VERSION:', process.version);
 // Start of Script
 console.log('This is the Trigger Script');
 
+const container = require('./container').default;
+
 const host = 'http://localhost:8080';
 const numberOfRecords = 15000;
 const number = '6583206274';
@@ -142,23 +144,104 @@ const runInSeqeunce = async (promises, campaignId, i = 0) => {
   }
 };
 
-let authToken = null;
-login()
-  .then(data => data.token)
-  .then((token) => {
-    authToken = token;
-    return createCampaign();
-  })
-  .then(campaign => campaign.id)
-  .then((campaignId) => {
-    console.log(campaignId);
-    const recordPromises = [];
-    for (let i = 0; i < numberOfRecords; i += 1) {
-      recordPromises.push(createRecord);
+// let authToken = null;
+// login()
+//   .then(data => data.token)
+//   .then((token) => {
+//     authToken = token;
+//     return createCampaign();
+//   })
+//   .then(campaign => campaign.id)
+//   .then((campaignId) => {
+//     console.log(campaignId);
+//     const recordPromises = [];
+//     for (let i = 0; i < numberOfRecords; i += 1) {
+//       recordPromises.push(createRecord);
+//     }
+
+//     return runInSeqeunce(recordPromises, campaignId);
+//   })
+//   .then(campaignId => startCampaign(campaignId))
+//   .then(data => console.log(data))
+//   .catch(error => console.error(error));
+
+let count = 0;
+const skipCount = 3;
+const batchSize = 1000;
+let batch = '';
+const result = [];
+const startTime = new Date().getTime();
+
+const filePath = '/Users/ypoh/vcmp/upload/20200226174126_bda7f7dd-95ea-4cc1-ba63-16168af6ca0a_10e6236a-b7c0-45a5-987f-89db17b13a2c_aaa.csv';
+
+// container.fileService.readLineBuffer(
+//   filePath,
+//   () => console.log('hi'),
+//   () => console.log((new Date().getTime() - startTime)),
+// );
+
+const reader = container.fileService.readNLineBuffer(filePath);
+let line = reader.next();
+
+while (line) {
+  if (count >= skipCount) {
+    if (count % batchSize === 0) {
+      // Process Batch
+      const tempBatch = batch;
+      batch = '';
+      const csvData = container.csvService.fromCsvSync(tempBatch);
+      for (let i = 0; i < csvData.length; i += 1) {
+        result.push(csvData[i]);
+      }
     }
 
-    return runInSeqeunce(recordPromises, campaignId);
-  })
-  .then(campaignId => startCampaign(campaignId))
-  .then(data => console.log(data))
-  .catch(error => console.error(error));
+    batch += `${line}\n`;
+  }
+
+  count += 1;
+  line = reader.next();
+}
+
+// Process Final Batch
+const tempBatch = batch;
+batch = '';
+const csvData = container.csvService.fromCsvSync(tempBatch);
+for (let i = 0; i < csvData.length; i += 1) {
+  result.push(csvData[i]);
+}
+
+console.log((new Date().getTime() - startTime));
+console.log(result.length);
+
+// container.fileService.readLineBuffer(
+//   filePath,
+//   (line) => {
+//     if (count % batchSize === 0) {
+//       // Process Batch
+//       const tempBatch = batch;
+//       batch = '';
+//       container.csvService.fromCsv(tempBatch)
+//         .then((csvData) => {
+//           for (let i = 0; i < csvData.length; i += 1) {
+//             result.push(csvData[i]);
+//           }
+//         });
+//     }
+
+//     batch += `${line}\n`;
+//     count += 1;
+//   },
+//   () => {
+//     // Process Batch
+//     const tempBatch = batch;
+//     batch = '';
+//     container.csvService.fromCsv(tempBatch)
+//       .then((csvData) => {
+//         for (let i = 0; i < csvData.length; i += 1) {
+//           result.push(csvData[i]);
+//         }
+//         console.log((new Date().getTime() - startTime));
+//         console.log(result.length);
+//       });
+//   },
+// );

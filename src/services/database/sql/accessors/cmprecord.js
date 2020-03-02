@@ -784,6 +784,53 @@ export default (container) => {
     }
   };
 
+  const createRecordBatch = async (records, excludeSecret = true) => {
+    try {
+      const { CmpRecord } = container.databaseService.models;
+      const creatableRecords = records.map((record) => {
+        const {
+          recipient,
+          cmpCampaignId,
+          cmpTemplateId,
+          cmpMediaId,
+          activeStartHour,
+          activeStartMinute,
+          activeEndHour,
+          activeEndMinute,
+          activeOnWeekends,
+          timezone,
+        } = record;
+        const activeStart = (activeStartHour * 60) + activeStartMinute;
+        const activeEnd = (activeEndHour * 60) + activeEndMinute;
+        return {
+          id: container.uuid(),
+          recipient,
+          cmpCampaignId,
+          cmpTemplateId,
+          cmpMediaId,
+          activeStart,
+          activeStartHour,
+          activeStartMinute,
+          activeEnd,
+          activeEndHour,
+          activeEndMinute,
+          activeOnWeekends,
+          timezone,
+          status: 'draft',
+          statusTime: new Date(),
+          deleted: false,
+        };
+      });
+      const createdRecords = await CmpRecord.bulkCreate(creatableRecords);
+      const cmpRecords = createdRecords.map(
+        rawCmpRecord => mapCmpRecord(rawCmpRecord, excludeSecret),
+      );
+      return Promise.resolve(cmpRecords);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecord = async (
     recipient,
     cmpCampaignId,
@@ -1143,6 +1190,7 @@ export default (container) => {
     countPendingRecordsByCampaignId,
 
     createRecord,
+    createRecordBatch,
     readRecord,
 
     updateRecord,

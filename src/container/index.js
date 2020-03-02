@@ -1,4 +1,6 @@
 import fs from 'fs';
+import readline from 'readline';
+import NReadLines from 'n-readlines';
 import path from 'path';
 import express from 'express';
 import axios from 'axios';
@@ -16,6 +18,7 @@ import moment from 'moment';
 import momentTimezone from 'moment-timezone';
 import Bottleneck from 'bottleneck';
 import multer from 'multer';
+import csvParse from 'csv-parse/lib/sync';
 import csvtojson from 'csvtojson';
 import arraytocsv from 'convert-array-to-csv';
 
@@ -59,6 +62,8 @@ container.config.hostUrl = container.config.customPort
 
 // External
 container.fs = fs;
+container.readline = readline;
+container.NReadLines = NReadLines;
 container.path = path;
 container.express = express;
 container.joi = joi;
@@ -78,6 +83,7 @@ container.moment = moment;
 container.momentTimezone = momentTimezone;
 container.Bottleneck = Bottleneck;
 container.multer = multer;
+container.csvParse = csvParse;
 container.csvtojson = csvtojson;
 container.arraytocsv = arraytocsv;
 

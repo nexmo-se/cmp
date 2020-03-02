@@ -12,6 +12,11 @@ export default (container) => {
     }
   };
 
+  const fromCsvSync = (csvContent) => {
+    const content = container.csvParse(csvContent);
+    return content;
+  };
+
   const toCsv = async (jsonContent) => {
     try {
       const csvContent = container.arraytocsv(jsonContent);
@@ -23,6 +28,7 @@ export default (container) => {
 
   return {
     fromCsv,
+    fromCsvSync,
     toCsv,
   };
 };
