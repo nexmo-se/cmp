@@ -51,6 +51,7 @@ export default {
     port: process.env.DATABASE_PORT || 3306,
     dialect: process.env.DATABASE_DIALECT || 'mysql',
     useSsl: (process.env.DATABASE_USE_SSL || 'false').toLowerCase() === 'true',
+    logging: (process.env.DATABASE_LOGGING || 'false').toLowerCase() === 'true',
   },
   enableSequelizeLog: false,
   forceSequelizeSync: false,

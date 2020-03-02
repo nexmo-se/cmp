@@ -7,7 +7,7 @@ export default (container) => {
 
   const createClient = () => {
     const {
-      name, username, password, host, port, dialect, useSsl,
+      name, username, password, host, port, dialect, useSsl, logging,
     } = container.config.database;
 
     // Setup Config
@@ -21,6 +21,7 @@ export default (container) => {
         acquire: 30000,
         idle: 10000,
       },
+      logging,
     };
     if (useSsl) {
       config.dialectOptions = { ssl: true };
