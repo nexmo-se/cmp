@@ -21,7 +21,7 @@ export default (container) => {
       return 'Asia/Ho_Chi_Minh';
     }
 
-    L.debug(`Using Timezone: ${trimmedTimezone}`);
+    // L.debug(`Using Timezone: ${trimmedTimezone}`);
     return trimmedTimezone;
   };
 

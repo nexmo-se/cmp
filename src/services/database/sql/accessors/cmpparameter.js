@@ -135,6 +135,24 @@ export default (container) => {
     }
   };
 
+  const createParameterBatch = async (parameters) => {
+    try {
+      const { CmpParameter } = container.databaseService.models;
+      const creatableParameters = parameters.map(parameterObj => ({
+        id: container.uuid(),
+        cmpRecordId: parameterObj.cmpRecordId,
+        parameter: parameterObj.parameter,
+        order: parameterObj.order,
+        deleted: false,
+      }));
+      const rawCmpParameters = await CmpParameter.bulkCreate(creatableParameters);
+      const cmpParameters = rawCmpParameters.map(mapCmpParameter);
+      return Promise.resolve(cmpParameters);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createParameter = async (
     cmpRecordId,
     parameter,
@@ -226,6 +244,7 @@ export default (container) => {
     listParameters,
 
     createParameter,
+    createParameterBatch,
     readParameter,
 
     updateParameter,

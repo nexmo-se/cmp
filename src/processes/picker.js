@@ -142,65 +142,69 @@ export default (container) => {
     }
   };
 
-  const runInSeqeunce = async (promises, i = 0, previousResults = []) => {
+  const createRecords = async (records) => {
     try {
-      if (i >= promises.length) {
-        return Promise.resolve(previousResults);
-      }
-
-      console.log(`Creating record ${i + 1}`);
-      const promise = promises[i];
-      const currentResult = await promise();
-      previousResults.push(currentResult);
-
-      const finalResults = await runInSeqeunce(promises, i + 1, previousResults);
-      return Promise.resolve(finalResults);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const processFileContentOld = async (
-    jsonContent, cmpCampaignId, cmpTemplateId, skipHeader = true,
-  ) => {
-    try {
-      const processStart = new Date().getTime();
-      L.debug(`Campaign ID: ${cmpCampaignId}`);
-      L.debug(`Template ID: ${cmpTemplateId}`);
-      const { CmpCampaign } = container.persistenceService;
-      const campaign = await CmpCampaign.readCampaign(cmpCampaignId);
-      const {
-        activeStartHour, activeStartMinute,
-        activeEndHour, activeEndMinute,
-        activeOnWeekends, timezone,
-      } = campaign;
-      const promises = jsonContent
-        .filter((_, index) => {
-          if (skipHeader) {
-            return true;
-          }
-          return index > 3;
-        })
-        .map(mapRecord)
-        .map(record => ({
-          recipient: record.recipient,
+      const { CmpRecord, CmpParameter } = container.persistenceService;
+      const creatableRecords = records.map((record) => {
+        const {
+          recipient,
+          cmpCampaignId, cmpTemplateId, actualCmpMediaId,
+          activeStartHour, activeStartMinute,
+          activeEndHour, activeEndMinute,
+          activeOnWeekends, timezone,
+        } = record;
+        const sanitizedStart = container.dateTimeService
+          .getDateInUtc(activeStartHour, activeStartMinute, timezone);
+        const sanitizedEnd = container.dateTimeService
+          .getDateInUtc(activeEndHour, activeEndMinute, timezone);
+        return {
+          recipient,
           cmpCampaignId,
           cmpTemplateId,
-          cmpMediaId: null,
-          cmpMedia: null,
-          cmpParameters: record.cmpParameters,
-          activeStartHour,
-          activeStartMinute,
-          activeEndHour,
-          activeEndMinute,
+          actualCmpMediaId,
+          activeStartHour: sanitizedStart.getUTCHours(),
+          activeStartMinute: sanitizedStart.getUTCMinutes(),
+          activeEndHour: sanitizedEnd.getUTCHours(),
+          activeEndMinute: sanitizedEnd.getUTCMinutes(),
           activeOnWeekends,
-          timezone,
-        }))
-        .map(record => createRecord(record));
-      const results = await runInSeqeunce(promises, promises.length, []);
-      L.debug(results);
-      const processEnd = new Date().getTime();
-      L.debug(`Time Taken (Process File Content): ${processEnd - processStart}ms`);
+          timezone: container.dateTimeService.tzUTC,
+        };
+      });
+
+      // Create Records
+      const createdRecords = await CmpRecord.createRecordBatch(creatableRecords);
+
+      // Create Parameters
+      const creatableParameters = [];
+      for (let i = 0; i < records.length; i += 1) {
+        const record = records[i];
+        const createdRecord = createdRecords[i];
+
+        const { cmpParameters } = record;
+        const { id } = createdRecord;
+
+        for (let j = 0; j < cmpParameters.length; j += 1) {
+          const parameterItem = {
+            cmpRecordId: id,
+            parameter: cmpParameters[j],
+            order: j,
+          };
+          creatableParameters.push(parameterItem);
+        }
+      }
+
+      await CmpParameter.createParameterBatch(creatableParameters);
+
+      const ids = createdRecords.map(record => record.id);
+      const criteria = {
+        id: ids,
+      };
+      const changes = {
+        status: 'pending',
+        statusTime: new Date(),
+      };
+
+      const results = await CmpRecord.updateRecords(criteria, changes, true, {});
       return Promise.resolve(results);
     } catch (error) {
       return Promise.reject(error);
@@ -235,7 +239,7 @@ export default (container) => {
           activeOnWeekends,
           timezone,
         }));
-      console.log(recordModels);
+      await createRecords(recordModels);
       const processEnd = new Date().getTime();
       L.debug(`Time Taken (Process File Content): ${processEnd - processStart}ms`);
       return Promise.resolve();
@@ -244,20 +248,26 @@ export default (container) => {
     }
   };
 
+  const parseContentBatch = (batchContent) => {
+    const processStart = new Date().getTime();
+    const result = [];
+    const csvData = container.csvService.fromCsvSync(batchContent);
+    for (let i = 0; i < csvData.length; i += 1) {
+      const csvItem = csvData[i];
+      result.push(csvItem);
+    }
+    const processEnd = new Date().getTime();
+    L.debug(`Time Taken (Parse Content Batch): ${processEnd - processStart}ms`);
+    return result;
+  };
+
   const processContentBatch = async (
     batchContent, cmpCampaignId, cmpTemplateId, campaign,
   ) => {
     try {
       const processStart = new Date().getTime();
-      const result = [];
-      const csvData = container.csvService.fromCsvSync(batchContent);
-      for (let i = 0; i < csvData.length; i += 1) {
-        const csvItem = csvData[i];
-        result.push(csvItem);
-      }
-
+      const result = parseContentBatch(batchContent);
       await processFileContent(result, cmpCampaignId, cmpTemplateId, campaign);
-      // await wait(0);
 
       const processEnd = new Date().getTime();
       L.debug(`Time Taken (Process Content Batch): ${processEnd - processStart}ms`);
@@ -272,7 +282,7 @@ export default (container) => {
     cmpCampaignId,
     cmpTemplateId,
     campaign,
-    options = { skipCount: 3, batchSize: 1000 },
+    options = { skipCount: 0, batchSize: 1000 },
     tracker = { startTime: 0, batchNumber: 0 },
   ) => {
     try {
@@ -299,12 +309,16 @@ export default (container) => {
       if (line) {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
+            const newOptions = {
+              skipCount: 0,
+              batchSize: options.batchSize,
+            };
             const newTracker = {
               startTime: new Date().getTime(),
               batchNumber: tracker.batchNumber + 1,
             };
             processNextBatch(
-              fileReader, cmpCampaignId, cmpTemplateId, campaign, options, newTracker,
+              fileReader, cmpCampaignId, cmpTemplateId, campaign, newOptions, newTracker,
             )
               .then(resolve)
               .catch(reject);

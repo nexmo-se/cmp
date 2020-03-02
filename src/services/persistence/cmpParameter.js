@@ -11,6 +11,16 @@ export default (container) => {
     }
   };
 
+  const createParameterBatch = async (parameters) => {
+    try {
+      const { CmpParameter } = container.databaseService.accessors;
+      const cmpParameters = await CmpParameter.createParameterBatch(parameters);
+      return Promise.resolve(cmpParameters);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createParameter = async (
     cmpRecordId,
     parameter,
@@ -86,6 +96,7 @@ export default (container) => {
     listParameters,
 
     createParameter,
+    createParameterBatch,
     readParameter,
 
     updateParameter,
