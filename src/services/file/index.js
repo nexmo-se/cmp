@@ -58,6 +58,15 @@ export default (container) => {
     }
   };
 
+  const deleteFile = async (path) => {
+    try {
+      container.fs.unlinkSync(path);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   return {
     readContent,
     readBuffer,
@@ -67,5 +76,7 @@ export default (container) => {
 
     writeContent,
     writeBuffer,
+
+    deleteFile,
   };
 };

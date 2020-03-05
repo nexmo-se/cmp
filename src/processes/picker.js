@@ -19,8 +19,50 @@ export default (container) => {
     return record;
   };
 
-  const createRecordsCsv = async (records) => {
+  const dataLoadCsv = async () => {
     try {
+      const { client } = container.databaseService;
+      const { dataloadPath } = container.config.csv;
+      const recordFilePath = `${dataloadPath}/records.csv`;
+      const parametersFilePath = `${dataloadPath}/parameters.csv`;
+      const recordsSql = `LOAD DATA LOCAL INFILE '${recordFilePath}' INTO TABLE CmpRecords FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+      const parametersSql = `LOAD DATA LOCAL INFILE '${parametersFilePath}' INTO TABLE CmpParameters FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+
+      const loadingStart = new Date().getTime();
+
+      // Dataload Records
+      L.debug('DataLoading Records');
+      const recordsStart = new Date().getTime();
+      await client.query(recordsSql);
+      const recordsEnd = new Date().getTime();
+      L.debug(`Time Taken (DataLoading Records): ${recordsEnd - recordsStart}ms`);
+
+      // Dataload Parameters
+      L.debug('DataLoading Parameters');
+      const parametersStart = new Date().getTime();
+      await client.query(parametersSql);
+      const parametersEnd = new Date().getTime();
+      L.debug(`Time Taken (DataLoading Parameters): ${parametersEnd - parametersStart}ms`);
+
+      const loadingEnd = new Date().getTime();
+      L.debug(`Time Taken (DataLoading Total): ${loadingEnd - loadingStart}ms`);
+
+      // Delete Dataload Files
+      L.debug('Deleting DataLoad Files');
+      container.fileService.deleteFile(recordFilePath);
+      L.debug('Records DataLoad File deleted');
+      container.fileService.deleteFile(parametersFilePath);
+      L.debug('Parameters DataLoad File deleted');
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateCsvForDataLoad = async (records) => {
+    try {
+      const { dataloadPath } = container.config.csv;
       const creatableRecords = records.map((record) => {
         const {
           recipient,
@@ -83,9 +125,9 @@ export default (container) => {
         container.moment().format(timePattern).toUpperCase(),
       ]));
       const parametersCsvString = await container.csvService.toCsv(parametersCsvArray);
-      await container.fileService.writeContent('/Users/ypoh/vcmp/dataload/parameters.csv', parametersCsvString);
+      await container.fileService.writeContent(`${dataloadPath}/parameters.csv`, parametersCsvString);
       const createParameterEnd = new Date().getTime();
-      L.debug(`Time Taken (Create Parameters): ${createParameterEnd - createParameterStart}ms`);
+      L.debug(`Time Taken (Create Dataload CSV Parameters): ${createParameterEnd - createParameterStart}ms`);
 
       // Create Records
       const createRecordStart = new Date().getTime();
@@ -111,10 +153,20 @@ export default (container) => {
         (record.activeEndHour * 60) + record.activeEndMinute,
       ]));
       const recordsCsvString = await container.csvService.toCsv(recordsCsvArray);
-      await container.fileService.writeContent('/Users/ypoh/vcmp/dataload/records.csv', recordsCsvString);
+      await container.fileService.writeContent(`${dataloadPath}/records.csv`, recordsCsvString);
       const createRecordEnd = new Date().getTime();
-      L.debug(`Time Taken (Create Records): ${createRecordEnd - createRecordStart}ms`);
+      L.debug(`Time Taken (Create Dataload CSV Records): ${createRecordEnd - createRecordStart}ms`);
 
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createRecordsCsv = async (records) => {
+    try {
+      await generateCsvForDataLoad(records);
+      await dataLoadCsv();
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
@@ -193,7 +245,11 @@ export default (container) => {
     jsonContent, cmpCampaignId, cmpTemplateId, campaign,
   ) => {
     try {
+      const { insertMode } = container.config.csv;
       const processStart = new Date().getTime();
+
+      // Mapping
+      const mappingStart = new Date().getTime();
       L.debug(`Campaign ID: ${cmpCampaignId}`);
       L.debug(`Template ID: ${cmpTemplateId}`);
       const {
@@ -217,9 +273,23 @@ export default (container) => {
           activeOnWeekends,
           timezone,
         }));
-      await createRecordsCsv(recordModels);
+      const mappingEnd = new Date().getTime();
+      L.debug(`Time Taken (Process File Content - Mapping): ${mappingEnd - mappingStart}ms`);
+
+      // Insert
+      const insertStart = new Date().getTime();
+      if (insertMode === 'csv') {
+        L.debug('Inserting using CSV (DataLoad)');
+        await createRecordsCsv(recordModels);
+      } else {
+        L.debug('Inserting using Database (Bulk Insert SQL)');
+        await createRecordsDatabase(recordModels);
+      }
+      const insertEnd = new Date().getTime();
+      L.debug(`Time Taken (Process File Content - Insert): ${insertEnd - insertStart}ms`);
+
       const processEnd = new Date().getTime();
-      L.debug(`Time Taken (Process File Content): ${processEnd - processStart}ms`);
+      L.debug(`Time Taken (Process File Content - Total): ${processEnd - processStart}ms`);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
@@ -311,6 +381,7 @@ export default (container) => {
 
   const processFileBatch = async (fileName) => {
     try {
+      const { skipCount, batchSize } = container.config.csv;
       const processStart = new Date().getTime();
       const metadata = extractMetadataFromFileName(fileName);
       const { cmpCampaignId, cmpTemplateId } = metadata;
@@ -319,10 +390,7 @@ export default (container) => {
       const { uploadPath } = container.config.csv;
       const filePath = `${uploadPath}/${fileName}`;
       const fileReader = container.fileService.readNLineBuffer(filePath);
-      const options = {
-        skipCount: 3,
-        batchSize: 10000,
-      };
+      const options = { skipCount, batchSize };
       const tracker = {
         startTime: new Date().getTime(),
         batchNumber: 1,
@@ -377,7 +445,6 @@ export default (container) => {
       const promises = csvFiles.map(async (csvFile) => {
         try {
           // Process
-          // await processFile(csvFile);
           await processFileBatch(csvFile);
 
           // Archive
