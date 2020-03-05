@@ -1,10 +1,15 @@
 export default (container) => {
   const { L } = container.defaultLogger('Nexmo Whatsapp Service');
   const getUrl = () => {
-    const { host, useWhatsappSandbox } = container.config.nexmo;
+    const {
+      host, useWhatsappSandbox, useMockWhatsapp, mockWhatsappUrl,
+    } = container.config.nexmo;
 
     let url = `${host}/v0.1/messages`;
-    if (useWhatsappSandbox) {
+    if (useMockWhatsapp) {
+      L.info('Using Mock Whatsapp Url');
+      url = mockWhatsappUrl;
+    } else if (useWhatsappSandbox) {
       L.info('Using APAC Whatsapp Sandbox Url');
       url = 'http://nexmoapac.hopto.me/sandbox/whatsapp.php';
     }
@@ -13,10 +18,12 @@ export default (container) => {
   };
 
   const getFromNumber = (senderId) => {
-    const { useWhatsappSandbox } = container.config.nexmo;
+    const { useWhatsappSandbox, useMockWhatsapp } = container.config.nexmo;
 
     let from = senderId;
-    if (useWhatsappSandbox) {
+    if (useMockWhatsapp) {
+      L.info('Using Mock Whatsapp, use provided mobile number');
+    } else if (useWhatsappSandbox) {
       L.info('Using APAC Whatsapp Sandbox Mobile Number');
       from = '447418342132';
     }

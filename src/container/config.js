@@ -1,13 +1,17 @@
 export default {
-  environment: process.env.NODE_ENV || 'development',
+  environment: (process.env.NODE_ENV || 'development').toLowerCase(),
   port: process.env.PORT || 8080,
   ip: process.env.IP || '0.0.0.0',
   host: process.env.HOST || 'http://localhost',
-  customPort: (process.env.CUSTOM_PORT || 'false') === 'true',
+  customPort: (process.env.CUSTOM_PORT || 'false').toLowerCase() === 'true',
   requestMaxSize: process.env.REQUEST_MAX_SIZE || '150mb',
   csv: {
+    skipCount: parseInt(process.env.CSV_SKIP_COUNT || '3', 10),
+    batchSize: parseInt(process.env.CSV_BATCH_SIZE || '10000', 10),
     uploadPath: process.env.CSV_UPLOAD_PATH,
     archivePath: process.env.CSV_ARCHIVE_PATH,
+    dataloadPath: process.env.CSV_DATALOAD_PATH,
+    insertMode: process.env.CSV_INSERT_MODE || 'sql',
   },
   jwt: {
     secret: process.env.JWT_SECRET,
@@ -19,7 +23,7 @@ export default {
     delay: parseInt(process.env.PICKER_DELAY || '5', 10),
   },
   blaster: {
-    rateLimiter: process.env.RATE_LIMITER || 'axiosratelimiter',
+    rateLimiter: (process.env.RATE_LIMITER || 'axiosratelimiter').toLowerCase(),
     secondsPerBatch: parseInt(process.env.SECONDS_PER_BATCH || '5', 10),
     recordsPerBatch: parseInt(process.env.RECORDS_PER_BATCH || '30', 10),
   },
@@ -27,8 +31,10 @@ export default {
     host: process.env.NEXMO_API,
     restHost: process.env.NEXMO_REST_API,
     mockSmsUrl: process.env.MOCK_SMS_URL,
-    useWhatsappSandbox: (process.env.USE_SANDBOX_WHATSAPP || 'false') === 'true',
-    useMockSms: (process.env.USE_MOCK_SMS || 'false') === 'true',
+    mockWhatsappUrl: process.env.MOCK_WHATSAPP_URL,
+    useWhatsappSandbox: (process.env.USE_SANDBOX_WHATSAPP || 'false').toLowerCase() === 'true',
+    useMockSms: (process.env.USE_MOCK_SMS || 'false').toLowerCase() === 'true',
+    useMockWhatsapp: (process.env.USE_MOCK_WHATSAPP || 'false').toLowerCase() === 'true',
   },
   log4js: {
     appenders: {
@@ -49,7 +55,7 @@ export default {
     password: process.env.DATABASE_PASSWORD || '',
     host: process.env.DATABASE_HOST || '',
     port: process.env.DATABASE_PORT || 3306,
-    dialect: process.env.DATABASE_DIALECT || 'mysql',
+    dialect: (process.env.DATABASE_DIALECT || 'mysql').toLowerCase(),
     useSsl: (process.env.DATABASE_USE_SSL || 'false').toLowerCase() === 'true',
     logging: (process.env.DATABASE_LOGGING || 'false').toLowerCase() === 'true',
   },
