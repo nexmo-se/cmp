@@ -492,9 +492,11 @@ export default (container) => {
       L.debug('CmpRecord Update Result', result);
 
       if (includeGet) {
+        L.debug('Getting Updated CmpRecords');
         const cmpRecords = await getByCriteria(
           criteria, excludeSecret, excludeDeleted, options,
         );
+        L.debug('Updated CmpRecords Retrieved');
         return Promise.resolve(cmpRecords);
       }
       return Promise.resolve([]);
@@ -898,7 +900,10 @@ export default (container) => {
 
   const updateRecords = async (criteria, changes, excludeSecret = true, options = {}) => {
     try {
-      const cmpRecords = await updateByCriteria(criteria, changes, excludeSecret, true, options);
+      const cmpRecords = await updateByCriteria(
+        criteria, changes, excludeSecret, true, true, options,
+      );
+      L.debug('Records Updated');
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
@@ -918,7 +923,7 @@ export default (container) => {
   const deleteRecords = async (criteria = {}, excludeSecret = true) => {
     try {
       const changes = { deleted: true };
-      const cmpRecords = await updateByCriteria(criteria, changes, excludeSecret, true);
+      const cmpRecords = await updateByCriteria(criteria, changes, excludeSecret, true, true);
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
