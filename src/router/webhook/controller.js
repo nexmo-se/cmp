@@ -10,6 +10,7 @@ export default (container) => {
   const register = async (req, res, next) => {
     try {
       L.debug('Demo Registering');
+      const startTime = new Date().getTime();
 
       // Get User Nexmo Ini
       const userId = getUserId(req);
@@ -48,6 +49,8 @@ export default (container) => {
         userNexmoIni, demoRoute, routes.rtc.event,
       );
 
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Nexmo Webhook Registration): ${endTime - startTime}ms`);
       res.status(container.httpStatus.OK).send('registered');
     } catch (error) {
       next(error);
@@ -152,7 +155,10 @@ export default (container) => {
       L.debug(req.query);
       const combined = Object.assign({}, req.body || {}, req.query || {});
       L.debug(combined);
+      const startTime = new Date().getTime();
 
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (SMS Inbound Webhook): ${endTime - startTime}ms`);
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
       next(error);
@@ -167,6 +173,7 @@ export default (container) => {
       L.debug(req.query);
       const combined = Object.assign({}, req.body || {}, req.query || {});
       L.debug(combined);
+      const startTime = new Date().getTime();
 
       const { messageId, status } = combined;
       const recordMessages = await updateRecordMessage(messageId, status);
@@ -179,6 +186,8 @@ export default (container) => {
         await publishSmsStatusAudit(recordMessage, combined);
       }
 
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (SMS Delivery Webhook): ${endTime - startTime}ms`);
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
       next(error);
@@ -190,6 +199,7 @@ export default (container) => {
       L.debug('VAPI Answer');
       L.debug(req.params);
       L.debug(req.body);
+      const startTime = new Date().getTime();
 
       const ncco = [
         {
@@ -197,6 +207,8 @@ export default (container) => {
           text: 'You have reached the NIDS Demo Answer. Have a nice day and goodbye.',
         },
       ];
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (VAPI Answer Webhook): ${endTime - startTime}ms`);
       res.json(ncco);
     } catch (error) {
       next(error);
@@ -208,6 +220,7 @@ export default (container) => {
       L.debug('VAPI Fallback Answer');
       L.debug(req.params);
       L.debug(req.body);
+      const startTime = new Date().getTime();
 
       const ncco = [
         {
@@ -215,6 +228,8 @@ export default (container) => {
           text: 'You have reached the NIDS Demo Fallback Answer. Have a nice day and goodbye.',
         },
       ];
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (VAPI Fallback Answer Webhook): ${endTime - startTime}ms`);
       res.json(ncco);
     } catch (error) {
       next(error);
@@ -226,6 +241,7 @@ export default (container) => {
       L.debug('VAPI Event');
       L.debug(req.params);
       L.debug(req.body);
+      const startTime = new Date().getTime();
 
       const ncco = [
         {
@@ -233,6 +249,8 @@ export default (container) => {
           text: 'You have reached the NIDS Demo Event. Have a nice day and goodbye.',
         },
       ];
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (VAPI Event Webhook): ${endTime - startTime}ms`);
       res.json(ncco);
     } catch (error) {
       next(error);
@@ -244,6 +262,9 @@ export default (container) => {
       L.debug('MAPI Inbound');
       L.debug(req.params);
       L.debug(req.body);
+      const startTime = new Date().getTime();
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (MAPI Inbound Webhook): ${endTime - startTime}ms`);
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
       next(error);
@@ -255,6 +276,8 @@ export default (container) => {
       L.debug('MAPI Status');
       L.debug(req.params);
       L.debug(req.body);
+
+      const startTime = new Date().getTime();
 
       const { status } = req.body;
       const messageId = req.body.message_uuid;
@@ -268,6 +291,8 @@ export default (container) => {
         await publishMapiStatusAudit(recordMessage, req.body);
       }
 
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (MAPI Status Webhook): ${endTime - startTime}ms`);
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
       next(error);
@@ -279,6 +304,9 @@ export default (container) => {
       L.debug('RTC Event');
       L.debug(req.params);
       L.debug(req.body);
+      const startTime = new Date().getTime();
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (RTC Status Webhook): ${endTime - startTime}ms`);
       res.status(container.httpStatus.OK).send('ok');
     } catch (error) {
       next(error);
