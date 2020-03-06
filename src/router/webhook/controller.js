@@ -64,7 +64,11 @@ export default (container) => {
         status,
         statusTime: new Date(),
       };
+
+      const startTime = new Date().getTime();
       const recordMessages = await CmpRecordMessage.updateRecordMessages(criteria, changes);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Update Record Message): ${endTime - startTime}ms`);
       return Promise.resolve(recordMessages);
     } catch (error) {
       return Promise.reject(error);
@@ -91,6 +95,7 @@ export default (container) => {
       const fromId = from.id;
       const fromNumber = from.number;
 
+      const startTime = new Date().getTime();
       const statusAudit = await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditMapi(
         recordMessage.id,
         messageUuid,
@@ -101,6 +106,8 @@ export default (container) => {
         currency, price,
         clientRef,
       );
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Publish Mapi Status Audit): ${endTime - startTime}ms`);
       return Promise.resolve(statusAudit);
     } catch (error) {
       return Promise.reject(error);
@@ -120,6 +127,7 @@ export default (container) => {
       const errCode = data['err-code'];
       const messageTimestamp = data['message-timestamp'];
 
+      const startTime = new Date().getTime();
       const statusAudit = await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditSms(
         recordMessage.id,
         msisdn, to,
@@ -128,6 +136,8 @@ export default (container) => {
         scts, errCode,
         messageTimestamp,
       );
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Publish SMS Status Audit): ${endTime - startTime}ms`);
       return Promise.resolve(statusAudit);
     } catch (error) {
       return Promise.reject(error);
