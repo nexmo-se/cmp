@@ -1,5 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
+    const fixInvalidSendTime = () => Sequelize.query('update CmpRecords set sendTime = NULL where CAST(sendTime as char(20))=\'0000-00-00 00:00:00\'');
     const dropCmpRecordsPrimaryKey = () => queryInterface.removeConstraint('CmpRecords', 'PRIMARY');
     const createCmpRecordsPrimaryIdColumn = () => queryInterface.addColumn('CmpRecords', 'primaryId', {
       type: Sequelize.BIGINT(),
@@ -8,6 +9,7 @@ module.exports = {
       primaryKey: true,
     });
 
+    const fixInvalidCreatedTime = () => Sequelize.query('update CmpParameters set createdAt = \'2020-03-09 00:00:00\' where CAST(createdAt as char(20))=\'0000-00-00 00:00:00\'');
     const dropCmpParametersPrimaryKey = () => queryInterface.removeConstraint('CmpParameters', 'PRIMARY');
     const createCmpParametersPrimaryIdColumn = () => queryInterface.addColumn('CmpParameters', 'primaryId', {
       type: Sequelize.BIGINT(),
@@ -17,8 +19,10 @@ module.exports = {
     });
 
     return Promise.resolve()
+      .then(fixInvalidSendTime)
       .then(dropCmpRecordsPrimaryKey)
       .then(createCmpRecordsPrimaryIdColumn)
+      .then(fixInvalidCreatedTime)
       .then(dropCmpParametersPrimaryKey)
       .then(createCmpParametersPrimaryIdColumn);
   },
