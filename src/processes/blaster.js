@@ -156,6 +156,7 @@ export default (container) => {
         changes.status = 'started';
         changes.statusTime = currentTime;
         changes.actualStartDate = currentTime;
+        L.debug(`Updating Campaign ${cmpCampaignId} Status to started at ${currentTime}`);
 
         await publishCampaignStatusAudit(campaign, 'started');
       }
@@ -168,6 +169,7 @@ export default (container) => {
         changes.statusTime = currentTime;
         changes.actualEndDate = currentTime;
         changes.actualDuration = currentTime.getTime() - actualStartDate.getTime();
+        L.debug(`Updating Campaign ${cmpCampaignId} Status to completed at ${currentTime}`);
 
         await publishCampaignStatusAudit(campaign, 'completed');
       }
