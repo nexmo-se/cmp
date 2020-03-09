@@ -15,3 +15,5 @@ xcmp.zip
 .env.ec2
 private.key
 vcmp.key
+
+mysql.index
