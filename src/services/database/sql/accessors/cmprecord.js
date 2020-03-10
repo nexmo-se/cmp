@@ -898,10 +898,12 @@ export default (container) => {
     }
   };
 
-  const updateRecords = async (criteria, changes, excludeSecret = true, options = {}) => {
+  const updateRecords = async (
+    criteria, changes, excludeSecret = true, includeGet = true, options = {},
+  ) => {
     try {
       const cmpRecords = await updateByCriteria(
-        criteria, changes, excludeSecret, true, true, options,
+        criteria, changes, excludeSecret, true, includeGet, options,
       );
       L.debug('Records Updated');
       return Promise.resolve(cmpRecords);

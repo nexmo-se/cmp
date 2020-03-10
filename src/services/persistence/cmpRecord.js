@@ -174,10 +174,14 @@ export default (container) => {
     }
   };
 
-  const updateRecords = async (criteria, changes, excludeSecret = true, options = {}) => {
+  const updateRecords = async (
+    criteria, changes, excludeSecret = true, includeGet = true, options = {},
+  ) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecords = await CmpRecord.updateRecords(criteria, changes, excludeSecret, options);
+      const cmpRecords = await CmpRecord.updateRecords(
+        criteria, changes, excludeSecret, includeGet, options,
+      );
       const mappedCmpRecords = cmpRecords.map(mapRecord);
       return Promise.resolve(mappedCmpRecords);
     } catch (error) {
