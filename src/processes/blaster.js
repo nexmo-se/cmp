@@ -133,9 +133,11 @@ export default (container) => {
     }
   };
 
-  const updateCampaignStatuses = async (cmpCampaignIds) => {
+  const updateCampaignStatuses = async (cmpCampaignIds, isStart = true, isEnd = true) => {
     try {
-      const promises = cmpCampaignIds.map(updateCampaignStatus);
+      const promises = cmpCampaignIds.map(
+        cmpCampaignId => updateCampaignStatus(cmpCampaignId, isStart, isEnd),
+      );
       const results = await Promise.all(promises);
       return Promise.resolve(results);
     } catch (error) {
@@ -143,7 +145,7 @@ export default (container) => {
     }
   };
 
-  const updateCampaignStatus = async (cmpCampaignId) => {
+  const updateCampaignStatus = async (cmpCampaignId, isStart = true, isEnd = true) => {
     try {
       const { CmpCampaign, CmpRecord } = container.persistenceService;
       const campaign = await CmpCampaign.readCampaign(cmpCampaignId);
@@ -151,7 +153,7 @@ export default (container) => {
       const currentTime = new Date();
 
       const changes = {};
-      if (campaign.status === 'pending') {
+      if (isStart && campaign.status === 'pending') {
         // Start, first record
         changes.status = 'started';
         changes.statusTime = currentTime;
@@ -161,17 +163,20 @@ export default (container) => {
         await publishCampaignStatusAudit(campaign, 'started');
       }
 
-      const recordsCount = await CmpRecord.countPendingRecordsByCampaignId(cmpCampaignId);
-      if (recordsCount === 0) {
-        const actualStartDate = campaign.actualStartDate || currentTime;
-        // End, last record
-        changes.status = 'completed';
-        changes.statusTime = currentTime;
-        changes.actualEndDate = currentTime;
-        changes.actualDuration = currentTime.getTime() - actualStartDate.getTime();
-        L.debug(`Updating Campaign ${cmpCampaignId} Status to completed at ${currentTime}`);
+      if (isEnd) {
+        const recordsCount = await CmpRecord
+          .countPendingAndQueuingRecordsByCampaignId(cmpCampaignId);
+        if (recordsCount === 0) {
+          const actualStartDate = campaign.actualStartDate || currentTime;
+          // End, last record
+          changes.status = 'completed';
+          changes.statusTime = currentTime;
+          changes.actualEndDate = currentTime;
+          changes.actualDuration = currentTime.getTime() - actualStartDate.getTime();
+          L.debug(`Updating Campaign ${cmpCampaignId} Status to completed at ${currentTime}`);
 
-        await publishCampaignStatusAudit(campaign, 'completed');
+          await publishCampaignStatusAudit(campaign, 'completed');
+        }
       }
 
       const result = await CmpCampaign.updateCampaign(cmpCampaignId, changes);
@@ -390,6 +395,14 @@ export default (container) => {
 
   const runSingle = async (records) => {
     try {
+      const campaigns = getUniqueCampaigns(records);
+      // Update Campaign
+      const campaignUpdateStart1 = new Date().getTime();
+      await updateCampaignStatuses(campaigns, true, false);
+      const campaignUpdateEnd1 = new Date().getTime();
+      L.debug('Campaign Updates 1 made');
+      L.debug(`Time Taken (Campaign Updates 1): ${campaignUpdateEnd1 - campaignUpdateStart1}ms`);
+
       // Make Blasts
       const blastsStart = new Date().getTime();
       await blastRecords(records);
@@ -398,12 +411,11 @@ export default (container) => {
       L.debug(`Time Taken (Wait for Blasts): ${blastsEnd - blastsStart}ms`);
 
       // Update Campaign
-      const campaignUpdateStart = new Date().getTime();
-      const campaigns = getUniqueCampaigns(records);
-      await updateCampaignStatuses(campaigns);
-      const campaignUpdateEnd = new Date().getTime();
-      L.debug('Campaign Updates made');
-      L.debug(`Time Taken (Campaign Updates): ${campaignUpdateEnd - campaignUpdateStart}ms`);
+      const campaignUpdateStart2 = new Date().getTime();
+      await updateCampaignStatuses(campaigns, false, true);
+      const campaignUpdateEnd2 = new Date().getTime();
+      L.debug('Campaign Updates 2 made');
+      L.debug(`Time Taken (Campaign Updates 2): ${campaignUpdateEnd2 - campaignUpdateStart2}ms`);
 
       return Promise.resolve();
     } catch (error) {

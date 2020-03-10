@@ -96,6 +96,16 @@ export default (container) => {
     }
   };
 
+  const countPendingAndQueuingRecordsByCampaignId = async (campaignId) => {
+    try {
+      const { CmpRecord } = container.databaseService.accessors;
+      const count = await CmpRecord.countPendingAndQueuingRecordsByCampaignId(campaignId);
+      return Promise.resolve(count);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecordBatch = async (records, excludeSecret = true) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
@@ -202,6 +212,7 @@ export default (container) => {
     listRecords,
     getActiveRecords,
     countPendingRecordsByCampaignId,
+    countPendingAndQueuingRecordsByCampaignId,
 
     createRecord,
     createRecordBatch,
