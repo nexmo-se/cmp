@@ -179,6 +179,10 @@ export default (container) => {
         }
       }
 
+      if (Object.keys(changes).length === 0) {
+        return Promise.resolve();
+      }
+
       const result = await CmpCampaign.updateCampaign(cmpCampaignId, changes);
       return Promise.resolve(result);
     } catch (error) {
@@ -398,10 +402,15 @@ export default (container) => {
       const campaigns = getUniqueCampaigns(records);
       // Update Campaign
       const campaignUpdateStart1 = new Date().getTime();
-      await updateCampaignStatuses(campaigns, true, false);
-      const campaignUpdateEnd1 = new Date().getTime();
-      L.debug('Campaign Updates 1 made');
-      L.debug(`Time Taken (Campaign Updates 1): ${campaignUpdateEnd1 - campaignUpdateStart1}ms`);
+      updateCampaignStatuses(campaigns, true, false)
+        .then(() => {
+          const campaignUpdateEnd1 = new Date().getTime();
+          L.debug('Campaign Updates 1 made');
+          L.debug(`Time Taken (Campaign Updates 1): ${campaignUpdateEnd1 - campaignUpdateStart1}ms`);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
 
       // Make Blasts
       const blastsStart = new Date().getTime();
@@ -412,10 +421,15 @@ export default (container) => {
 
       // Update Campaign
       const campaignUpdateStart2 = new Date().getTime();
-      await updateCampaignStatuses(campaigns, false, true);
-      const campaignUpdateEnd2 = new Date().getTime();
-      L.debug('Campaign Updates 2 made');
-      L.debug(`Time Taken (Campaign Updates 2): ${campaignUpdateEnd2 - campaignUpdateStart2}ms`);
+      updateCampaignStatuses(campaigns, false, true)
+        .then(() => {
+          const campaignUpdateEnd2 = new Date().getTime();
+          L.debug('Campaign Updates 2 made');
+          L.debug(`Time Taken (Campaign Updates 2): ${campaignUpdateEnd2 - campaignUpdateStart2}ms`);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
 
       return Promise.resolve();
     } catch (error) {
