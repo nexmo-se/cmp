@@ -1,5 +1,6 @@
 import http from 'http';
 import https from 'https';
+import request from 'request';
 
 export default (container) => {
   const { L } = container.defaultLogger('RateLimiter Service');
@@ -61,11 +62,63 @@ export default (container) => {
     return rateLimitedAxiosInstance;
   };
 
-  const createNewBottleneckInstance = (key, tps) => {
+  const createNewBottleneckRequestInstance = (key, tps) => {
     const httpAgent = new http.Agent({ keepAlive: true });
     const httpsAgent = new https.Agent({ keepAlive: true });
     const config = { maxRequests: tps, perMilliseconds: 1000 };
-    L.debug('Creating new Bottleneck instance', config);
+    L.debug('Creating new Bottleneck instance (Request)', config);
+
+    const minTime = Math.ceil(1000 / tps);
+    const bottleneckInstance = new container.Bottleneck({ minTime, trackDoneStatus: true });
+    return {
+      get: () => bottleneckInstance.schedule(
+        () => Promise.resolve(),
+      ),
+      post: (url, body, requestConfig) => bottleneckInstance.schedule(
+        () => new Promise((resolve, reject) => {
+          const agent = url.indexOf('https') === 0 ? httpsAgent : httpAgent;
+          const { headers = {} } = (requestConfig || {}).headers || {};
+          const options = {
+            url,
+            agent,
+            json: body,
+            headers,
+          };
+
+          const handler = (error, res, resBody) => {
+            const counts = bottleneckInstance.counts();
+            L.debug('Bottleneck Counts', counts);
+            if (error) {
+              reject(error);
+              return;
+            }
+
+            L.error(resBody);
+            const newRes = res;
+            newRes.data = resBody;
+            resolve(newRes);
+          };
+
+          request.post(options, handler);
+        }),
+      ),
+      put: () => bottleneckInstance.schedule(
+        () => Promise.resolve(),
+      ),
+      delete: () => bottleneckInstance.schedule(
+        () => Promise.resolve(),
+      ),
+    };
+  };
+
+  const createNewBottleneckAxiosInstance = (key, tps) => {
+    const httpAgent = new http.Agent({ keepAlive: true });
+    const httpsAgent = new https.Agent({ keepAlive: true });
+    const config = { maxRequests: tps, perMilliseconds: 1000 };
+    L.debug('Creating new Bottleneck instance (Axios)', config);
+
+    const minTime = Math.ceil(1000 / tps);
+    const bottleneckInstance = new container.Bottleneck({ minTime, trackDoneStatus: true });
 
     const originalAxiosInstance = container.axios.create({
       httpAgent,
@@ -86,6 +139,9 @@ export default (container) => {
 
       const timeText = `${month}/${date}/${year} ${hour}:${minute}:${second}.${milliseconds} ${ampm}`;
       L.debug(`Bottleneck API Request Sent (${key}) at ${timeText}`);
+
+      const counts = bottleneckInstance.counts();
+      L.debug('Bottleneck Counts', counts);
 
       return req;
     });
@@ -113,15 +169,32 @@ export default (container) => {
       return res;
     });
 
-    const minTime = Math.ceil(1000 / tps);
-    const bottleneckInstance = new container.Bottleneck({ minTime });
+    // limiter.schedule(() => myFunction(arg1, arg2))
+    //   .then((result) => {
+    //     /* handle result */
+    //   });
 
     return {
-      get: bottleneckInstance.wrap(originalAxiosInstance.get),
-      post: bottleneckInstance.wrap(originalAxiosInstance.post),
-      put: bottleneckInstance.wrap(originalAxiosInstance.put),
-      delete: bottleneckInstance.wrap(originalAxiosInstance.delete),
+      get: (url, requestConfig) => bottleneckInstance.schedule(
+        () => originalAxiosInstance.get(url, requestConfig),
+      ),
+      post: (url, body, requestConfig) => bottleneckInstance.schedule(
+        () => originalAxiosInstance.post(url, body, requestConfig),
+      ),
+      put: (url, body, requestConfig) => bottleneckInstance.schedule(
+        () => originalAxiosInstance.put(url, body, requestConfig),
+      ),
+      delete: (url, body, requestConfig) => bottleneckInstance.schedule(
+        () => originalAxiosInstance.delete(url, body, requestConfig),
+      ),
     };
+
+    // return {
+    //   get: bottleneckInstance.wrap(originalAxiosInstance.get),
+    //   post: bottleneckInstance.wrap(originalAxiosInstance.post),
+    //   put: bottleneckInstance.wrap(originalAxiosInstance.put),
+    //   delete: bottleneckInstance.wrap(originalAxiosInstance.delete),
+    // };
   };
 
   const getAxiosRateLimiter = (id, channel, tps) => {
@@ -133,10 +206,19 @@ export default (container) => {
     return axiosMap[key];
   };
 
-  const getAxiosBottleneck = (id, channel, tps) => {
+  const getAxiosBottleneckAxios = (id, channel, tps) => {
     const key = `${channel}-${id}`;
     if (axiosMap[key] == null) {
-      axiosMap[key] = createNewBottleneckInstance(key, tps);
+      axiosMap[key] = createNewBottleneckAxiosInstance(key, tps);
+    }
+
+    return axiosMap[key];
+  };
+
+  const getAxiosBottleneckRequest = (id, channel, tps) => {
+    const key = `${channel}-${id}`;
+    if (axiosMap[key] == null) {
+      axiosMap[key] = createNewBottleneckRequestInstance(key, tps);
     }
 
     return axiosMap[key];
@@ -145,7 +227,15 @@ export default (container) => {
   const getAxios = (id, channel, tps) => {
     const { rateLimiter } = container.config.blaster;
     if (rateLimiter === 'bottleneck') {
-      return getAxiosBottleneck(id, channel, tps);
+      return getAxiosBottleneckAxios(id, channel, tps);
+    }
+
+    if (rateLimiter === 'bottleneckaxios') {
+      return getAxiosBottleneckAxios(id, channel, tps);
+    }
+
+    if (rateLimiter === 'bottleneckrequest') {
+      return getAxiosBottleneckRequest(id, channel, tps);
     }
 
     if (rateLimiter === 'axiosratelimiter') {
@@ -153,7 +243,7 @@ export default (container) => {
     }
 
     L.debug(`Invalid Rate Limiter '${rateLimiter}', using bottleneck`);
-    return getAxiosBottleneck(id, channel, tps);
+    return getAxiosBottleneckAxios(id, channel, tps);
   };
 
   return {
