@@ -157,7 +157,7 @@ export default (container) => {
 
       const endTime = new Date().getTime();
       const duration = endTime - startTime;
-      L.debug(`Time Taken (Create Record Messages): ${duration}ms`);
+      L.debug(`Time Taken (Create Record Messages Bulk): ${duration}ms`);
       return Promise.resolve(recordMessages);
     } catch (error) {
       return Promise.reject(error);
@@ -208,7 +208,7 @@ export default (container) => {
         changes.status = 'started';
         changes.statusTime = currentTime;
         changes.actualStartDate = currentTime;
-        L.debug(`Updating Campaign ${cmpCampaignId} Status to started at ${currentTime}`);
+        L.trace(`Updating Campaign ${cmpCampaignId} Status to started at ${currentTime}`);
 
         await publishCampaignStatusAudit(campaign, 'started');
       }
@@ -228,7 +228,7 @@ export default (container) => {
           changes.statusTime = currentTime;
           changes.actualEndDate = currentTime;
           changes.actualDuration = currentTime.getTime() - actualStartDate.getTime();
-          L.debug(`Updating Campaign ${cmpCampaignId} Status to completed at ${currentTime}`);
+          L.trace(`Updating Campaign ${cmpCampaignId} Status to completed at ${currentTime}`);
 
           await publishCampaignStatusAudit(campaign, 'completed');
         }
@@ -406,7 +406,7 @@ export default (container) => {
         // result = await blastViber(record, axios);
         result = ['mid'];
       }
-      L.debug(`Blast Result - ${record.id}`, result);
+      L.trace(`Blast Result - ${record.id}`, result);
 
       const endTime = new Date().getTime();
       const duration = endTime - startTime;
@@ -438,7 +438,7 @@ export default (container) => {
       L.debug(results);
 
       await updateRecordSendTimeBulk(records);
-      // await createRecordMessagesBulk(results);
+      await createRecordMessagesBulk(results);
 
       const endTime = new Date().getTime();
       const duration = endTime - startTime;
@@ -472,7 +472,7 @@ export default (container) => {
       updateCampaignStatuses(campaigns, true, false)
         .then(() => {
           const campaignUpdateEnd1 = new Date().getTime();
-          L.debug('Campaign Updates 1 made');
+          L.trace('Campaign Updates 1 made');
           L.debug(`Time Taken (Campaign Updates 1): ${campaignUpdateEnd1 - campaignUpdateStart1}ms`);
         })
         .catch((error) => {
@@ -483,7 +483,7 @@ export default (container) => {
       const blastsStart = new Date().getTime();
       await blastRecords(records);
       const blastsEnd = new Date().getTime();
-      L.debug('Blasts made');
+      L.trace('Blasts made');
       L.debug(`Time Taken (Wait for Blasts): ${blastsEnd - blastsStart}ms`);
 
       // Update Campaign
@@ -491,7 +491,7 @@ export default (container) => {
       updateCampaignStatuses(campaigns, false, true)
         .then(() => {
           const campaignUpdateEnd2 = new Date().getTime();
-          L.debug('Campaign Updates 2 made');
+          L.trace('Campaign Updates 2 made');
           L.debug(`Time Taken (Campaign Updates 2): ${campaignUpdateEnd2 - campaignUpdateStart2}ms`);
         })
         .catch((error) => {
@@ -509,7 +509,7 @@ export default (container) => {
       const startTime = new Date().getTime();
       const { recordsPerBatch, secondsPerBatch } = container.config.blaster;
       const records = await getRecords(recordsPerBatch);
-      L.debug(`Number of Records: ${records.length}`);
+      L.info(`Number of Records: ${records.length}`);
 
       // Prepare
       await prepareRecordsBulk(records);
@@ -518,18 +518,18 @@ export default (container) => {
       const currentTime = new Date().getTime();
       const waitTime = blastTime - currentTime;
       if (waitTime > 0) {
-        L.debug(`Start to Wait for ${waitTime}ms`);
+        L.trace(`Start to Wait for ${waitTime}ms`);
         const waitStart = new Date().getTime();
         await wait(waitTime);
         const waitEnd = new Date().getTime();
         L.debug(`Time Taken (Wait): ${waitEnd - waitStart}ms`);
       }
-      L.debug('Wait Over');
+      L.trace('Wait Over');
 
       const blastsStart = new Date().getTime();
       const newBlast = records.length;
       runSingle(records)
-        .then(() => L.debug('Single Ended'))
+        .then(() => L.trace('Single Ended'))
         .catch((error) => {
           L.error(error);
           throw error;
