@@ -66,6 +66,7 @@ export default (container) => {
       const ids = records.map(record => record.id);
       const criteria = {
         id: ids,
+        status: 'pending',
       };
 
       const startTime = new Date().getTime();
@@ -466,6 +467,10 @@ export default (container) => {
 
   const runSingle = async (records) => {
     try {
+      if (records.length === 0) {
+        return Promise.resolve();
+      }
+
       const campaigns = getUniqueCampaigns(records);
       // Update Campaign
       const campaignUpdateStart1 = new Date().getTime();
