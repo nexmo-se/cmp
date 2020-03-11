@@ -388,23 +388,23 @@ export default (container) => {
       const { cmpTemplate } = record;
       const { cmpChannel } = cmpTemplate;
       const { channel, tps } = cmpChannel;
+      const { useMockBlast } = container.config.blaster;
 
       const startTime = new Date().getTime();
       const axios = container.rateLimiterService.getAxios(cmpChannel.id, channel, tps);
 
       let result;
-      if (channel === 'sms') {
-        // result = await blastSms(record, axios);
-        result = ['mid'];
+      if (useMockBlast) {
+        const messageId = container.uuid();
+        result = [messageId];
+      } else if (channel === 'sms') {
+        result = await blastSms(record, axios);
       } else if (channel === 'whatsapp') {
-        // result = await blastWhatsapp(record, axios);
-        result = ['mid'];
+        result = await blastWhatsapp(record, axios);
       } else if (channel === 'facebook') {
-        // result = await blastFacebook(record, axios);
-        result = ['mid'];
+        result = await blastFacebook(record, axios);
       } else if (channel === 'viber') {
-        // result = await blastViber(record, axios);
-        result = ['mid'];
+        result = await blastViber(record, axios);
       }
       L.trace(`Blast Result - ${record.id}`, result);
 

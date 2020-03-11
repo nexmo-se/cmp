@@ -26,6 +26,7 @@ export default {
     rateLimiter: (process.env.RATE_LIMITER || 'axiosratelimiter').toLowerCase(),
     secondsPerBatch: parseInt(process.env.SECONDS_PER_BATCH || '5', 10),
     recordsPerBatch: parseInt(process.env.RECORDS_PER_BATCH || '30', 10),
+    useMockBlast: (process.env.USE_MOCK_BLAST || 'false').toLowerCase() === 'true',
   },
   nexmo: {
     host: process.env.NEXMO_API,
