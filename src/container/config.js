@@ -46,7 +46,10 @@ export default {
       },
     },
     categories: {
-      default: { appenders: ['out', 'everything'], level: 'trace' },
+      default: {
+        appenders: ['out', 'everything'],
+        level: process.env.LOGGING_LEVEL || 'info',
+      },
     },
   },
   database: {
