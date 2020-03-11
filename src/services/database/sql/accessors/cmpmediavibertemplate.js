@@ -19,7 +19,7 @@ export default (container) => {
 
       const rawCmpMediaViberTemplate = await CmpMediaViberTemplate.findOne(query);
       if (rawCmpMediaViberTemplate == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -57,7 +57,7 @@ export default (container) => {
     try {
       const cmpMediaViberTemplates = await getByCriteria(criteria, excludeDeleted);
       if (cmpMediaViberTemplates == null || cmpMediaViberTemplates.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -85,7 +85,7 @@ export default (container) => {
       }
 
       const result = await CmpMediaViberTemplate.update(changes, query);
-      L.debug('CmpMediaViberTemplate Update Result', result);
+      L.trace('CmpMediaViberTemplate Update Result', result);
 
       const cmpMedia = await getById(cmpMediaViberTemplateId, excludeDeleted);
       return Promise.resolve(cmpMedia);
@@ -107,7 +107,7 @@ export default (container) => {
       }
 
       const result = await CmpMediaViberTemplate.update(changes, query);
-      L.debug('CmpMediaViberTemplate Update Result', result);
+      L.trace('CmpMediaViberTemplate Update Result', result);
 
       const cmpMediaViberTemplates = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpMediaViberTemplates);

@@ -40,7 +40,7 @@ export default (container) => {
     messageTimestamp,
   ) => {
     try {
-      L.debug(cmpRecordMessageId);
+      L.trace(cmpRecordMessageId);
       const {
         CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditSms,
       } = container.databaseService.accessors;
@@ -85,7 +85,7 @@ export default (container) => {
     clientRef,
   ) => {
     try {
-      L.debug(cmpRecordMessageId);
+      L.trace(cmpRecordMessageId);
       const {
         CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditMapi,
       } = container.databaseService.accessors;

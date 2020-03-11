@@ -320,7 +320,7 @@ export default (container) => {
 
       let actualCmpMediaId = cmpMediaId;
       if (actualCmpMediaId == null && cmpMedia) {
-        L.debug('Creating New Media');
+        L.trace('Creating New Media');
         const actualCmpMedia = await createMedia(cmpMedia);
         actualCmpMediaId = actualCmpMedia.id;
       }
@@ -346,16 +346,16 @@ export default (container) => {
 
       if (cmpParameters) {
         // Delete Previous Parameters
-        L.debug('Removing Previous Parameters');
+        L.trace('Removing Previous Parameters');
         await deleteParameters(cmpRecord.id);
 
         // Create New Parameters
-        L.debug('Creating New Parameters');
+        L.trace('Creating New Parameters');
         await createParameters(cmpRecord.id, cmpParameters);
       }
 
 
-      L.debug('Setting Record to Pending');
+      L.trace('Setting Record to Pending');
       const changes = {
         status: 'pending',
         statusTime: new Date(),

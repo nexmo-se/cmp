@@ -147,10 +147,10 @@ export default (container) => {
       }
 
       if (roleExists) {
-        L.debug('User Role has already existed, will not add new User Role');
+        L.trace('User Role has already existed, will not add new User Role');
       } else {
         const newUserRole = await UserRole.createUserRole(userId, role);
-        L.debug('New User Role Created', newUserRole);
+        L.trace('New User Role Created', newUserRole);
       }
 
       return Promise.resolve();
@@ -176,10 +176,10 @@ export default (container) => {
       }
 
       if (userRoleId == null) {
-        L.debug('User Role does not exist, nothing to delete');
+        L.trace('User Role does not exist, nothing to delete');
       } else {
         const deletedUserRole = await UserRole.deleteUserRole(userRoleId);
-        L.debug('User Role Deleted', deletedUserRole);
+        L.trace('User Role Deleted', deletedUserRole);
       }
       return Promise.resolve();
     } catch (error) {

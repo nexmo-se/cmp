@@ -60,25 +60,25 @@ export default (container) => {
 
       for (let i = 0; i < controllerConfigs.length; i += 1) {
         const controllerConfig = controllerConfigs[i];
-        L.debug('Checking Controller Config', controllerConfig);
+        L.trace('Checking Controller Config', controllerConfig);
         const { roles, controller } = controllerConfig;
         const userHasAllRoles = hasAllRoles(roles, userRoles);
 
         if (userHasAllRoles) {
-          L.debug('User has All Roles');
+          L.trace('User has All Roles');
           mappedController = controller;
           break;
         }
 
-        L.debug('User does not have All Roles');
+        L.trace('User does not have All Roles');
       }
 
       if (mappedController) {
-        L.debug('Mapped Controller found, using configured controller');
-        L.debug(mappedController);
+        L.trace('Mapped Controller found, using configured controller');
+        L.trace(mappedController);
         mappedController(req, res, next);
       } else {
-        L.debug('No Mapped Controller, proceeding to next');
+        L.trace('No Mapped Controller, proceeding to next');
         next();
       }
     } catch (error) {

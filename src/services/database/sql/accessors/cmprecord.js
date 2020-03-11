@@ -200,7 +200,7 @@ export default (container) => {
 
       const rawCmpRecord = await CmpRecord.findOne(query);
       if (rawCmpRecord == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -437,7 +437,7 @@ export default (container) => {
         criteria, excludeSecret, excludeDeleted, options,
       );
       if (cmpRecords == null || cmpRecords.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -465,7 +465,7 @@ export default (container) => {
       }
 
       const result = await CmpRecord.update(changes, query);
-      L.debug('CmpRecord Update Result', result);
+      L.trace('CmpRecord Update Result', result);
 
       const cmpRecord = await getById(cmpRecordId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpRecord);
@@ -489,14 +489,14 @@ export default (container) => {
       }
 
       const result = await CmpRecord.update(changes, query);
-      L.debug('CmpRecord Update Result', result);
+      L.trace('CmpRecord Update Result', result);
 
       if (includeGet) {
-        L.debug('Getting Updated CmpRecords');
+        L.trace('Getting Updated CmpRecords');
         const cmpRecords = await getByCriteria(
           criteria, excludeSecret, excludeDeleted, options,
         );
-        L.debug('Updated CmpRecords Retrieved');
+        L.trace('Updated CmpRecords Retrieved');
         return Promise.resolve(cmpRecords);
       }
       return Promise.resolve([]);
@@ -905,7 +905,7 @@ export default (container) => {
       const cmpRecords = await updateByCriteria(
         criteria, changes, excludeSecret, true, includeGet, options,
       );
-      L.debug('Records Updated');
+      L.trace('Records Updated');
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);

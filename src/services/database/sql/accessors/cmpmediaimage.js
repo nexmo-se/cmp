@@ -19,7 +19,7 @@ export default (container) => {
 
       const rawCmpMediaImage = await CmpMediaImage.findOne(query);
       if (rawCmpMediaImage == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -57,7 +57,7 @@ export default (container) => {
     try {
       const cmpMediaImages = await getByCriteria(criteria, excludeDeleted);
       if (cmpMediaImages == null || cmpMediaImages.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -85,7 +85,7 @@ export default (container) => {
       }
 
       const result = await CmpMediaImage.update(changes, query);
-      L.debug('CmpMediaImage Update Result', result);
+      L.trace('CmpMediaImage Update Result', result);
 
       const cmpMedia = await getById(cmpMediaImageId, excludeDeleted);
       return Promise.resolve(cmpMedia);
@@ -107,7 +107,7 @@ export default (container) => {
       }
 
       const result = await CmpMediaImage.update(changes, query);
-      L.debug('CmpMediaImage Update Result', result);
+      L.trace('CmpMediaImage Update Result', result);
 
       const cmpMediaImages = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpMediaImages);

@@ -8,15 +8,12 @@ export default (container) => {
       }
 
       let found = false;
-      L.debug(userId);
 
       // Check Application Users
-      L.debug('Check Application Users');
+      L.trace('Check Application Users');
       if (cmpApplication.users) {
-        L.debug(cmpApplication.users);
         for (let i = 0; i < cmpApplication.users.length; i += 1) {
           const user = cmpApplication.users[i];
-          L.debug(user.id);
           if (user.id === userId) {
             found = true;
             break;
@@ -25,12 +22,10 @@ export default (container) => {
       }
 
       // Check Api Key Users
-      L.debug('Check Api Key Users');
+      L.trace('Check Api Key Users');
       if (cmpApplication.cmpApiKey && cmpApplication.cmpApiKey.users) {
-        L.debug(cmpApplication.cmpApiKey.users);
         for (let i = 0; i < cmpApplication.cmpApiKey.users.length; i += 1) {
           const user = cmpApplication.cmpApiKey.users[i];
-          L.debug(user.id);
           if (user.id === userId) {
             found = true;
             break;

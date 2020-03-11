@@ -31,14 +31,14 @@ export default (container) => {
       const loadingStart = new Date().getTime();
 
       // Dataload Records
-      L.debug('DataLoading Records');
+      L.trace('DataLoading Records');
       const recordsStart = new Date().getTime();
       await client.query(recordsSql);
       const recordsEnd = new Date().getTime();
       L.debug(`Time Taken (DataLoading Records): ${recordsEnd - recordsStart}ms`);
 
       // Dataload Parameters
-      L.debug('DataLoading Parameters');
+      L.trace('DataLoading Parameters');
       const parametersStart = new Date().getTime();
       await client.query(parametersSql);
       const parametersEnd = new Date().getTime();
@@ -48,11 +48,11 @@ export default (container) => {
       L.debug(`Time Taken (DataLoading Total): ${loadingEnd - loadingStart}ms`);
 
       // Delete Dataload Files
-      L.debug('Deleting DataLoad Files');
+      L.trace('Deleting DataLoad Files');
       container.fileService.deleteFile(recordFilePath);
-      L.debug('Records DataLoad File deleted');
+      L.trace('Records DataLoad File deleted');
       container.fileService.deleteFile(parametersFilePath);
-      L.debug('Parameters DataLoad File deleted');
+      L.trace('Parameters DataLoad File deleted');
 
       return Promise.resolve();
     } catch (error) {
@@ -250,8 +250,8 @@ export default (container) => {
 
       // Mapping
       const mappingStart = new Date().getTime();
-      L.debug(`Campaign ID: ${cmpCampaignId}`);
-      L.debug(`Template ID: ${cmpTemplateId}`);
+      L.trace(`Campaign ID: ${cmpCampaignId}`);
+      L.trace(`Template ID: ${cmpTemplateId}`);
       const {
         activeStartHour, activeStartMinute,
         activeEndHour, activeEndMinute,
@@ -279,10 +279,10 @@ export default (container) => {
       // Insert
       const insertStart = new Date().getTime();
       if (insertMode === 'csv') {
-        L.debug('Inserting using CSV (DataLoad)');
+        L.trace('Inserting using CSV (DataLoad)');
         await createRecordsCsv(recordModels);
       } else {
-        L.debug('Inserting using Database (Bulk Insert SQL)');
+        L.trace('Inserting using Database (Bulk Insert SQL)');
         await createRecordsDatabase(recordModels);
       }
       const insertEnd = new Date().getTime();
@@ -455,7 +455,7 @@ export default (container) => {
         }
       });
       const result = await Promise.all(promises);
-      L.debug(`${result.length} files processed`);
+      L.info(`${result.length} files processed`);
       return Promise.resolve(result);
     } catch (error) {
       return Promise.reject(error);
@@ -474,7 +474,7 @@ export default (container) => {
         L.debug(`Time Taken (Wait): ${waitEnd - waitStart}ms`);
       }
 
-      L.debug('Wait Over');
+      L.trace('Wait Over');
 
       const startTime = new Date().getTime();
       await runSingle();

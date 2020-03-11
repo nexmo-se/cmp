@@ -18,7 +18,6 @@ export default (container) => {
     statusTime,
   ) => {
     try {
-      L.debug(cmpCampaignId);
       const {
         CmpCampaignStatusAudit,
       } = container.databaseService.accessors;

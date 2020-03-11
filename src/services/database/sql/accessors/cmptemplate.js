@@ -50,7 +50,7 @@ export default (container) => {
 
       const rawCmpTemplate = await CmpTemplate.findOne(query);
       if (rawCmpTemplate == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -133,7 +133,7 @@ export default (container) => {
     try {
       const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted, options);
       if (cmpTemplates == null || cmpTemplates.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -161,7 +161,7 @@ export default (container) => {
       }
 
       const result = await CmpTemplate.update(changes, query);
-      L.debug('CmpTemplate Update Result', result);
+      L.trace('CmpTemplate Update Result', result);
 
       const cmpTemplate = await getById(cmpTemplateId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpTemplate);
@@ -183,7 +183,7 @@ export default (container) => {
       }
 
       const result = await CmpTemplate.update(changes, query);
-      L.debug('CmpTemplate Update Result', result);
+      L.trace('CmpTemplate Update Result', result);
 
       const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpTemplates);

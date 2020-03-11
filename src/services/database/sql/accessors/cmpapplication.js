@@ -75,7 +75,7 @@ export default (container) => {
 
       const rawCmpApplication = await CmpApplication.findOne(query);
       if (rawCmpApplication == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -155,7 +155,7 @@ export default (container) => {
 
       const rawCmpApplication = await CmpApplication.findOne(query);
       if (rawCmpApplication == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -349,7 +349,7 @@ export default (container) => {
         criteria, userId, excludeSecret, excludeDeleted, options,
       ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       if (cmpApplications == null || cmpApplications.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -377,7 +377,7 @@ export default (container) => {
       }
 
       const result = await CmpApplication.update(changes, query);
-      L.debug('CmpApplication Update Result', result);
+      L.trace('CmpApplication Update Result', result);
 
       const cmpApplication = userId ? await getByIdUser(
         cmpApplicationId, userId, excludeSecret, excludeDeleted,
@@ -401,7 +401,7 @@ export default (container) => {
       }
 
       const result = await CmpApplication.update(changes, query);
-      L.debug('CmpApplication Update Result', result);
+      L.trace('CmpApplication Update Result', result);
 
       const cmpApplications = userId ? await getByCriteriaUser(
         criteria, userId, excludeSecret, excludeDeleted, options,

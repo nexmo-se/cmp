@@ -435,7 +435,7 @@ export default (container) => {
 
       const promises = records.map(blastRecord);
       const results = await Promise.all(promises);
-      L.debug(results);
+      L.trace('Record Blast Results', results);
 
       await updateRecordSendTimeBulk(records);
       await createRecordMessagesBulk(results);

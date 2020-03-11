@@ -93,7 +93,7 @@ export default (container) => {
 
       const rawCmpChannel = await CmpChannel.findOne(query);
       if (rawCmpChannel == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -193,7 +193,7 @@ export default (container) => {
 
       const rawCmpChannel = await CmpChannel.findOne(query);
       if (rawCmpChannel == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -427,7 +427,7 @@ export default (container) => {
         criteria, userId, excludeSecret, excludeDeleted, options,
       ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       if (cmpChannels == null || cmpChannels.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -455,7 +455,7 @@ export default (container) => {
       }
 
       const result = await CmpChannel.update(changes, query);
-      L.debug('CmpChannel Update Result', result);
+      L.trace('CmpChannel Update Result', result);
 
       const cmpChannel = userId ? await getByIdUser(
         cmpChannelId, userId, excludeSecret, excludeDeleted,
@@ -479,7 +479,7 @@ export default (container) => {
       }
 
       const result = await CmpChannel.update(changes, query);
-      L.debug('CmpChannel Update Result', result);
+      L.trace('CmpChannel Update Result', result);
 
       const cmpChannels = userId ? await getByCriteriaUser(
         criteria, userId, excludeSecret, excludeDeleted, options,

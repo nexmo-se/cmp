@@ -8,15 +8,12 @@ export default (container) => {
       }
 
       let found = false;
-      L.debug(userId);
 
       // Check Application Users
-      L.debug('Check Channel Users');
+      L.trace('Check Channel Users');
       if (cmpChannel.users) {
-        L.debug(cmpChannel.users);
         for (let i = 0; i < cmpChannel.users.length; i += 1) {
           const user = cmpChannel.users[i];
-          L.debug(user.id);
           if (user.id === userId) {
             found = true;
             break;
@@ -25,12 +22,10 @@ export default (container) => {
       }
 
       // Check Application Users
-      L.debug('Check Application Users');
+      L.trace('Check Application Users');
       if (cmpChannel.cmpApplication && cmpChannel.cmpApplication.users) {
-        L.debug(cmpChannel.cmpApplication.users);
         for (let i = 0; i < cmpChannel.cmpApplication.users.length; i += 1) {
           const user = cmpChannel.cmpApplication.users[i];
-          L.debug(user.id);
           if (user.id === userId) {
             found = true;
             break;
@@ -39,12 +34,10 @@ export default (container) => {
       }
 
       // Check Api Key Users
-      L.debug('Check Api Key Users');
+      L.trace('Check Api Key Users');
       if (cmpChannel.cmpApiKey && cmpChannel.cmpApiKey.users) {
-        L.debug(cmpChannel.cmpApiKey.users);
         for (let i = 0; i < cmpChannel.cmpApiKey.users.length; i += 1) {
           const user = cmpChannel.cmpApiKey.users[i];
-          L.debug(user.id);
           if (user.id === userId) {
             found = true;
             break;

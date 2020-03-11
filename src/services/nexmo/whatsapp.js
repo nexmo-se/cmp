@@ -81,14 +81,14 @@ export default (container) => {
   ) => {
     try {
       if (mediaType === 'text') {
-        L.debug('Using Message Template');
+        L.trace('Using Message Template');
         return sendMessageTemplate(
           from, to, namespace, name, parameters,
           clientRef, applicationId, privateKey, axios,
         );
       }
 
-      L.debug('Using Media Template');
+      L.trace('Using Media Template');
       return sendMediaTemplate(
         from, to, namespace, name, mediaType, media, parameters,
         clientRef, applicationId, privateKey, axios,
@@ -197,25 +197,25 @@ export default (container) => {
   const getMediaParameter = (mediaType, media) => {
     let parameter = { type: 'text', text: media };
     if (mediaType === 'text') {
-      L.debug('MTM Text');
+      L.trace('MTM Text');
       parameter = getTextParameter(media);
     } else if (mediaType === 'image') {
-      L.debug('MTM Image');
+      L.trace('MTM Image');
       parameter = getImageParameter(media);
     } else if (mediaType === 'audio') {
-      L.debug('MTM Audio');
+      L.trace('MTM Audio');
       parameter = getAudioParameter(media);
     } else if (mediaType === 'video') {
-      L.debug('MTM Video');
+      L.trace('MTM Video');
       parameter = getVideoParameter(media);
     } else if (mediaType === 'file') {
-      L.debug('MTM File');
+      L.trace('MTM File');
       parameter = getFileParameter(media);
     } else if (mediaType === 'location') {
-      L.debug('MTM Location');
+      L.trace('MTM Location');
       parameter = getLocationParameter(media);
     } else {
-      L.debug('MTM Unknown - Default');
+      L.trace('MTM Unknown - Default');
     }
 
     return parameter;

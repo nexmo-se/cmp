@@ -19,7 +19,7 @@ export default (container) => {
 
       const rawCmpCampaignStatusAudit = await CmpCampaignStatusAudit.findOne(query);
       if (rawCmpCampaignStatusAudit == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -61,7 +61,7 @@ export default (container) => {
     try {
       const cmpCampaignStatusAudits = await getByCriteria(criteria, excludeDeleted);
       if (cmpCampaignStatusAudits == null || cmpCampaignStatusAudits.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -89,7 +89,7 @@ export default (container) => {
       }
 
       const result = await CmpCampaignStatusAudit.update(changes, query);
-      L.debug('CmpCampaignStatusAudit Update Result', result);
+      L.trace('CmpCampaignStatusAudit Update Result', result);
 
       const cmpCampaignStatusAudit = await getById(
         cmpCampaignStatusAuditId, excludeDeleted,
@@ -113,7 +113,7 @@ export default (container) => {
       }
 
       const result = await CmpCampaignStatusAudit.update(changes, query);
-      L.debug('CmpCampaignStatusAudit Update Result', result);
+      L.trace('CmpCampaignStatusAudit Update Result', result);
 
       const cmpCampaignStatusAudits = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpCampaignStatusAudits);

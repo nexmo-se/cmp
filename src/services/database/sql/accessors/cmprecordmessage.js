@@ -19,7 +19,7 @@ export default (container) => {
 
       const rawCmpRecordMessage = await CmpRecordMessage.findOne(query);
       if (rawCmpRecordMessage == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -57,7 +57,7 @@ export default (container) => {
     try {
       const cmpRecordMessages = await getByCriteria(criteria, excludeDeleted);
       if (cmpRecordMessages == null || cmpRecordMessages.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -85,7 +85,7 @@ export default (container) => {
       }
 
       const result = await CmpRecordMessage.update(changes, query);
-      L.debug('CmpRecordMessage Update Result', result);
+      L.trace('CmpRecordMessage Update Result', result);
 
       const cmpRecordMessage = await getById(cmpRecordMessageId, excludeDeleted);
       return Promise.resolve(cmpRecordMessage);
@@ -107,7 +107,7 @@ export default (container) => {
       }
 
       const result = await CmpRecordMessage.update(changes, query);
-      L.debug('CmpRecordMessage Update Result', result);
+      L.trace('CmpRecordMessage Update Result', result);
 
       const cmpRecordMessages = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpRecordMessages);

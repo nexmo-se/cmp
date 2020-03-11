@@ -4,8 +4,8 @@ export default (container) => {
   const getUrl = () => {
     const { restHost, useMockSms, mockSmsUrl } = container.config.nexmo;
     if (useMockSms) {
-      L.debug('Using Mock SMS Endpoint');
-      L.debug(mockSmsUrl);
+      L.trace('Using Mock SMS Endpoint');
+      L.trace(mockSmsUrl);
       return mockSmsUrl;
     }
 
@@ -28,13 +28,13 @@ export default (container) => {
       };
 
       if (smsUseSignature) {
-        L.debug('With SMS Signature');
+        L.trace('With SMS Signature');
         const signature = container.nexmo.generateSignature(
           signatureMethod, signatureSecret, body,
         );
         body.sig = signature;
       } else {
-        L.debug('Without SMS Signature');
+        L.trace('Without SMS Signature');
         body.api_secret = apiSecret;
       }
 

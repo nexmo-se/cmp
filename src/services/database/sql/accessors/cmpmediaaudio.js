@@ -19,7 +19,7 @@ export default (container) => {
 
       const rawCmpMediaAudio = await CmpMediaAudio.findOne(query);
       if (rawCmpMediaAudio == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -57,7 +57,7 @@ export default (container) => {
     try {
       const cmpMediaAudios = await getByCriteria(criteria, excludeDeleted);
       if (cmpMediaAudios == null || cmpMediaAudios.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -85,7 +85,7 @@ export default (container) => {
       }
 
       const result = await CmpMediaAudio.update(changes, query);
-      L.debug('CmpMediaAudio Update Result', result);
+      L.trace('CmpMediaAudio Update Result', result);
 
       const cmpMedia = await getById(cmpMediaAudioId, excludeDeleted);
       return Promise.resolve(cmpMedia);
@@ -107,7 +107,7 @@ export default (container) => {
       }
 
       const result = await CmpMediaAudio.update(changes, query);
-      L.debug('CmpMediaAudio Update Result', result);
+      L.trace('CmpMediaAudio Update Result', result);
 
       const cmpMediaAudios = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpMediaAudios);

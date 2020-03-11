@@ -8,15 +8,12 @@ export default (container) => {
       }
 
       let found = false;
-      L.debug(userId);
 
       // Check Application Users
-      L.debug('Check ApiKey Users');
+      L.trace('Check ApiKey Users');
       if (cmpApiKey.users) {
-        L.debug(cmpApiKey.users);
         for (let i = 0; i < cmpApiKey.users.length; i += 1) {
           const user = cmpApiKey.users[i];
-          L.debug(user.id);
           if (user.id === userId) {
             found = true;
             break;

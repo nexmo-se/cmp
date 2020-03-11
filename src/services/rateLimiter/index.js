@@ -30,7 +30,7 @@ export default (container) => {
       const ampm = hours < 12 ? 'AM' : 'PM';
 
       const timeText = `${month}/${date}/${year} ${hour}:${minute}:${second}.${milliseconds} ${ampm}`;
-      L.debug(`API Request Sent (${key}) at ${timeText}`);
+      L.trace(`API Request Sent (${key}) at ${timeText}`);
 
       return req;
     });
@@ -48,12 +48,12 @@ export default (container) => {
       const ampm = hours < 12 ? 'AM' : 'PM';
 
       const timeText = `${month}/${date}/${year} ${hour}:${minute}:${second}.${milliseconds} ${ampm}`;
-      L.debug(`API Response Received (${key}) at ${timeText}`);
+      L.trace(`API Response Received (${key}) at ${timeText}`);
 
       if (res.status >= 400) {
         L.error(`Interceptor (${key}): ${res.status}`, res.data);
       } else {
-        L.debug(`Interceptor (${key}): ${res.status}`, res.data);
+        L.trace(`Interceptor (${key}): ${res.status}`, res.data);
       }
       return res;
     });
@@ -138,7 +138,7 @@ export default (container) => {
       const ampm = hours < 12 ? 'AM' : 'PM';
 
       const timeText = `${month}/${date}/${year} ${hour}:${minute}:${second}.${milliseconds} ${ampm}`;
-      L.debug(`Bottleneck API Request Sent (${key}) at ${timeText}`);
+      L.trace(`Bottleneck API Request Sent (${key}) at ${timeText}`);
 
       const counts = bottleneckInstance.counts();
       L.debug('Bottleneck Counts', counts);
@@ -164,7 +164,7 @@ export default (container) => {
       if (res.status >= 400) {
         L.error(`Interceptor (${key}): ${res.status}`, res.data);
       } else {
-        L.debug(`Interceptor (${key}): ${res.status}`, res.data);
+        L.trace(`Interceptor (${key}): ${res.status}`, res.data);
       }
       return res;
     });

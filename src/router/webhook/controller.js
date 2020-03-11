@@ -80,7 +80,7 @@ export default (container) => {
 
   const publishMapiStatusAudit = async (recordMessage, data) => {
     try {
-      L.debug(recordMessage.id);
+      L.trace(recordMessage.id);
       const { CmpRecordMessageStatusAudit } = container.persistenceService;
       const {
         to, from,
@@ -119,7 +119,7 @@ export default (container) => {
 
   const publishSmsStatusAudit = async (recordMessage, data) => {
     try {
-      L.debug(recordMessage.id);
+      L.trace(recordMessage.id);
       const { CmpRecordMessageStatusAudit } = container.persistenceService;
       const {
         msisdn, to,
@@ -150,11 +150,11 @@ export default (container) => {
   const smsInbound = async (req, res, next) => {
     try {
       L.debug('SMS Inbound');
-      L.debug(req.params);
-      L.debug(req.body);
-      L.debug(req.query);
+      L.trace(req.params);
+      L.trace(req.body);
+      L.trace(req.query);
       const combined = Object.assign({}, req.body || {}, req.query || {});
-      L.debug(combined);
+      L.trace(combined);
       const startTime = new Date().getTime();
 
       const endTime = new Date().getTime();
@@ -168,11 +168,11 @@ export default (container) => {
   const smsDelivery = async (req, res, next) => {
     try {
       L.debug('SMS Delivery');
-      L.debug(req.params);
-      L.debug(req.body);
-      L.debug(req.query);
+      L.trace(req.params);
+      L.trace(req.body);
+      L.trace(req.query);
       const combined = Object.assign({}, req.body || {}, req.query || {});
-      L.debug(combined);
+      L.trace(combined);
       const startTime = new Date().getTime();
 
       const { messageId, status } = combined;
@@ -181,7 +181,7 @@ export default (container) => {
       if (recordMessages.length < 1) {
         L.info('No Sms Record Message Updated');
       } else {
-        L.debug('Publishing Sms Status Audit');
+        L.trace('Publishing Sms Status Audit');
         const recordMessage = recordMessages[0];
         await publishSmsStatusAudit(recordMessage, combined);
       }
@@ -197,8 +197,8 @@ export default (container) => {
   const vapiAnswer = async (req, res, next) => {
     try {
       L.debug('VAPI Answer');
-      L.debug(req.params);
-      L.debug(req.body);
+      L.trace(req.params);
+      L.trace(req.body);
       const startTime = new Date().getTime();
 
       const ncco = [
@@ -218,8 +218,8 @@ export default (container) => {
   const vapiFallbackAnswer = async (req, res, next) => {
     try {
       L.debug('VAPI Fallback Answer');
-      L.debug(req.params);
-      L.debug(req.body);
+      L.trace(req.params);
+      L.trace(req.body);
       const startTime = new Date().getTime();
 
       const ncco = [
@@ -239,8 +239,8 @@ export default (container) => {
   const vapiEvent = async (req, res, next) => {
     try {
       L.debug('VAPI Event');
-      L.debug(req.params);
-      L.debug(req.body);
+      L.trace(req.params);
+      L.trace(req.body);
       const startTime = new Date().getTime();
 
       const ncco = [
@@ -260,8 +260,8 @@ export default (container) => {
   const mapiInbound = async (req, res, next) => {
     try {
       L.debug('MAPI Inbound');
-      L.debug(req.params);
-      L.debug(req.body);
+      L.trace(req.params);
+      L.trace(req.body);
       const startTime = new Date().getTime();
       const endTime = new Date().getTime();
       L.debug(`Time Taken (MAPI Inbound Webhook): ${endTime - startTime}ms`);
@@ -274,8 +274,8 @@ export default (container) => {
   const mapiStatus = async (req, res, next) => {
     try {
       L.debug('MAPI Status');
-      L.debug(req.params);
-      L.debug(req.body);
+      L.trace(req.params);
+      L.trace(req.body);
 
       const startTime = new Date().getTime();
 
@@ -286,7 +286,7 @@ export default (container) => {
       if (recordMessages.length < 1) {
         L.info('No Mapi Record Message Updated');
       } else {
-        L.debug('Publishing Mapi Status Audit');
+        L.trace('Publishing Mapi Status Audit');
         const recordMessage = recordMessages[0];
         await publishMapiStatusAudit(recordMessage, req.body);
       }
@@ -302,8 +302,8 @@ export default (container) => {
   const rtcEvent = async (req, res, next) => {
     try {
       L.debug('RTC Event');
-      L.debug(req.params);
-      L.debug(req.body);
+      L.trace(req.params);
+      L.trace(req.body);
       const startTime = new Date().getTime();
       const endTime = new Date().getTime();
       L.debug(`Time Taken (RTC Status Webhook): ${endTime - startTime}ms`);

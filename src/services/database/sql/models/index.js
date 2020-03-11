@@ -11,7 +11,7 @@ export default (container) => {
     for (let i = 0; i < modelFiles.length; i += 1) {
       const modelFile = modelFiles[i];
 
-      L.debug(`Importing model: ${modelFile}`);
+      L.info(`Importing model: ${modelFile}`);
       const model = sequelizeClient.import(modelFile);
 
       const modelName = model.name;

@@ -44,22 +44,22 @@ export default (container) => {
   const getMediaContentBody = (mediaType, media) => {
     let mediaContentBody = { type: 'text', text: media };
     if (mediaType === 'text') {
-      L.debug('FB Template Text');
+      L.trace('FB Template Text');
       mediaContentBody = getTextMediaContentBody(media);
     } else if (mediaType === 'image') {
-      L.debug('FB Template Image');
+      L.trace('FB Template Image');
       mediaContentBody = getImageMediaContentBody(media);
     } else if (mediaType === 'audio') {
-      L.debug('FB Template Audio');
+      L.trace('FB Template Audio');
       mediaContentBody = getAudioMediaContentBody(media);
     } else if (mediaType === 'video') {
-      L.debug('FB Template Video');
+      L.trace('FB Template Video');
       mediaContentBody = getVideoMediaContentBody(media);
     } else if (mediaType === 'file') {
-      L.debug('FB Template File');
+      L.trace('FB Template File');
       mediaContentBody = getFileMediaContentBody(media);
     } else {
-      L.debug('FB Template Unknown - Default');
+      L.trace('FB Template Unknown - Default');
     }
 
     return mediaContentBody;

@@ -54,7 +54,7 @@ export default (container) => {
 
       const rawCmpApiKey = await CmpApiKey.findOne(query);
       if (rawCmpApiKey == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -116,7 +116,7 @@ export default (container) => {
 
       const rawCmpApiKey = await CmpApiKey.findOne(query);
       if (rawCmpApiKey == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -273,7 +273,7 @@ export default (container) => {
         criteria, userId, excludeSecret, excludeDeleted, options,
       ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       if (cmpApiKeys == null || cmpApiKeys.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -301,7 +301,7 @@ export default (container) => {
       }
 
       const result = await CmpApiKey.update(changes, query);
-      L.debug('CmpApiKey Update Result', result);
+      L.trace('CmpApiKey Update Result', result);
 
       const apiKey = userId ? await getByIdUser(cmpApiKeyId, userId, excludeSecret, excludeDeleted)
         : await getByIdAdmin(cmpApiKeyId, excludeSecret, excludeDeleted);
@@ -324,7 +324,7 @@ export default (container) => {
       }
 
       const result = await CmpApiKey.update(changes, query);
-      L.debug('CmpApiKey Update Result', result);
+      L.trace('CmpApiKey Update Result', result);
 
       const cmpApiKeys = userId ? await getByCriteriaUser(
         criteria, userId, excludeSecret, excludeDeleted, options,

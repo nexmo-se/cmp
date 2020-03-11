@@ -41,7 +41,7 @@ export default (container) => {
 
       const rawCmpRecordMessageStatusAudit = await CmpRecordMessageStatusAudit.findOne(query);
       if (rawCmpRecordMessageStatusAudit == null) {
-        L.debug('Null result for Get By Id, returning null');
+        L.trace('Null result for Get By Id, returning null');
         return Promise.resolve(null);
       }
 
@@ -105,7 +105,7 @@ export default (container) => {
     try {
       const cmpRecordMessageStatusAudits = await getByCriteria(criteria, excludeDeleted);
       if (cmpRecordMessageStatusAudits == null || cmpRecordMessageStatusAudits.length === 0) {
-        L.debug('Empty result when trying to Get One by Criteria, returning null');
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
       }
 
@@ -133,7 +133,7 @@ export default (container) => {
       }
 
       const result = await CmpRecordMessageStatusAudit.update(changes, query);
-      L.debug('CmpRecordMessageStatusAudit Update Result', result);
+      L.trace('CmpRecordMessageStatusAudit Update Result', result);
 
       const cmpRecordMessageStatusAudit = await getById(
         cmpRecordMessageStatusAuditId, excludeDeleted,
@@ -157,7 +157,7 @@ export default (container) => {
       }
 
       const result = await CmpRecordMessageStatusAudit.update(changes, query);
-      L.debug('CmpRecordMessageStatusAudit Update Result', result);
+      L.trace('CmpRecordMessageStatusAudit Update Result', result);
 
       const cmpRecordMessageStatusAudits = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpRecordMessageStatusAudits);
