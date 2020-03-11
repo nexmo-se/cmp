@@ -3,7 +3,7 @@ export default (container) => {
   const { L } = container.defaultLogger('Router - ErrorHandler');
 
   const handleError = (err, req, res, next) => {
-    console.error(err);
+    L.error(err);
     const response = {
       code: err.status || 500,
       message: err.message || container.httpStatus[err.status],

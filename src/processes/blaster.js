@@ -409,7 +409,7 @@ export default (container) => {
           L.debug(`Time Taken (Campaign Updates 1): ${campaignUpdateEnd1 - campaignUpdateStart1}ms`);
         })
         .catch((error) => {
-          console.error(error);
+          L.error(error);
         });
 
       // Make Blasts
@@ -428,7 +428,7 @@ export default (container) => {
           L.debug(`Time Taken (Campaign Updates 2): ${campaignUpdateEnd2 - campaignUpdateStart2}ms`);
         })
         .catch((error) => {
-          console.error(error);
+          L.error(error);
         });
 
       return Promise.resolve();
@@ -451,6 +451,7 @@ export default (container) => {
       const currentTime = new Date().getTime();
       const waitTime = blastTime - currentTime;
       if (waitTime > 0) {
+        L.debug(`Start to Wait for ${waitTime}ms`);
         const waitStart = new Date().getTime();
         await wait(waitTime);
         const waitEnd = new Date().getTime();
@@ -461,9 +462,9 @@ export default (container) => {
       const blastsStart = new Date().getTime();
       const newBlast = records.length;
       runSingle(records)
-        .then(() => console.log('Single Ended'))
+        .then(() => L.debug('Single Ended'))
         .catch((error) => {
-          console.error(error);
+          L.error(error);
           throw error;
         });
 
