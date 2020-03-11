@@ -5,6 +5,42 @@ import request from 'request';
 export default (container) => {
   const { L } = container.defaultLogger('RateLimiter Service');
   const axiosMap = {};
+  const trackerMap = {};
+
+  const getTrackTime = () => {
+    const currentTime = new Date();
+    const year = currentTime.getFullYear();
+    const month = currentTime.getMonth() + 1;
+    const date = currentTime.getDate();
+    const hours = currentTime.getHours();
+    const minute = `0${currentTime.getMinutes()}`.slice(-2);
+    const second = `0${currentTime.getSeconds()}`.slice(-2);
+    const trackTime = `${month}/${date}/${year} ${hours}:${minute}:${second}`;
+    return trackTime;
+  };
+
+  const trackTps = (key) => {
+    if (trackerMap[key] == null) {
+      L.trace('New TPS Tracker');
+      trackerMap[key] = {
+        lastTps: 0,
+        trackingTps: 0,
+        trackTime: getTrackTime(),
+      };
+    }
+
+    const tracker = trackerMap[key];
+    const trackTime = getTrackTime();
+    if (tracker.trackTime === trackTime) {
+      tracker.trackingTps += 1;
+    } else {
+      tracker.trackTime = trackTime;
+      tracker.lastTps = tracker.trackingTps;
+      tracker.trackingTps = 1;
+
+      L.debug(`Bottleneck TPS (${key}): ${tracker.lastTps}tps`);
+    }
+  };
 
   const createNewAxiosInstance = (key, tps) => {
     const httpAgent = new http.Agent({ keepAlive: true });
@@ -32,6 +68,7 @@ export default (container) => {
       const timeText = `${month}/${date}/${year} ${hour}:${minute}:${second}.${milliseconds} ${ampm}`;
       L.trace(`API Request Sent (${key}) at ${timeText}`);
 
+      trackTps(key);
       return req;
     });
 
@@ -72,7 +109,10 @@ export default (container) => {
     const bottleneckInstance = new container.Bottleneck({ minTime, trackDoneStatus: true });
     return {
       get: () => bottleneckInstance.schedule(
-        () => Promise.resolve(),
+        () => {
+          trackTps(key);
+          Promise.resolve();
+        },
       ),
       post: (url, body, requestConfig) => bottleneckInstance.schedule(
         () => new Promise((resolve, reject) => {
@@ -100,13 +140,20 @@ export default (container) => {
           };
 
           request.post(options, handler);
+          trackTps(key);
         }),
       ),
       put: () => bottleneckInstance.schedule(
-        () => Promise.resolve(),
+        () => {
+          trackTps(key);
+          Promise.resolve();
+        },
       ),
       delete: () => bottleneckInstance.schedule(
-        () => Promise.resolve(),
+        () => {
+          trackTps(key);
+          Promise.resolve();
+        },
       ),
     };
   };
@@ -141,8 +188,9 @@ export default (container) => {
       L.trace(`Bottleneck API Request Sent (${key}) at ${timeText}`);
 
       const counts = bottleneckInstance.counts();
-      L.debug('Bottleneck Counts', counts);
+      L.trace('Bottleneck Counts', counts);
 
+      trackTps(key);
       return req;
     });
 
@@ -159,7 +207,7 @@ export default (container) => {
       const ampm = hours < 12 ? 'AM' : 'PM';
 
       const timeText = `${month}/${date}/${year} ${hour}:${minute}:${second}.${milliseconds} ${ampm}`;
-      L.debug(`Bottleneck API Response Received (${key}) at ${timeText}`);
+      L.trace(`Bottleneck API Response Received (${key}) at ${timeText}`);
 
       if (res.status >= 400) {
         L.error(`Interceptor (${key}): ${res.status}`, res.data);
@@ -168,11 +216,6 @@ export default (container) => {
       }
       return res;
     });
-
-    // limiter.schedule(() => myFunction(arg1, arg2))
-    //   .then((result) => {
-    //     /* handle result */
-    //   });
 
     return {
       get: (url, requestConfig) => bottleneckInstance.schedule(
@@ -188,13 +231,6 @@ export default (container) => {
         () => originalAxiosInstance.delete(url, body, requestConfig),
       ),
     };
-
-    // return {
-    //   get: bottleneckInstance.wrap(originalAxiosInstance.get),
-    //   post: bottleneckInstance.wrap(originalAxiosInstance.post),
-    //   put: bottleneckInstance.wrap(originalAxiosInstance.put),
-    //   delete: bottleneckInstance.wrap(originalAxiosInstance.delete),
-    // };
   };
 
   const getAxiosRateLimiter = (id, channel, tps) => {
