@@ -11,6 +11,16 @@ export default (container) => {
     }
   };
 
+  const createRecordMessageBulk = async (records) => {
+    try {
+      const { CmpRecordMessage } = container.databaseService.accessors;
+      const cmpRecordMessages = await CmpRecordMessage.createRecordMessageBulk(records);
+      return Promise.resolve(cmpRecordMessages);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecordMessage = async (
     cmpRecordId,
     messageId,
@@ -83,6 +93,7 @@ export default (container) => {
   return {
     listRecordMessages,
 
+    createRecordMessageBulk,
     createRecordMessage,
     readRecordMessage,
 

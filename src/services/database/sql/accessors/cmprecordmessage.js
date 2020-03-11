@@ -135,6 +135,34 @@ export default (container) => {
     }
   };
 
+  const createRecordMessageBulk = async (records) => {
+    try {
+      const { CmpRecordMessage } = container.databaseService.models;
+      const creatableRecordMessages = [];
+      for (let i = 0; i < records.length; i += 1) {
+        const record = records[i];
+        const { cmpRecordId, messageIds = [] } = record;
+        for (let j = 0; j < messageIds.length; j += 1) {
+          const messageId = messageIds[j];
+          creatableRecordMessages.push({
+            id: container.uuid(),
+            cmpRecordId,
+            messageId,
+            status: 'requested',
+            statusTime: new Date(),
+            deleted: false,
+          });
+        }
+      }
+
+      const rawCreatedRecordMessages = await CmpRecordMessage.bulkCreate(creatableRecordMessages);
+      const cmpRecordMessages = rawCreatedRecordMessages.map(mapCmpRecordMessage);
+      return Promise.resolve(cmpRecordMessages);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecordMessage = async (
     cmpRecordId,
     messageId,
@@ -225,6 +253,7 @@ export default (container) => {
   return {
     listRecordMessages,
 
+    createRecordMessageBulk,
     createRecordMessage,
     readRecordMessage,
 
