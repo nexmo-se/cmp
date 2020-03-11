@@ -21,6 +21,10 @@ export default (container) => {
 
   const prepareRecordsBulk = async (records) => {
     try {
+      if (records.length === 0) {
+        return Promise.resolve();
+      }
+
       const { CmpRecord } = container.persistenceService;
       const changes = {
         status: 'queuing',
@@ -47,6 +51,10 @@ export default (container) => {
 
   const updateRecordSendTimeBulk = async (records) => {
     try {
+      if (records.length === 0) {
+        return Promise.resolve();
+      }
+
       const { CmpRecord } = container.persistenceService;
       const criteria = {
         id: records.map(record => record.id),
@@ -71,6 +79,10 @@ export default (container) => {
 
   const createRecordMessagesBulk = async (records) => {
     try {
+      if (records.length === 0) {
+        return Promise.resolve();
+      }
+
       const startTime = new Date().getTime();
 
       const { CmpRecordMessage } = container.persistenceService;
@@ -103,6 +115,10 @@ export default (container) => {
 
   const updateCampaignStatuses = async (cmpCampaignIds, isStart = true, isEnd = true) => {
     try {
+      if (cmpCampaignIds.length === 0) {
+        return Promise.resolve();
+      }
+
       const { CmpCampaign } = container.persistenceService;
       const criteria = { id: cmpCampaignIds };
       const cmpCampaigns = await CmpCampaign.findCampaigns(criteria);
