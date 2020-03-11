@@ -19,42 +19,6 @@ export default (container) => {
     }
   };
 
-  const prepareRecord = async (record) => {
-    try {
-      const { CmpRecord } = container.persistenceService;
-      const recordId = record.id;
-      const changes = {
-        status: 'queuing',
-        statusTime: new Date(),
-      };
-
-      const startTime = new Date().getTime();
-      const updatedRecord = await CmpRecord.updateRecord(recordId, changes, true);
-      const endTime = new Date().getTime();
-      const duration = endTime - startTime;
-      L.debug(`Time Taken (Prepare Record - ${recordId}): ${duration}ms`);
-      return Promise.resolve(updatedRecord);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const prepareRecords = async (records) => {
-    try {
-      const startTime = new Date().getTime();
-
-      const promises = records.map(prepareRecord);
-      const results = await Promise.all(promises);
-
-      const endTime = new Date().getTime();
-      const duration = endTime - startTime;
-      L.debug(`Time Taken (Prepare Records): ${duration}ms`);
-      return Promise.resolve(results);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
   const prepareRecordsBulk = async (records) => {
     try {
       const { CmpRecord } = container.persistenceService;
@@ -86,6 +50,7 @@ export default (container) => {
       const { CmpRecord } = container.persistenceService;
       const criteria = {
         id: records.map(record => record.id),
+        status: ['queuing', 'pending'],
       };
       const changes = {
         status: 'requested',
@@ -94,56 +59,11 @@ export default (container) => {
       };
 
       const startTime = new Date().getTime();
-      const updatedRecord = await CmpRecord.updateRecords(criteria, changes, true, false);
+      const updatedRecord = await CmpRecord.updateRecords(criteria, changes, true, false, {});
       const endTime = new Date().getTime();
       const duration = endTime - startTime;
       L.debug(`Time Taken (Update Record Send Time Bulk: ${duration}ms`);
       return Promise.resolve(updatedRecord);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const updateRecordSendTime = async (record) => {
-    try {
-      const { CmpRecord } = container.persistenceService;
-      const recordId = record.id;
-      const changes = {
-        status: 'requested',
-        statusTime: new Date(),
-        sendTime: new Date(),
-      };
-
-      const startTime = new Date().getTime();
-      const updatedRecord = await CmpRecord.updateRecord(recordId, changes, true, false);
-      const endTime = new Date().getTime();
-      const duration = endTime - startTime;
-      L.debug(`Time Taken (Update Record Send Time - ${recordId}): ${duration}ms`);
-      return Promise.resolve(updatedRecord);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const createRecordMessage = async (record, messageId) => {
-    try {
-      const { CmpRecordMessage } = container.persistenceService;
-      const recordMessages = await CmpRecordMessage.createRecordMessage(record.id, messageId);
-      return Promise.resolve(recordMessages);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const createRecordMessages = async (record, messageIds) => {
-    try {
-      const startTime = new Date().getTime();
-      const promises = messageIds.map(messageId => createRecordMessage(record, messageId));
-      const recordMessages = await Promise.all(promises);
-      const endTime = new Date().getTime();
-      const duration = endTime - startTime;
-      L.debug(`Time Taken (Create Record Messages): ${duration}ms`);
-      return Promise.resolve(recordMessages);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -391,7 +311,6 @@ export default (container) => {
       const { channel, tps } = cmpChannel;
       const { useMockBlast } = container.config.blaster;
 
-      const startTime = new Date().getTime();
       const axios = container.rateLimiterService.getAxios(cmpChannel.id, channel, tps);
 
       let result;
@@ -408,10 +327,6 @@ export default (container) => {
         result = await blastViber(record, axios);
       }
       L.trace(`Blast Result - ${record.id}`, result);
-
-      const endTime = new Date().getTime();
-      const duration = endTime - startTime;
-      L.debug(`Time Taken (Blast Record - ${record.id}): ${duration}ms`);
 
       // await updateRecordSendTime(record);
       // await createRecordMessages(record, result);
@@ -438,12 +353,17 @@ export default (container) => {
       const results = await Promise.all(promises);
       L.trace('Record Blast Results', results);
 
-      await updateRecordSendTimeBulk(records);
-      await createRecordMessagesBulk(results);
-
       const endTime = new Date().getTime();
       const duration = endTime - startTime;
       L.debug(`Time Taken (Blast Records): ${duration}ms`);
+
+      const postStartTime = new Date().getTime();
+      await updateRecordSendTimeBulk(records);
+      await createRecordMessagesBulk(results);
+      const postEndTime = new Date().getTime();
+      const postDuration = [postEndTime] - postStartTime;
+      L.debug(`Time Taken (PostBlast Records): ${postDuration}ms`);
+
       return Promise.resolve(results);
     } catch (error) {
       return Promise.reject(error);
