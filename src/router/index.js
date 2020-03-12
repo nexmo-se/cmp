@@ -8,6 +8,7 @@ import ParameterRouter from './cmpparameter';
 import MediaRouter from './cmpmedia';
 import CampaignRouter from './cmpcampaign';
 import RecordRouter from './cmprecord';
+import ReportRouter from './cmpreport';
 import WebhookRouter from './webhook';
 import BlasterRouter from './blaster';
 
@@ -27,6 +28,7 @@ export default (container) => {
   router.use('/media', MediaRouter(container));
   router.use('/campaigns', CampaignRouter(container));
   router.use('/records', RecordRouter(container));
+  router.use('/reports', ReportRouter(container));
   router.use('/blaster', BlasterRouter(container));
   router.use('/webhook', WebhookRouter(container));
 
