@@ -1,0 +1,249 @@
+export default (container) => {
+  const { L } = container.defaultLogger('Cmp Report Model Accessor');
+
+  const getById = async (cmpReportId, excludeDeleted = true) => {
+    try {
+      const { CmpReport } = container.databaseService.models;
+      const query = {
+        where: {
+          id: cmpReportId,
+        },
+      };
+
+      // Check Deleted
+      if (excludeDeleted) {
+        query.where.deleted = false;
+      }
+
+      const rawCmpReport = await CmpReport.findOne(query);
+      if (rawCmpReport == null) {
+        L.trace('Null result for Get By Id, returning null');
+        return Promise.resolve(null);
+      }
+
+      const cmpReport = mapCmpReport(rawCmpReport);
+      return Promise.resolve(cmpReport);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const getByCriteria = async (
+    criteria = {}, excludeDeleted = true, options = {},
+  ) => {
+    try {
+      const { CmpReport } = container.databaseService.models;
+      const query = {
+        where: criteria,
+      };
+
+      // Check Deleted
+      if (excludeDeleted) {
+        query.where.deleted = false;
+      }
+
+      // Check Limit
+      if (options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      // Check Offset
+      if (options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
+      const rawCmpReports = await CmpReport.findAll(query);
+      const cmpReports = rawCmpReports.map(mapCmpReport);
+      return Promise.resolve(cmpReports);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const getOneByCriteria = async (
+    criteria = {}, excludeDeleted = true, options = { limit: 1 },
+  ) => {
+    try {
+      const cmpReports = await getByCriteria(criteria, excludeDeleted, options);
+      if (cmpReports == null || cmpReports.length === 0) {
+        L.trace('Empty result when trying to Get One by Criteria, returning null');
+        return Promise.resolve(null);
+      }
+
+      const cmpReport = cmpReports[0];
+      return Promise.resolve(cmpReport);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const updateById = async (
+    cmpReportId, changes = {}, excludeDeleted = true,
+  ) => {
+    try {
+      const { CmpReport } = container.databaseService.models;
+      const query = {
+        where: {
+          id: cmpReportId,
+        },
+      };
+
+      // Check Deleted
+      if (excludeDeleted) {
+        query.where.deleted = false;
+      }
+
+      const result = await CmpReport.update(changes, query);
+      L.trace('CmpTemplate Update Result', result);
+
+      const cmpReport = await getById(cmpReportId, excludeDeleted);
+      return Promise.resolve(cmpReport);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const updateByCriteria = async (
+    criteria = {}, changes = {}, excludeDeleted = true, options = {},
+  ) => {
+    try {
+      const { CmpReport } = container.databaseService.models;
+      const query = { where: criteria };
+
+      // Check Deleted
+      if (excludeDeleted) {
+        query.where.deleted = false;
+      }
+
+      const result = await CmpReport.update(changes, query);
+      L.trace('CmpReport Update Result', result);
+
+      const cmpReports = await getByCriteria(criteria, excludeDeleted, options);
+      return Promise.resolve(cmpReports);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const mapCmpReport = (cmpReport) => {
+    const mappedCmpReport = cmpReport.dataValues;
+
+    delete mappedCmpReport.deleted;
+    delete mappedCmpReport.createdAt;
+    delete mappedCmpReport.updatedAt;
+
+    return mappedCmpReport;
+  };
+
+  const listReports = async (options = {}) => {
+    try {
+      const cmpReports = await getByCriteria({}, true, options);
+      return Promise.resolve(cmpReports);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createReport = async (
+    type,
+    name,
+  ) => {
+    try {
+      const { CmpReport } = container.databaseService.models;
+      const rawCmpReport = await CmpReport.create({
+        id: container.uuid(),
+        type,
+        name,
+        deleted: false,
+      });
+
+      const cmpReport = mapCmpReport(rawCmpReport);
+      return Promise.resolve(cmpReport);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const readReport = async (cmpReportId) => {
+    try {
+      const cmpReport = await getById(cmpReportId, false);
+      return Promise.resolve(cmpReport);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const updateReport = async (cmpReportId, changes) => {
+    try {
+      const cmpReport = await updateById(cmpReportId, changes, true);
+      return Promise.resolve(cmpReport);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const updateReports = async (criteria, changes, options = {}) => {
+    try {
+      const cmpReports = await updateByCriteria(criteria, changes, true, options);
+      return Promise.resolve(cmpReports);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const deleteReport = async (cmpReportId) => {
+    try {
+      const changes = { deleted: true };
+      const cmpReport = await updateById(cmpReportId, changes, true);
+      return Promise.resolve(cmpReport);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const deleteReports = async (criteria = {}) => {
+    try {
+      const changes = { deleted: true };
+      const cmpReports = await updateByCriteria(criteria, changes, true);
+      return Promise.resolve(cmpReports);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findReport = async (criteria = {}, excludeDeleted = true) => {
+    try {
+      const cmpReport = await getOneByCriteria(criteria, excludeDeleted);
+      return Promise.resolve(cmpReport);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findReports = async (
+    criteria = {}, excludeDeleted = true, options = {},
+  ) => {
+    try {
+      const cmpReports = await getByCriteria(criteria, excludeDeleted, options);
+      return Promise.resolve(cmpReports);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  return {
+    listReports,
+
+    createReport,
+    readReport,
+
+    updateReport,
+    updateReports,
+
+    deleteReport,
+    deleteReports,
+
+    findReport,
+    findReports,
+  };
+};

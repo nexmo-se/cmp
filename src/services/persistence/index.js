@@ -10,6 +10,7 @@ import CmpCampaign from './cmpCampaign';
 import CmpCampaignStatusAudit from './cmpCampaignStatusAudit';
 import CmpRecordMessage from './cmpRecordMessage';
 import CmpRecordMessageStatusAudit from './cmpRecordMessageStatusAudit';
+import CmpReport from './cmpReport';
 
 export default container => ({
   User: User(container),
@@ -24,4 +25,5 @@ export default container => ({
   CmpCampaignStatusAudit: CmpCampaignStatusAudit(container),
   CmpRecordMessage: CmpRecordMessage(container),
   CmpRecordMessageStatusAudit: CmpRecordMessageStatusAudit(container),
+  CmpReport: CmpReport(container),
 });
