@@ -5,14 +5,8 @@ export default {
     query: {
       limit: Joi.number().integer(),
       offset: Joi.number().integer(),
-      type: Joi.alternatives().try(
-        Joi.string(),
-        Joi.array().items(Joi.string()),
-      ),
-      status: Joi.alternatives().try(
-        Joi.string().valid('pending', 'processing', 'completed', 'rejected'),
-        Joi.array().items(Joi.string().valid('pending', 'processing', 'completed', 'rejected')),
-      ),
+      type: Joi.string(),
+      status: Joi.string().valid('pending', 'processing', 'completed', 'rejected'),
     },
     params: {},
     body: {},
