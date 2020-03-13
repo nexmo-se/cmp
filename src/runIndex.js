@@ -33,29 +33,13 @@ console.log('This is the Trigger Script');
 
 const container = require('./container').default;
 
-const { client } = container.databaseService;
-const recordFilePath = '/Users/ypoh/vcmp/dataload/records.csv';
-const parametersFilePath = '/Users/ypoh/vcmp/dataload/parameters.csv';
-const recordsSql = `LOAD DATA LOCAL INFILE '${recordFilePath}' INTO TABLE CmpRecords FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-const parametersSql = `LOAD DATA LOCAL INFILE '${parametersFilePath}' INTO TABLE CmpParameters FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+const from = new Date(1168445696000);
+const to = new Date();
+const cmpCampaignId = '8fef82b5-86ac-4ab2-8327-a72158264cfd';
 
-let recordsStart;
-let parametersStart;
-Promise.resolve()
-  .then(() => {
-    recordsStart = new Date().getTime();
-    console.log('Loading Records');
-    return client.query(recordsSql);
-  })
-  .then(() => {
-    const endTime = new Date().getTime();
-    console.log(`Time Taken (Records): ${endTime - recordsStart}ms`);
-    parametersStart = new Date().getTime();
-    console.log('Loading Parameters');
-    return client.query(parametersSql);
-  })
-  .then(() => {
-    const endTime = new Date().getTime();
-    console.log(`Time Taken (Parameters): ${endTime - parametersStart}ms`);
-  })
+container.reportService.summary.getOverallSummary(from, to)
+// container.reportService.summary.getCampaignSummary(cmpCampaignId, from, to)
+  .then(results => console.log(results))
+  .then(() => console.log('done'))
+  .then(() => process.exit(0))
   .catch(console.error);
