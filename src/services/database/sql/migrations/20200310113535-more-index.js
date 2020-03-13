@@ -24,7 +24,7 @@ module.exports = {
   },
   down: (queryInterface) => {
     const removeCmpRecordsCmpCampaignIdStatusDeleted = () => queryInterface.removeIndex(
-      'CmpRecCmpRecordsords',
+      'CmpRecords',
       [
         'cmpCampaignId',
         'status',

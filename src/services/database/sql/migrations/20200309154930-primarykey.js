@@ -33,7 +33,7 @@ module.exports = {
 
     const dropCmpParametersPrimaryKey = () => queryInterface.removeConstraint('CmpParameters', 'PRIMARY');
     const removeCmpParametersPrimaryIdColumn = () => queryInterface.removeColumn('CmpParameters', 'primaryId');
-    const createCmpParametersPrimaryKey = () => queryInterface.addConstraint('CmpCmpParametersRecords', ['id'], { type: 'primary key', name: 'PRIMARY' });
+    const createCmpParametersPrimaryKey = () => queryInterface.addConstraint('CmpParameters', ['id'], { type: 'primary key', name: 'PRIMARY' });
 
     return Promise.resolve()
       .then(dropCmpRecordsPrimaryKey)
