@@ -147,6 +147,9 @@ export default (container) => {
   const createReport = async (
     type,
     name,
+    cmpReportOverallSummaryId,
+    cmpReportCampaignSummaryId,
+    cmpReportCampaignDetailId,
   ) => {
     try {
       const { CmpReport } = container.databaseService.models;
@@ -154,6 +157,9 @@ export default (container) => {
         id: container.uuid(),
         type,
         name,
+        cmpReportOverallSummaryId,
+        cmpReportCampaignSummaryId,
+        cmpReportCampaignDetailId,
         deleted: false,
       });
 

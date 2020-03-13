@@ -35,6 +35,18 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: true,
     },
+    cmpReportOverallSummaryId: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    cmpReportCampaignSummaryId: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
+    cmpReportCampaignDetailId: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
     deleted: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -46,6 +58,9 @@ module.exports = (sequelize, DataTypes) => {
 
   CmpReport.associate = (models) => {
     // associations can be defined here
+    CmpReport.belongsTo(models.CmpReportOverallSummary, { foreignKey: 'cmpReportOverallSummaryId', as: 'cmpReportOverallSummary' });
+    CmpReport.belongsTo(models.CmpReportCampaignSummary, { foreignKey: 'cmpReportCampaignSummaryId', as: 'cmpReportCampaignSummary' });
+    CmpReport.belongsTo(models.CmpReportCampaignDetail, { foreignKey: 'cmpReportCampaignDetailId', as: 'cmpReportCampaignDetail' });
   };
 
   return CmpReport;
