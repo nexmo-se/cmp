@@ -1,14 +1,20 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Report Persistence Accessor');
 
+  const ReportTypes = {
+    overallSummary: 'overall_summary',
+    campaignSummary: 'campaign_summary',
+    campaignDetail: 'campaign_detail',
+  };
+
   const mapReport = (report) => {
     const reportData = report;
 
-    if (report.type === 'overall_summary') {
+    if (report.type === ReportTypes.overallSummary) {
       reportData.content = report.cmpReportOverallSummary;
-    } else if (report.type === 'campaign_summary') {
+    } else if (report.type === ReportTypes.campaignSummary) {
       reportData.content = report.cmpReportCampaignSummary;
-    } else if (report.type === 'campaign_detail') {
+    } else if (report.type === ReportTypes.campaignDetail) {
       reportData.content = report.cmpReportCampaignDetail;
     }
 
@@ -129,6 +135,26 @@ export default (container) => {
     }
   };
 
+  const createReport = async (
+    type, name, content,
+  ) => {
+    try {
+      let report;
+      if (type === ReportTypes.overallSummary) {
+        report = await createOverallSummary(type, name, content);
+      } else if (type === ReportTypes.campaignSummary) {
+        report = await createCampaignSummary(type, name, content);
+      } else if (type === ReportTypes.campaignDetail) {
+        report = await createCampaignDetail(type, name, content);
+      } else {
+        throw new container.BadRequestError('Unknown Report Type');
+      }
+      return Promise.resolve(report);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const readReport = async (cmpReportId) => {
     try {
       const { CmpReport } = container.databaseService.accessors;
@@ -192,6 +218,7 @@ export default (container) => {
   return {
     listReports,
 
+    createReport,
     createOverallSummary,
     createCampaignSummary,
     createCampaignDetail,
