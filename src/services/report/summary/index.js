@@ -38,8 +38,11 @@ group by ACampaigns.id, ACampaigns.name, CmpRecordMessages.status
 
       if (cmpCampaignId && cmpCampaignId !== '') {
         const isValid = isUuid(cmpCampaignId);
-        console.log(isValid);
-        sql = sql.replace(/__CAMPAIGN_ID__/g, `and CmpCampaigns.id='${cmpCampaignId}'`);
+        if (isValid) {
+          sql = sql.replace(/__CAMPAIGN_ID__/g, `and CmpCampaigns.id='${cmpCampaignId}'`);
+        } else {
+          sql = sql.replace(/__CAMPAIGN_ID__/g, '');
+        }
       } else {
         sql = sql.replace(/__CAMPAIGN_ID__/g, '');
       }
