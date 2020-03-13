@@ -1,5 +1,18 @@
+import SummaryReporter from './summary';
+
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Template Controller');
+
+  const summaryReporter = SummaryReporter(container);
+
+  const ReportTypes = {
+    overallSummary: 'overall_summary',
+    campaignSummary: 'campaign_summary',
+  };
+  const ReportGenerators = {
+    [ReportTypes.overallSummary]: summaryReporter.getOverall,
+    [ReportTypes.campaignSummary]: summaryReporter.getCampaign,
+  };
 
   const findAllReports = async (req, res, next) => {
     try {
@@ -102,9 +115,18 @@ export default (container) => {
   const createJsonReport = async (req, res, next) => {
     try {
       const { type, content } = req.body;
-      const { CmpReport } = container.persistenceService;
-      // res.status(200).json({});
-      res.status(500).send('Not implement, coming soon');
+
+      if (type == null) {
+        throw new container.BadRequestError('Invalid report type');
+      }
+
+      const reportGenerator = ReportGenerators[type];
+      if (reportGenerator == null) {
+        throw new container.BadRequestError('Invalid report type');
+      }
+
+      const report = await reportGenerator(content);
+      res.json(report);
     } catch (error) {
       next(error);
     }
@@ -113,10 +135,7 @@ export default (container) => {
   const createCsvReport = async (req, res, next) => {
     try {
       const { type, name, content } = req.body;
-      const { CmpReport } = container.persistenceService;
-      // const cmpReport = await CmpReport.createReport(type, name);
-      // res.status(200).json({});
-      res.status(500).send('Not implemented, coming soon');
+      throw new container.BadRequestError('Invalid report format');
     } catch (error) {
       next(error);
     }
