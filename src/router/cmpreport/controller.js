@@ -1,17 +1,21 @@
 import SummaryReporter from './summary';
+import CampaignDetailReporter from './campaignDetail';
 
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Template Controller');
 
   const summaryReporter = SummaryReporter(container);
+  const campaignDetailReporter = CampaignDetailReporter(container);
 
   const ReportTypes = {
     overallSummary: 'overall_summary',
     campaignSummary: 'campaign_summary',
+    campaignDetail: 'campaign_detail',
   };
   const ReportGenerators = {
     [ReportTypes.overallSummary]: summaryReporter.getOverall,
     [ReportTypes.campaignSummary]: summaryReporter.getCampaign,
+    [ReportTypes.campaignDetail]: campaignDetailReporter.getCampaign,
   };
 
   const findAllReports = async (req, res, next) => {
