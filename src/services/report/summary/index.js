@@ -11,30 +11,51 @@ export default (container) => {
     try {
       const { databaseService, Sequelize } = container;
       const { client: rawClient } = databaseService;
+//       let sql = `
+// select 
+// ACampaigns.id, 
+// ACampaigns.name, 
+// CmpRecordMessages.status,
+// COUNT(*) as statusCount
+// from (
+// select * from CmpCampaigns
+// where CmpCampaigns.deleted=0
+// __CAMPAIGN_ID__
+// order by CmpCampaigns.id asc
+// __LIMIT__
+// __OFFSET__
+// ) as ACampaigns
+// left join CmpRecords
+// on ACampaigns.id=CmpRecords.cmpCampaignId 
+// and CmpRecords.deleted=0
+// left join CmpRecordMessages
+// on CmpRecords.id=CmpRecordMessages.cmpRecordId 
+// and CmpRecordMessages.deleted=0
+// __FROM_TO__
+// group by ACampaigns.id, ACampaigns.name, CmpRecordMessages.status
+
+//     `.replace(/\n/g, ' ');
       let sql = `
 select 
-ACampaigns.id, 
-ACampaigns.name, 
-CmpRecordMessages.status,
-COUNT(*) as statusCount
-from (
+ACampaigns.id, ACampaigns.name, 
+CmpRecordMessages.status, count(*) statusCount
+from CmpRecords 
+left join CmpRecordMessages 
+on CmpRecordMessages.cmpRecordId = CmpRecords.id 
+left join (
 select * from CmpCampaigns
-where CmpCampaigns.deleted=0
+where CmpCampaigns.deleted = 0
 __CAMPAIGN_ID__
-order by CmpCampaigns.id asc
 __LIMIT__
 __OFFSET__
 ) as ACampaigns
-left join CmpRecords
-on ACampaigns.id=CmpRecords.cmpCampaignId 
-and CmpRecords.deleted=0
-left join CmpRecordMessages
-on CmpRecords.id=CmpRecordMessages.cmpRecordId 
-and CmpRecordMessages.deleted=0
+on ACampaigns.id = CmpRecords.cmpCampaignId
+where CmpRecords.deleted = 0 
+and CmpRecordMessages.deleted = 0 
 __FROM_TO__
-group by ACampaigns.id, ACampaigns.name, CmpRecordMessages.status
-
-    `.replace(/\n/g, ' ');
+and ACampaigns.deleted = 0
+group by ACampaigns.id, ACampaigns.name, CmpRecordMessages.status;
+      `.replace(/\n/g, ' ');
 
       if (cmpCampaignId && cmpCampaignId !== '') {
         const isValid = isUuid(cmpCampaignId);
