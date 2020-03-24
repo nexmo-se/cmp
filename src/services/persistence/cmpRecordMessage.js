@@ -47,11 +47,11 @@ export default (container) => {
     }
   };
 
-  const updateRecordMessage = async (cmpRecordMessageId, changes) => {
+  const updateRecordMessage = async (cmpRecordMessageId, changes, options = {}) => {
     try {
       const { CmpRecordMessage } = container.databaseService.accessors;
       const cmpRecordMessage = await CmpRecordMessage.updateRecordMessage(
-        cmpRecordMessageId, changes,
+        cmpRecordMessageId, changes, options,
       );
       return Promise.resolve(cmpRecordMessage);
     } catch (error) {
@@ -59,31 +59,57 @@ export default (container) => {
     }
   };
 
-  const updateRecordMessages = async (criteria, changes) => {
+  const updateRecordMessages = async (criteria, changes, options = {}) => {
     try {
       const { CmpRecordMessage } = container.databaseService.accessors;
-      const cmpRecordMessages = await CmpRecordMessage.updateRecordMessages(criteria, changes);
+      const cmpRecordMessages = await CmpRecordMessage.updateRecordMessages(
+        criteria, changes, options,
+      );
       return Promise.resolve(cmpRecordMessages);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteRecordMessage = async (cmpRecordMessageId) => {
+  const deleteRecordMessage = async (cmpRecordMessageId, options = {}) => {
     try {
       const { CmpRecordMessage } = container.databaseService.accessors;
-      const cmpRecordMessage = await CmpRecordMessage.deleteRecordMessage(cmpRecordMessageId);
+      const cmpRecordMessage = await CmpRecordMessage.deleteRecordMessage(
+        cmpRecordMessageId, options,
+      );
       return Promise.resolve(cmpRecordMessage);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteRecordMessages = async (criteria) => {
+  const deleteRecordMessages = async (criteria, options = {}) => {
     try {
       const { CmpRecordMessage } = container.databaseService.accessors;
-      const cmpRecordMessages = await CmpRecordMessage.deleteRecordMessages(criteria);
+      const cmpRecordMessages = await CmpRecordMessage.deleteRecordMessages(
+        criteria, options,
+      );
       return Promise.resolve(cmpRecordMessages);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findRecordMessage = async (criteria) => {
+    try {
+      const { CmpRecordMessage } = container.databaseService.accessors;
+      const cmpRecordMessage = await CmpRecordMessage.findRecordMessage(criteria, true);
+      return Promise.resolve(cmpRecordMessage);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const findRecordMessages = async (criteria, options = {}) => {
+    try {
+      const { CmpRecordMessage } = container.databaseService.accessors;
+      const cmpRecordMessage = await CmpRecordMessage.findRecordMessages(criteria, true, options);
+      return Promise.resolve(cmpRecordMessage);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -102,5 +128,8 @@ export default (container) => {
 
     deleteRecordMessage,
     deleteRecordMessages,
+
+    findRecordMessage,
+    findRecordMessages,
   };
 };

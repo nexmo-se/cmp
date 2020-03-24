@@ -30,7 +30,10 @@ export default (container) => {
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (
+    criteria = {}, excludeDeleted = true,
+    options = { limit: 30, offset: 0 },
+  ) => {
     try {
       const {
         CmpRecordMessage,
@@ -44,6 +47,16 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      // Check Limit
+      if (options && options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      // Check Offset
+      if (options && options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpRecordMessages = await CmpRecordMessage.findAll(query);
       const cmpRecordMessages = rawCmpRecordMessages
         .map(cmpRecordMessage => mapCmpRecordMessage(cmpRecordMessage));
@@ -55,7 +68,8 @@ export default (container) => {
 
   const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const cmpRecordMessages = await getByCriteria(criteria, excludeDeleted);
+      const options = { limit: 1, offset: 0 };
+      const cmpRecordMessages = await getByCriteria(criteria, excludeDeleted, options);
       if (cmpRecordMessages == null || cmpRecordMessages.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -70,6 +84,7 @@ export default (container) => {
 
   const updateById = async (
     cmpRecordMessageId, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpRecordMessage } = container.databaseService.models;
@@ -87,6 +102,10 @@ export default (container) => {
       const result = await CmpRecordMessage.update(changes, query);
       L.trace('CmpRecordMessage Update Result', result);
 
+      if (options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpRecordMessage = await getById(cmpRecordMessageId, excludeDeleted);
       return Promise.resolve(cmpRecordMessage);
     } catch (error) {
@@ -96,6 +115,7 @@ export default (container) => {
 
   const updateByCriteria = async (
     criteria = {}, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpRecordMessage } = container.databaseService.models;
@@ -108,6 +128,10 @@ export default (container) => {
 
       const result = await CmpRecordMessage.update(changes, query);
       L.trace('CmpRecordMessage Update Result', result);
+
+      if (options.noGet) {
+        return Promise.resolve();
+      }
 
       const cmpRecordMessages = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpRecordMessages);
@@ -126,9 +150,9 @@ export default (container) => {
     return mappedCmpRecordMessage;
   };
 
-  const listRecordMessages = async () => {
+  const listRecordMessages = async (options = {}) => {
     try {
-      const cmpRecordMessages = await getByCriteria({}, true);
+      const cmpRecordMessages = await getByCriteria({}, true, options);
       return Promise.resolve(cmpRecordMessages);
     } catch (error) {
       return Promise.reject(error);
@@ -194,38 +218,38 @@ export default (container) => {
     }
   };
 
-  const updateRecordMessage = async (cmpRecordMessageId, changes) => {
+  const updateRecordMessage = async (cmpRecordMessageId, changes, options = {}) => {
     try {
-      const cmpRecordMessage = await updateById(cmpRecordMessageId, changes, true);
+      const cmpRecordMessage = await updateById(cmpRecordMessageId, changes, true, options);
       return Promise.resolve(cmpRecordMessage);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateRecordMessages = async (criteria, changes) => {
+  const updateRecordMessages = async (criteria, changes, options = {}) => {
     try {
-      const cmpRecordMessages = await updateByCriteria(criteria, changes, true);
+      const cmpRecordMessages = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpRecordMessages);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteRecordMessage = async (cmpRecordMessageId) => {
+  const deleteRecordMessage = async (cmpRecordMessageId, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpRecordMessage = await updateById(cmpRecordMessageId, changes, true);
+      const cmpRecordMessage = await updateById(cmpRecordMessageId, changes, true, options);
       return Promise.resolve(cmpRecordMessage);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteRecordMessages = async (criteria = {}) => {
+  const deleteRecordMessages = async (criteria = {}, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpRecordMessages = await updateByCriteria(criteria, changes, true);
+      const cmpRecordMessages = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpRecordMessages);
     } catch (error) {
       return Promise.reject(error);
@@ -241,9 +265,9 @@ export default (container) => {
     }
   };
 
-  const findRecordMessages = async (criteria = {}, excludeDeleted = true) => {
+  const findRecordMessages = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
-      const cmpRecordMessages = await getByCriteria(criteria, excludeDeleted);
+      const cmpRecordMessages = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpRecordMessages);
     } catch (error) {
       return Promise.reject(error);
