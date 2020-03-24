@@ -45,6 +45,7 @@ import FileService from '../services/file';
 import CsvService from '../services/csv';
 import ReportService from '../services/report';
 import QueueService from '../services/queue';
+import WebhookService from '../services/webhook';
 
 import Logger from '../services/logger';
 import Authenticator from '../services/authenticator';
@@ -117,6 +118,7 @@ container.fileService = FileService(container);
 container.csvService = CsvService(container);
 container.reportService = ReportService(container);
 container.queueService = QueueService(container);
+container.webhookService = WebhookService(container);
 
 // Process
 container.blasterProcess = BlasterProcess(container);
