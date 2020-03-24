@@ -44,6 +44,7 @@ import DateTimeService from '../services/datetime';
 import FileService from '../services/file';
 import CsvService from '../services/csv';
 import ReportService from '../services/report';
+import QueueService from '../services/queue';
 
 import Logger from '../services/logger';
 import Authenticator from '../services/authenticator';
@@ -115,6 +116,7 @@ container.dateTimeService = DateTimeService(container);
 container.fileService = FileService(container);
 container.csvService = CsvService(container);
 container.reportService = ReportService(container);
+container.queueService = QueueService(container);
 
 // Process
 container.blasterProcess = BlasterProcess(container);
