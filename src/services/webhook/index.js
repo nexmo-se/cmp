@@ -32,6 +32,7 @@ export default (container) => {
 
       if (useQueue) {
         // Add to Queue
+        container.queueService.pushRecordMessageUpdate(messageId, status);
       } else {
         // Update Immediately
         const criteria = { messageId };
@@ -71,6 +72,23 @@ export default (container) => {
 
       if (useQueue) {
         // Add to Queue
+        const creatableData = {
+          messageUuid,
+          toType,
+          toId,
+          toNumber,
+          fromType,
+          fromId,
+          fromNumber,
+          timestamp,
+          status,
+          errorCode: code,
+          errorReason: reason,
+          usageCurrency: currency,
+          usagePrice: price,
+          clientRef,
+        };
+        container.queueService.pushMapiStatusAudit(messageUuid, creatableData);
       } else {
         // Insert Immediately
         const recordMessage = await getRecordMessage(messageUuid);
@@ -110,6 +128,18 @@ export default (container) => {
 
       if (useQueue) {
         // Add to Queue
+        const creatableData = {
+          msisdn,
+          to,
+          networkCode,
+          messageId,
+          price,
+          status,
+          scts,
+          errCode,
+          messageTimestamp,
+        };
+        container.queueService.pushSmsStatusAudit(messageId, creatableData);
       } else {
         const recordMessage = await getRecordMessage(messageId);
         await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditSms(
