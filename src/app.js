@@ -39,6 +39,9 @@ app.use(log4js.connectLogger(L, { level: log4js.levels.INFO }));
 app.use('/', Router(container));
 app.use(errorHandler.handleError);
 
+// Initialize Webhook Queue
+container.queueService.initialize();
+
 const httpServer = http.createServer(app);
 socketIoService.init(httpServer);
 
