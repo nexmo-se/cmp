@@ -88,7 +88,7 @@ export default (container) => {
           usagePrice: price,
           clientRef,
         };
-        container.queueService.pushMapiStatusAudit(messageUuid, creatableData);
+        container.queueService.pushMapiStatusAudit(creatableData);
       } else {
         // Insert Immediately
         const recordMessage = await getRecordMessage(messageUuid);
@@ -139,7 +139,7 @@ export default (container) => {
           errCode,
           messageTimestamp,
         };
-        container.queueService.pushSmsStatusAudit(messageId, creatableData);
+        container.queueService.pushSmsStatusAudit(creatableData);
       } else {
         const recordMessage = await getRecordMessage(messageId);
         await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditSms(
