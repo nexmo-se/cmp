@@ -31,6 +31,49 @@ export default (container) => {
     }
   };
 
+  const createRecordMessageStatusAuditSmsBatch = async (audits) => {
+    try {
+      const {
+        CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditSms,
+      } = container.databaseService.accessors;
+
+      const commonAudits = [];
+      const smsAudits = [];
+
+      for (let i = 0; i < audits.length; i += 1) {
+        const audit = audits[i];
+        const smsAuditId = container.uuid();
+        smsAudits.push({
+          id: smsAuditId,
+          msisdn: audit.msisdn,
+          to: audit.to,
+          networkCode: audit.networkCode,
+          messageId: audit.messageId,
+          price: audit.price,
+          status: audit.status,
+          scts: audit.scts,
+          errCode: audit.errCode,
+          messageTimestamp: audit.messageTimestamp,
+        });
+
+        commonAudits.push({
+          id: container.uuid(),
+          cmpRecordMessageId: audit.cmpRecordMessageId,
+          messageType: 'sms',
+          cmpRecordMessageStatusAuditSmsId: smsAuditId,
+          cmpRecordMessageStatusAuditMapiId: null,
+        });
+      }
+
+      // Insert SMS Audits
+      await CmpRecordMessageStatusAuditSms.createRecordMessageStatusAuditSmsBatch(smsAudits);
+      await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditBatch(commonAudits);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecordMessageStatusAuditSms = async (
     cmpRecordMessageId,
     msisdn, to,
@@ -46,29 +89,77 @@ export default (container) => {
       } = container.databaseService.accessors;
 
       // Create RecordMessageStatusAudit Text
-      const cmpRecordMessageStatusAuditSms = await CmpRecordMessageStatusAuditSms
+      const cmpRecordMessageStatusAuditSmsId = container.uuid();
+      await CmpRecordMessageStatusAuditSms
         .createRecordMessageStatusAuditSms(
+          container.uuid(),
+          cmpRecordMessageStatusAuditSmsId,
           msisdn, to,
           networkCode, messageId,
           price, status,
           scts, errCode,
           messageTimestamp,
         );
-      const cmpRMSAuditSmsId = cmpRecordMessageStatusAuditSms.id;
 
       // Create RecordMessageStatusAudit
-      const cmpRecordMessageStatusAudit = await CmpRecordMessageStatusAudit
+      await CmpRecordMessageStatusAudit
         .createRecordMessageStatusAudit(
+          container.uuid(),
           cmpRecordMessageId,
           'sms',
-          cmpRMSAuditSmsId,
+          cmpRecordMessageStatusAuditSmsId,
           null,
         );
-      const mappedCmpRecordMessageStatusAudit = mapRecordMessageStatusAudit(
-        cmpRecordMessageStatusAudit,
-      );
 
-      return Promise.resolve(mappedCmpRecordMessageStatusAudit);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createRecordMessageStatusAuditMapiBatch = async (audits) => {
+    try {
+      const {
+        CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditMapi,
+      } = container.databaseService.accessors;
+
+      const commonAudits = [];
+      const mapiAudits = [];
+
+      for (let i = 0; i < audits.length; i += 1) {
+        const audit = audits[i];
+        const mapiAuditId = container.uuid();
+        mapiAudits.push({
+          id: mapiAuditId,
+          messageUuid: audit.messageUuid,
+          toType: audit.toType,
+          toId: audit.toId,
+          toNumber: audit.toNumber,
+          fromType: audit.fromType,
+          fromId: audit.fromId,
+          fromNumber: audit.fromNumber,
+          timestamp: audit.timestamp,
+          status: audit.status,
+          errorCode: audit.errorCode,
+          errorReason: audit.errorReason,
+          usageCurrency: audit.usageCurrency,
+          usagePrice: audit.usagePrice,
+          clientRef: audit.clientRef,
+        });
+
+        commonAudits.push({
+          id: container.uuid(),
+          cmpRecordMessageId: audit.cmpRecordMessageId,
+          messageType: 'mapi',
+          cmpRecordMessageStatusAuditSmsId: null,
+          cmpRecordMessageStatusAuditMapiId: mapiAuditId,
+        });
+      }
+
+      // Insert SMS Audits
+      await CmpRecordMessageStatusAuditMapi.createRecordMessageStatusAuditMapiBatch(mapiAudits);
+      await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditBatch(commonAudits);
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
@@ -91,8 +182,11 @@ export default (container) => {
       } = container.databaseService.accessors;
 
       // Create RecordMessageStatusAudit Text
-      const cmpRecordMessageStatusAuditMapi = await CmpRecordMessageStatusAuditMapi
+      const cmpRecordMessageStatusAuditMapiId = container.uuid();
+      await CmpRecordMessageStatusAuditMapi
         .createRecordMessageStatusAuditMapi(
+          container.uuid(),
+          cmpRecordMessageStatusAuditMapiId,
           messageUuid,
           toType, toId, toNumber,
           fromType, fromId, fromNumber,
@@ -101,15 +195,15 @@ export default (container) => {
           usageCurrency, usagePrice,
           clientRef,
         );
-      const cmpRMSAuditMapiId = cmpRecordMessageStatusAuditMapi.id;
 
       // Create RecordMessageStatusAudit
       const cmpRecordMessageStatusAudit = await CmpRecordMessageStatusAudit
         .createRecordMessageStatusAudit(
+          container.uuid(),
           cmpRecordMessageId,
           'mapi',
           null,
-          cmpRMSAuditMapiId,
+          cmpRecordMessageStatusAuditMapiId,
         );
       const mappedCmpRecordMessageStatusAudit = mapRecordMessageStatusAudit(
         cmpRecordMessageStatusAudit,
@@ -167,7 +261,11 @@ export default (container) => {
     listRecordMessageStatusAudits,
 
     createRecordMessageStatusAuditSms,
+    createRecordMessageStatusAuditSmsBatch,
+
     createRecordMessageStatusAuditMapi,
+    createRecordMessageStatusAuditMapiBatch,
+
     readRecordMessageStatusAudit,
 
     deleteRecordMessageStatusAudit,
