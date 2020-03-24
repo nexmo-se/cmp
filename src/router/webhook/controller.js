@@ -57,96 +57,6 @@ export default (container) => {
     }
   };
 
-  const updateRecordMessage = async (messageId, status) => {
-    try {
-      const { CmpRecordMessage } = container.persistenceService;
-      const criteria = {
-        messageId,
-      };
-      const changes = {
-        status,
-        statusTime: new Date(),
-      };
-
-      const startTime = new Date().getTime();
-      const recordMessages = await CmpRecordMessage.updateRecordMessages(criteria, changes);
-      const endTime = new Date().getTime();
-      L.debug(`Time Taken (Update Record Message): ${endTime - startTime}ms`);
-      return Promise.resolve(recordMessages);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const publishMapiStatusAudit = async (recordMessage, data) => {
-    try {
-      L.trace(recordMessage.id);
-      const { CmpRecordMessageStatusAudit } = container.persistenceService;
-      const {
-        to, from,
-        timestamp, status,
-        error, usage,
-      } = data;
-      const messageUuid = data.message_uuid;
-      const clientRef = data.client_ref;
-      const { code, reason } = error || {};
-      const { currency, price } = usage || {};
-      const toType = to.type;
-      const toId = to.id;
-      const toNumber = to.number;
-      const fromType = from.type;
-      const fromId = from.id;
-      const fromNumber = from.number;
-
-      const startTime = new Date().getTime();
-      const statusAudit = await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditMapi(
-        recordMessage.id,
-        messageUuid,
-        toType, toId, toNumber,
-        fromType, fromId, fromNumber,
-        timestamp, status,
-        code, reason,
-        currency, price,
-        clientRef,
-      );
-      const endTime = new Date().getTime();
-      L.debug(`Time Taken (Publish Mapi Status Audit): ${endTime - startTime}ms`);
-      return Promise.resolve(statusAudit);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const publishSmsStatusAudit = async (recordMessage, data) => {
-    try {
-      L.trace(recordMessage.id);
-      const { CmpRecordMessageStatusAudit } = container.persistenceService;
-      const {
-        msisdn, to,
-        messageId,
-        price, status, scts,
-      } = data;
-      const networkCode = data['network-code'];
-      const errCode = data['err-code'];
-      const messageTimestamp = data['message-timestamp'];
-
-      const startTime = new Date().getTime();
-      const statusAudit = await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditSms(
-        recordMessage.id,
-        msisdn, to,
-        networkCode, messageId,
-        price, status,
-        scts, errCode,
-        messageTimestamp,
-      );
-      const endTime = new Date().getTime();
-      L.debug(`Time Taken (Publish SMS Status Audit): ${endTime - startTime}ms`);
-      return Promise.resolve(statusAudit);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
   const smsInbound = async (req, res, next) => {
     try {
       L.debug('SMS Inbound');
@@ -176,15 +86,8 @@ export default (container) => {
       const startTime = new Date().getTime();
 
       const { messageId, status } = combined;
-      const recordMessages = await updateRecordMessage(messageId, status);
-
-      if (recordMessages.length < 1) {
-        L.info('No Sms Record Message Updated');
-      } else {
-        L.trace('Publishing Sms Status Audit');
-        const recordMessage = recordMessages[0];
-        await publishSmsStatusAudit(recordMessage, combined);
-      }
+      await container.webhookService.updateRecordMessage(messageId, status);
+      await container.webhookService.publishSmsStatusAudit(combined);
 
       const endTime = new Date().getTime();
       L.debug(`Time Taken (SMS Delivery Webhook): ${endTime - startTime}ms`);
@@ -281,15 +184,8 @@ export default (container) => {
 
       const { status } = req.body;
       const messageId = req.body.message_uuid;
-      const recordMessages = await updateRecordMessage(messageId, status);
-
-      if (recordMessages.length < 1) {
-        L.info('No Mapi Record Message Updated');
-      } else {
-        L.trace('Publishing Mapi Status Audit');
-        const recordMessage = recordMessages[0];
-        await publishMapiStatusAudit(recordMessage, req.body);
-      }
+      await container.webhookService.updateRecordMessage(messageId, status);
+      await container.webhookService.publishMapiStatusAudit(req.body);
 
       const endTime = new Date().getTime();
       L.debug(`Time Taken (MAPI Status Webhook): ${endTime - startTime}ms`);
