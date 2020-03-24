@@ -124,12 +124,12 @@ export default (container) => {
           const updateEndTime = new Date().getTime();
           L.debug(`Time Taken (All Record Message Status Update)[${updates.length}]: ${updateEndTime - updateStartTime}ms`);
           L.trace(`${updates.length} Record Message Updates saved`);
-        } else {
-          L.trace('Nothing to save for Record Message Updates');
         }
 
         const totalEndTime = new Date().getTime();
         L.debug(`Time Taken (Total Record Message Save): ${totalEndTime - totalStartTime}ms`);
+      } else {
+        L.trace('Nothing to save for Record Message Updates');
       }
 
 
