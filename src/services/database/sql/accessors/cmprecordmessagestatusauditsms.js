@@ -142,7 +142,33 @@ export default (container) => {
     }
   };
 
+  const createRecordMessageStatusAuditSmsBatch = async (audits) => {
+    try {
+      const { CmpRecordMessageStatusAuditSms } = container.databaseService.models;
+      const createableAudits = audits.map(audit => ({
+        id: audit.id || container.uuid(),
+        msisdn: audit.msisdn,
+        to: audit.to,
+        networkCode: audit.networkCode,
+        messageId: audit.messageId,
+        price: audit.price,
+        status: audit.status,
+        scts: audit.scts,
+        errCode: audit.errCode,
+        messageTimestamp: audit.messageTimestamp,
+        deleted: false,
+      }));
+
+      const rawAuditSmses = await CmpRecordMessageStatusAuditSms.bulkCreate(createableAudits);
+      const auditSmses = rawAuditSmses.map(mapCmpRecordMessageStatusAuditSms);
+      return Promise.resolve(auditSmses);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecordMessageStatusAuditSms = async (
+    id,
     msisdn,
     to,
     networkCode,
@@ -156,7 +182,7 @@ export default (container) => {
     try {
       const { CmpRecordMessageStatusAuditSms } = container.databaseService.models;
       const rawCmpRecordMessageStatusAuditSms = await CmpRecordMessageStatusAuditSms.create({
-        id: container.uuid(),
+        id: id || container.uuid(),
         msisdn,
         to,
         networkCode,
@@ -233,6 +259,8 @@ export default (container) => {
     listRecordMessageStatusAuditSmses,
 
     createRecordMessageStatusAuditSms,
+    createRecordMessageStatusAuditSmsBatch,
+
     readRecordMessageStatusAuditSms,
 
     deleteRecordMessageStatusAuditSms,

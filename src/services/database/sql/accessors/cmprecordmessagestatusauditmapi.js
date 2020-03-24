@@ -142,7 +142,38 @@ export default (container) => {
     }
   };
 
+  const createRecordMessageStatusAuditMapiBatch = async (audits) => {
+    try {
+      const { CmpRecordMessageStatusAuditMapi } = container.databaseService.models;
+      const createableAudits = audits.map(audit => ({
+        id: audit.id || container.uuid(),
+        messageUuid: audit.messageUuid,
+        toType: audit.toType,
+        toId: audit.toId,
+        toNumber: audit.toNumber,
+        fromType: audit.fromType,
+        fromId: audit.fromId,
+        fromNumber: audit.fromNumber,
+        timestamp: audit.timestamp,
+        status: audit.status,
+        errorCode: audit.errorCode,
+        errorReason: audit.errorReason,
+        usageCurrency: audit.usageCurrency,
+        usagePrice: audit.usagePrice,
+        clientRef: audit.clientRef,
+        deleted: false,
+      }));
+
+      const rawAuditMapis = await CmpRecordMessageStatusAuditMapi.bulkCreate(createableAudits);
+      const auditMapis = rawAuditMapis.map(mapCmpRecordMessageStatusAuditMapi);
+      return Promise.resolve(auditMapis);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecordMessageStatusAuditMapi = async (
+    id,
     messageUuid,
     toType,
     toId,
@@ -161,7 +192,7 @@ export default (container) => {
     try {
       const { CmpRecordMessageStatusAuditMapi } = container.databaseService.models;
       const rawCmpRecordMessageStatusAuditMapi = await CmpRecordMessageStatusAuditMapi.create({
-        id: container.uuid(),
+        id: id || container.uuid(),
         messageUuid,
         toType,
         toId,
@@ -263,6 +294,8 @@ export default (container) => {
     listRecordMessageStatusAuditMapis,
 
     createRecordMessageStatusAuditMapi,
+    createRecordMessageStatusAuditMapiBatch,
+
     readRecordMessageStatusAuditMapi,
 
     updateRecordMessageStatusAuditMapi,
