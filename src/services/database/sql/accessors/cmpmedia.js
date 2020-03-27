@@ -93,11 +93,14 @@ export default (container) => {
       const cmpMedia = mapCmpMedia(rawCmpMedia);
       return Promise.resolve(cmpMedia);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpMediaId, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
       const {
         CmpMedia, CmpMediaText, CmpMediaImage,
@@ -178,18 +181,30 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      if (options && options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      if (options && options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpMedias = await CmpMedia.findAll(query);
       const cmpMedias = rawCmpMedias
         .map(cmpMedia => mapCmpMedia(cmpMedia));
       return Promise.resolve(cmpMedias);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const cmpMedias = await getByCriteria(criteria, excludeDeleted);
+      const options = { limit: 1, offset: 0 };
+      const cmpMedias = await getByCriteria(criteria, excludeDeleted, options);
       if (cmpMedias == null || cmpMedias.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -204,6 +219,7 @@ export default (container) => {
 
   const updateById = async (
     cmpMediaId, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpMedia } = container.databaseService.models;
@@ -221,15 +237,23 @@ export default (container) => {
       const result = await CmpMedia.update(changes, query);
       L.trace('CmpMedia Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpMedia = await getById(cmpMediaId, excludeDeleted);
       return Promise.resolve(cmpMedia);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpMediaId, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const updateByCriteria = async (
     criteria = {}, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpMedia } = container.databaseService.models;
@@ -243,9 +267,16 @@ export default (container) => {
       const result = await CmpMedia.update(changes, query);
       L.trace('CmpMedia Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpMedias = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpMedias);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -353,9 +384,9 @@ export default (container) => {
     return mappedCmpMedia;
   };
 
-  const listMedias = async () => {
+  const listMedias = async (options = {}) => {
     try {
-      const cmpMedias = await getByCriteria({}, true);
+      const cmpMedias = await getByCriteria({}, true, options);
       return Promise.resolve(cmpMedias);
     } catch (error) {
       return Promise.reject(error);
@@ -391,6 +422,18 @@ export default (container) => {
       const cmpMedia = await getById(id, true);
       return Promise.resolve(cmpMedia);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createMedia(
+          mediaType,
+          cmpMediaTextId,
+          cmpMediaImageId,
+          cmpMediaAudioId,
+          cmpMediaVideoId,
+          cmpMediaFileId,
+          cmpMediaLocationId,
+          cmpMediaViberTemplateId,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -404,38 +447,38 @@ export default (container) => {
     }
   };
 
-  const updateMedia = async (cmpMediaId, changes) => {
+  const updateMedia = async (cmpMediaId, changes, options = {}) => {
     try {
-      const cmpMedia = await updateById(cmpMediaId, changes, true);
+      const cmpMedia = await updateById(cmpMediaId, changes, true, options);
       return Promise.resolve(cmpMedia);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateMedias = async (criteria, changes) => {
+  const updateMedias = async (criteria, changes, options = {}) => {
     try {
-      const cmpMedias = await updateByCriteria(criteria, changes, true);
+      const cmpMedias = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpMedias);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteMedia = async (cmpMediaId) => {
+  const deleteMedia = async (cmpMediaId, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpMedia = await updateById(cmpMediaId, changes, true);
+      const cmpMedia = await updateById(cmpMediaId, changes, true, options);
       return Promise.resolve(cmpMedia);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteMedias = async (criteria = {}) => {
+  const deleteMedias = async (criteria = {}, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpMedias = await updateByCriteria(criteria, changes, true);
+      const cmpMedias = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpMedias);
     } catch (error) {
       return Promise.reject(error);
@@ -451,9 +494,9 @@ export default (container) => {
     }
   };
 
-  const findMedias = async (criteria = {}, excludeDeleted = true) => {
+  const findMedias = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
-      const cmpMedias = await getByCriteria(criteria, excludeDeleted);
+      const cmpMedias = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpMedias);
     } catch (error) {
       return Promise.reject(error);

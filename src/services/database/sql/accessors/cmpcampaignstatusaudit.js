@@ -28,11 +28,14 @@ export default (container) => {
       );
       return Promise.resolve(cmpCampaignStatusAudit);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpCampaignStatusAuditId, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
       const {
         CmpCampaignStatusAudit,
@@ -46,6 +49,14 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      if (options && options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      if (options && options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpCampaignStatusAudits = await CmpCampaignStatusAudit.findAll(query);
       const cmpCampaignStatusAudits = rawCmpCampaignStatusAudits
         .map(cmpCampaignStatusAudit => mapCmpCampaignStatusAudit(
@@ -53,13 +64,17 @@ export default (container) => {
         ));
       return Promise.resolve(cmpCampaignStatusAudits);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const cmpCampaignStatusAudits = await getByCriteria(criteria, excludeDeleted);
+      const options = { limit: 1, offset: 0 };
+      const cmpCampaignStatusAudits = await getByCriteria(criteria, excludeDeleted, options);
       if (cmpCampaignStatusAudits == null || cmpCampaignStatusAudits.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -73,7 +88,7 @@ export default (container) => {
   };
 
   const updateById = async (
-    cmpCampaignStatusAuditId, changes = {}, excludeDeleted = true,
+    cmpCampaignStatusAuditId, changes = {}, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpCampaignStatusAudit } = container.databaseService.models;
@@ -91,17 +106,24 @@ export default (container) => {
       const result = await CmpCampaignStatusAudit.update(changes, query);
       L.trace('CmpCampaignStatusAudit Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpCampaignStatusAudit = await getById(
         cmpCampaignStatusAuditId, excludeDeleted,
       );
       return Promise.resolve(cmpCampaignStatusAudit);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpCampaignStatusAuditId, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludeDeleted = true,
+    criteria = {}, changes = {}, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpCampaignStatusAudit } = container.databaseService.models;
@@ -115,9 +137,16 @@ export default (container) => {
       const result = await CmpCampaignStatusAudit.update(changes, query);
       L.trace('CmpCampaignStatusAudit Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpCampaignStatusAudits = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpCampaignStatusAudits);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -132,9 +161,9 @@ export default (container) => {
     return mappedCmpCSAudit;
   };
 
-  const listCampaignStatusAudits = async () => {
+  const listCampaignStatusAudits = async (options) => {
     try {
-      const cmpCampaignStatusAudits = await getByCriteria({}, true);
+      const cmpCampaignStatusAudits = await getByCriteria({}, true, options);
       return Promise.resolve(cmpCampaignStatusAudits);
     } catch (error) {
       return Promise.reject(error);
@@ -160,6 +189,9 @@ export default (container) => {
       const cmpCampaignStatusAudit = await getById(id, true);
       return Promise.resolve(cmpCampaignStatusAudit);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createCampaignStatusAudit(cmpCampaignId, status, statusTime);
+      }
       return Promise.reject(error);
     }
   };
@@ -173,11 +205,11 @@ export default (container) => {
     }
   };
 
-  const deleteCampaignStatusAudit = async (cmpCampaignStatusAuditId) => {
+  const deleteCampaignStatusAudit = async (cmpCampaignStatusAuditId, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
       const cmpCampaignStatusAudit = await updateById(
-        cmpCampaignStatusAuditId, changes, true,
+        cmpCampaignStatusAuditId, changes, true, options,
       );
       return Promise.resolve(cmpCampaignStatusAudit);
     } catch (error) {
@@ -185,10 +217,10 @@ export default (container) => {
     }
   };
 
-  const deleteCampaignStatusAudits = async (criteria = {}) => {
+  const deleteCampaignStatusAudits = async (criteria = {}, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpCampaignStatusAudits = await updateByCriteria(criteria, changes, true);
+      const cmpCampaignStatusAudits = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpCampaignStatusAudits);
     } catch (error) {
       return Promise.reject(error);
@@ -204,9 +236,9 @@ export default (container) => {
     }
   };
 
-  const findCampaignStatusAudits = async (criteria = {}, excludeDeleted = true) => {
+  const findCampaignStatusAudits = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
-      const cmpCampaignStatusAudits = await getByCriteria(criteria, excludeDeleted);
+      const cmpCampaignStatusAudits = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpCampaignStatusAudits);
     } catch (error) {
       return Promise.reject(error);

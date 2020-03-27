@@ -26,11 +26,14 @@ export default (container) => {
       const cmpMediaText = mapCmpMediaText(rawCmpMediaText);
       return Promise.resolve(cmpMediaText);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpMediaTextId, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
       const {
         CmpMediaText,
@@ -44,18 +47,30 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      if (options && options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      if (options && options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpMediaTexts = await CmpMediaText.findAll(query);
       const cmpMediaTexts = rawCmpMediaTexts
         .map(cmpMediaText => mapCmpMediaText(cmpMediaText));
       return Promise.resolve(cmpMediaTexts);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const cmpMediaTexts = await getByCriteria(criteria, excludeDeleted);
+      const options = { limit: 1, offset: 0 };
+      const cmpMediaTexts = await getByCriteria(criteria, excludeDeleted, options);
       if (cmpMediaTexts == null || cmpMediaTexts.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -70,6 +85,7 @@ export default (container) => {
 
   const updateById = async (
     cmpMediaTextId, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpMediaText } = container.databaseService.models;
@@ -87,15 +103,22 @@ export default (container) => {
       const result = await CmpMediaText.update(changes, query);
       L.trace('CmpMediaText Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpMedia = await getById(cmpMediaTextId, excludeDeleted);
       return Promise.resolve(cmpMedia);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpMediaTextId, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludeDeleted = true,
+    criteria = {}, changes = {}, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpMediaText } = container.databaseService.models;
@@ -109,9 +132,16 @@ export default (container) => {
       const result = await CmpMediaText.update(changes, query);
       L.trace('CmpMediaText Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpMediaTexts = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpMediaTexts);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -126,9 +156,9 @@ export default (container) => {
     return mappedCmpMediaText;
   };
 
-  const listMediaTexts = async () => {
+  const listMediaTexts = async (options = {}) => {
     try {
-      const cmpMediaTexts = await getByCriteria({}, true);
+      const cmpMediaTexts = await getByCriteria({}, true, options);
       return Promise.resolve(cmpMediaTexts);
     } catch (error) {
       return Promise.reject(error);
@@ -149,6 +179,9 @@ export default (container) => {
       const cmpMediaText = mapCmpMediaText(rawCmpMediaText);
       return Promise.resolve(cmpMediaText);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createMediaText(text);
+      }
       return Promise.reject(error);
     }
   };
@@ -162,38 +195,38 @@ export default (container) => {
     }
   };
 
-  const updateMediaText = async (cmpMediaTextId, changes) => {
+  const updateMediaText = async (cmpMediaTextId, changes, options = {}) => {
     try {
-      const cmpMediaText = await updateById(cmpMediaTextId, changes, true);
+      const cmpMediaText = await updateById(cmpMediaTextId, changes, true, options);
       return Promise.resolve(cmpMediaText);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateMediaTexts = async (criteria, changes) => {
+  const updateMediaTexts = async (criteria, changes, options = {}) => {
     try {
-      const cmpMediaTexts = await updateByCriteria(criteria, changes, true);
+      const cmpMediaTexts = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpMediaTexts);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteMediaText = async (cmpMediaTextId) => {
+  const deleteMediaText = async (cmpMediaTextId, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpMediaText = await updateById(cmpMediaTextId, changes, true);
+      const cmpMediaText = await updateById(cmpMediaTextId, changes, true, options);
       return Promise.resolve(cmpMediaText);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteMediaTexts = async (criteria = {}) => {
+  const deleteMediaTexts = async (criteria = {}, options = {}) => {
     try {
       const changes = { deleted: true };
-      const cmpMediaTexts = await updateByCriteria(criteria, changes, true);
+      const cmpMediaTexts = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpMediaTexts);
     } catch (error) {
       return Promise.reject(error);
@@ -209,9 +242,9 @@ export default (container) => {
     }
   };
 
-  const findMediaTexts = async (criteria = {}, excludeDeleted = true) => {
+  const findMediaTexts = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
-      const cmpMediaTexts = await getByCriteria(criteria, excludeDeleted);
+      const cmpMediaTexts = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpMediaTexts);
     } catch (error) {
       return Promise.reject(error);

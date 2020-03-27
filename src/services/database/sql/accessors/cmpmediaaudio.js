@@ -26,11 +26,14 @@ export default (container) => {
       const cmpMediaAudio = mapCmpMediaAudio(rawCmpMediaAudio);
       return Promise.resolve(cmpMediaAudio);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpMediaAudioId, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
       const {
         CmpMediaAudio,
@@ -44,18 +47,30 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      if (options && options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      if (options && options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpMediaAudios = await CmpMediaAudio.findAll(query);
       const cmpMediaAudios = rawCmpMediaAudios
         .map(cmpMediaAudio => mapCmpMediaAudio(cmpMediaAudio));
       return Promise.resolve(cmpMediaAudios);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const cmpMediaAudios = await getByCriteria(criteria, excludeDeleted);
+      const options = { limit: 1, offset: 0 };
+      const cmpMediaAudios = await getByCriteria(criteria, excludeDeleted, options);
       if (cmpMediaAudios == null || cmpMediaAudios.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -69,7 +84,7 @@ export default (container) => {
   };
 
   const updateById = async (
-    cmpMediaAudioId, changes = {}, excludeDeleted = true,
+    cmpMediaAudioId, changes = {}, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpMediaAudio } = container.databaseService.models;
@@ -87,15 +102,22 @@ export default (container) => {
       const result = await CmpMediaAudio.update(changes, query);
       L.trace('CmpMediaAudio Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpMedia = await getById(cmpMediaAudioId, excludeDeleted);
       return Promise.resolve(cmpMedia);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpMediaAudioId, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludeDeleted = true,
+    criteria = {}, changes = {}, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpMediaAudio } = container.databaseService.models;
@@ -109,9 +131,16 @@ export default (container) => {
       const result = await CmpMediaAudio.update(changes, query);
       L.trace('CmpMediaAudio Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpMediaAudios = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpMediaAudios);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -149,6 +178,9 @@ export default (container) => {
       const cmpMediaAudio = mapCmpMediaAudio(rawCmpMediaAudio);
       return Promise.resolve(cmpMediaAudio);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createMediaAudio(url);
+      }
       return Promise.reject(error);
     }
   };
@@ -162,38 +194,38 @@ export default (container) => {
     }
   };
 
-  const updateMediaAudio = async (cmpMediaAudioId, changes) => {
+  const updateMediaAudio = async (cmpMediaAudioId, changes, options = {}) => {
     try {
-      const cmpMediaAudio = await updateById(cmpMediaAudioId, changes, true);
+      const cmpMediaAudio = await updateById(cmpMediaAudioId, changes, true, options);
       return Promise.resolve(cmpMediaAudio);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateMediaAudios = async (criteria, changes) => {
+  const updateMediaAudios = async (criteria, changes, options = {}) => {
     try {
-      const cmpMediaAudios = await updateByCriteria(criteria, changes, true);
+      const cmpMediaAudios = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpMediaAudios);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteMediaAudio = async (cmpMediaAudioId) => {
+  const deleteMediaAudio = async (cmpMediaAudioId, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpMediaAudio = await updateById(cmpMediaAudioId, changes, true);
+      const cmpMediaAudio = await updateById(cmpMediaAudioId, changes, true, options);
       return Promise.resolve(cmpMediaAudio);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteMediaAudios = async (criteria = {}) => {
+  const deleteMediaAudios = async (criteria = {}, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpMediaAudios = await updateByCriteria(criteria, changes, true);
+      const cmpMediaAudios = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpMediaAudios);
     } catch (error) {
       return Promise.reject(error);
@@ -209,9 +241,9 @@ export default (container) => {
     }
   };
 
-  const findMediaAudios = async (criteria = {}, excludeDeleted = true) => {
+  const findMediaAudios = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
-      const cmpMediaAudios = await getByCriteria(criteria, excludeDeleted);
+      const cmpMediaAudios = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpMediaAudios);
     } catch (error) {
       return Promise.reject(error);

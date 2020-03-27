@@ -26,11 +26,14 @@ export default (container) => {
       const cmpMediaFile = mapCmpMediaFile(rawCmpMediaFile);
       return Promise.resolve(cmpMediaFile);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpMediaFileId, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
       const {
         CmpMediaFile,
@@ -44,18 +47,30 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      if (options && options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      if (options && options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpMediaFiles = await CmpMediaFile.findAll(query);
       const cmpMediaFiles = rawCmpMediaFiles
         .map(cmpMediaFile => mapCmpMediaFile(cmpMediaFile));
       return Promise.resolve(cmpMediaFiles);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const cmpMediaFiles = await getByCriteria(criteria, excludeDeleted);
+      const options = { limit: 1, offset: 0 };
+      const cmpMediaFiles = await getByCriteria(criteria, excludeDeleted, options);
       if (cmpMediaFiles == null || cmpMediaFiles.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -69,7 +84,7 @@ export default (container) => {
   };
 
   const updateById = async (
-    cmpMediaFileId, changes = {}, excludeDeleted = true,
+    cmpMediaFileId, changes = {}, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpMediaFile } = container.databaseService.models;
@@ -87,15 +102,22 @@ export default (container) => {
       const result = await CmpMediaFile.update(changes, query);
       L.trace('CmpMediaFile Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpMedia = await getById(cmpMediaFileId, excludeDeleted);
       return Promise.resolve(cmpMedia);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpMediaFileId, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const updateByCriteria = async (
-    criteria = {}, changes = {}, excludeDeleted = true,
+    criteria = {}, changes = {}, excludeDeleted = true, options = {},
   ) => {
     try {
       const { CmpMediaFile } = container.databaseService.models;
@@ -109,9 +131,16 @@ export default (container) => {
       const result = await CmpMediaFile.update(changes, query);
       L.trace('CmpMediaFile Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpMediaFiles = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpMediaFiles);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -126,9 +155,9 @@ export default (container) => {
     return mappedCmpMediaFile;
   };
 
-  const listMediaFiles = async () => {
+  const listMediaFiles = async (options = {}) => {
     try {
-      const cmpMediaFiles = await getByCriteria({}, true);
+      const cmpMediaFiles = await getByCriteria({}, true, options);
       return Promise.resolve(cmpMediaFiles);
     } catch (error) {
       return Promise.reject(error);
@@ -151,6 +180,9 @@ export default (container) => {
       const cmpMediaFile = mapCmpMediaFile(rawCmpMediaFile);
       return Promise.resolve(cmpMediaFile);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createMediaFile(url, caption, fileName);
+      }
       return Promise.reject(error);
     }
   };
@@ -164,38 +196,38 @@ export default (container) => {
     }
   };
 
-  const updateMediaFile = async (cmpMediaFileId, changes) => {
+  const updateMediaFile = async (cmpMediaFileId, changes, options = {}) => {
     try {
-      const cmpMediaFile = await updateById(cmpMediaFileId, changes, true);
+      const cmpMediaFile = await updateById(cmpMediaFileId, changes, true, options);
       return Promise.resolve(cmpMediaFile);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateMediaFiles = async (criteria, changes) => {
+  const updateMediaFiles = async (criteria, changes, options = {}) => {
     try {
-      const cmpMediaFiles = await updateByCriteria(criteria, changes, true);
+      const cmpMediaFiles = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpMediaFiles);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteMediaFile = async (cmpMediaFileId) => {
+  const deleteMediaFile = async (cmpMediaFileId, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpMediaFile = await updateById(cmpMediaFileId, changes, true);
+      const cmpMediaFile = await updateById(cmpMediaFileId, changes, true, options);
       return Promise.resolve(cmpMediaFile);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteMediaFiles = async (criteria = {}) => {
+  const deleteMediaFiles = async (criteria = {}, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpMediaFiles = await updateByCriteria(criteria, changes, true);
+      const cmpMediaFiles = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpMediaFiles);
     } catch (error) {
       return Promise.reject(error);
@@ -211,9 +243,9 @@ export default (container) => {
     }
   };
 
-  const findMediaFiles = async (criteria = {}, excludeDeleted = true) => {
+  const findMediaFiles = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
-      const cmpMediaFiles = await getByCriteria(criteria, excludeDeleted);
+      const cmpMediaFiles = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpMediaFiles);
     } catch (error) {
       return Promise.reject(error);

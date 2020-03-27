@@ -61,6 +61,9 @@ export default (container) => {
       const cmpApiKey = mapCmpApiKey(rawCmpApiKey, excludeSecret);
       return Promise.resolve(cmpApiKey);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByIdUser(cmpApiKeyId, userId, excludeSecret, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -123,6 +126,9 @@ export default (container) => {
       const cmpApiKey = mapCmpApiKey(rawCmpApiKey, excludeSecret);
       return Promise.resolve(cmpApiKey);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByIdAdmin(cmpApiKeyId, excludeSecret, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -193,6 +199,9 @@ export default (container) => {
         .map(cmpApiKey => mapCmpApiKey(cmpApiKey, excludeSecret));
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteriaUser(criteria, userId, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -261,14 +270,18 @@ export default (container) => {
         .map(cmpApiKey => mapCmpApiKey(cmpApiKey, excludeSecret));
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (
-    criteria = {}, userId, excludeSecret = true, excludeDeleted = true, options = {},
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
   ) => {
     try {
+      const options = { limit: 1, offset: 0 };
       const cmpApiKeys = userId ? await getByCriteriaUser(
         criteria, userId, excludeSecret, excludeDeleted, options,
       ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
@@ -280,12 +293,16 @@ export default (container) => {
       const cmpApiKey = cmpApiKeys[0];
       return Promise.resolve(cmpApiKey);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getOneByCriteria(criteria, userId, excludeSecret, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
   const updateById = async (
     cmpApiKeyId, userId, changes = {}, excludeSecret = true, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpApiKey } = container.databaseService.models;
@@ -303,10 +320,17 @@ export default (container) => {
       const result = await CmpApiKey.update(changes, query);
       L.trace('CmpApiKey Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const apiKey = userId ? await getByIdUser(cmpApiKeyId, userId, excludeSecret, excludeDeleted)
         : await getByIdAdmin(cmpApiKeyId, excludeSecret, excludeDeleted);
       return Promise.resolve(apiKey);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpApiKeyId, userId, changes, excludeSecret, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -326,11 +350,18 @@ export default (container) => {
       const result = await CmpApiKey.update(changes, query);
       L.trace('CmpApiKey Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpApiKeys = userId ? await getByCriteriaUser(
         criteria, userId, excludeSecret, excludeDeleted, options,
       ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, userId, changes, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -431,6 +462,16 @@ export default (container) => {
       const cmpApiKey = mapCmpApiKey(rawCmpApiKey, excludeSecret);
       return Promise.resolve(cmpApiKey);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createApiKey(
+          name,
+          apiKey,
+          apiSecret,
+          signatureSecret,
+          signatureMethod,
+          excludeSecret,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -445,16 +486,23 @@ export default (container) => {
     }
   };
 
-  const updateApiKey = async (cmpApiKeyId, userId, changes, excludeSecret = true) => {
+  const updateApiKey = async (
+    cmpApiKeyId, userId, changes, excludeSecret = true,
+    options = {},
+  ) => {
     try {
-      const cmpApiKey = await updateById(cmpApiKeyId, userId, changes, excludeSecret, true);
+      const cmpApiKey = await updateById(
+        cmpApiKeyId, userId, changes, excludeSecret, true, options,
+      );
       return Promise.resolve(cmpApiKey);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateApiKeys = async (criteria, userId, changes, excludeSecret = true, options = {}) => {
+  const updateApiKeys = async (
+    criteria, userId, changes, excludeSecret = true, options = {},
+  ) => {
     try {
       const cmpApiKeys = await updateByCriteria(
         criteria, userId, changes, excludeSecret, true, options,
@@ -465,27 +513,39 @@ export default (container) => {
     }
   };
 
-  const deleteApiKey = async (cmpApiKeyId, userId, excludeSecret = true) => {
+  const deleteApiKey = async (
+    cmpApiKeyId, userId, excludeSecret = true,
+    options = { noGet: true },
+  ) => {
     try {
       const changes = { deleted: true };
-      const cmpApiKey = await updateById(cmpApiKeyId, userId, changes, excludeSecret, true);
+      const cmpApiKey = await updateById(
+        cmpApiKeyId, userId, changes, excludeSecret, true, options,
+      );
       return Promise.resolve(cmpApiKey);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteApiKeys = async (criteria = {}, userId, excludeSecret = true) => {
+  const deleteApiKeys = async (
+    criteria = {}, userId, excludeSecret = true,
+    options = { noGet: true },
+  ) => {
     try {
       const changes = { deleted: true };
-      const cmpApiKeys = await updateByCriteria(criteria, userId, changes, excludeSecret, true);
+      const cmpApiKeys = await updateByCriteria(
+        criteria, userId, changes, excludeSecret, true, options,
+      );
       return Promise.resolve(cmpApiKeys);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const findApiKey = async (criteria = {}, userId, excludeSecret = true, excludeDeleted = true) => {
+  const findApiKey = async (
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
+  ) => {
     try {
       const cmpApiKey = await getOneByCriteria(criteria, userId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpApiKey);

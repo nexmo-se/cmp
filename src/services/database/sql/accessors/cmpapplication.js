@@ -82,6 +82,9 @@ export default (container) => {
       const cmpApplication = mapCmpApplication(rawCmpApplication, excludeSecret);
       return Promise.resolve(cmpApplication);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByIdUser(cmpApplicationId, userId, excludeSecret, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -162,6 +165,9 @@ export default (container) => {
       const cmpApplication = mapCmpApplication(rawCmpApplication, excludeSecret);
       return Promise.resolve(cmpApplication);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByIdAdmin(cmpApplicationId, excludeSecret, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -251,6 +257,9 @@ export default (container) => {
         .map(cmpApplication => mapCmpApplication(cmpApplication, excludeSecret));
       return Promise.resolve(cmpApplications);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteriaUser(criteria, userId, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -337,14 +346,18 @@ export default (container) => {
         .map(cmpApplication => mapCmpApplication(cmpApplication, excludeSecret));
       return Promise.resolve(cmpApplications);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (
-    criteria = {}, userId, excludeSecret = true, excludeDeleted = true, options = {},
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
   ) => {
     try {
+      const options = { limit: 1, offset: 0 };
       const cmpApplications = userId ? await getByCriteriaUser(
         criteria, userId, excludeSecret, excludeDeleted, options,
       ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
@@ -362,6 +375,7 @@ export default (container) => {
 
   const updateById = async (
     cmpApplicationId, userId, changes = {}, excludeSecret = true, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpApplication } = container.databaseService.models;
@@ -379,11 +393,20 @@ export default (container) => {
       const result = await CmpApplication.update(changes, query);
       L.trace('CmpApplication Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpApplication = userId ? await getByIdUser(
         cmpApplicationId, userId, excludeSecret, excludeDeleted,
       ) : await getByIdAdmin(cmpApplicationId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpApplication);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(
+          cmpApplicationId, userId, changes, excludeSecret, excludeDeleted, options,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -403,11 +426,20 @@ export default (container) => {
       const result = await CmpApplication.update(changes, query);
       L.trace('CmpApplication Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpApplications = userId ? await getByCriteriaUser(
         criteria, userId, excludeSecret, excludeDeleted, options,
       ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpApplications);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(
+          criteria, userId, changes, excludeSecret, excludeDeleted, options,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -498,6 +530,15 @@ export default (container) => {
       const cmpApplication = mapCmpApplication(rawCmpApplication, excludeSecret);
       return Promise.resolve(cmpApplication);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createApplication(
+          name,
+          cmpApiKeyId,
+          applicationId,
+          privateKey,
+          excludeSecret,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -513,10 +554,13 @@ export default (container) => {
     }
   };
 
-  const updateApplication = async (cmpApplicationId, userId, changes, excludeSecret = true) => {
+  const updateApplication = async (
+    cmpApplicationId, userId, changes, excludeSecret = true,
+    options = {},
+  ) => {
     try {
       const cmpApplication = await updateById(
-        cmpApplicationId, userId, changes, excludeSecret, true,
+        cmpApplicationId, userId, changes, excludeSecret, true, options,
       );
       return Promise.resolve(cmpApplication);
     } catch (error) {
@@ -524,10 +568,13 @@ export default (container) => {
     }
   };
 
-  const updateApplications = async (criteria, userId, changes, excludeSecret = true) => {
+  const updateApplications = async (
+    criteria, userId, changes, excludeSecret = true,
+    options = {},
+  ) => {
     try {
       const cmpApplications = await updateByCriteria(
-        criteria, userId, changes, excludeSecret, true,
+        criteria, userId, changes, excludeSecret, true, options,
       );
       return Promise.resolve(cmpApplications);
     } catch (error) {
@@ -535,11 +582,14 @@ export default (container) => {
     }
   };
 
-  const deleteApplication = async (cmpApplicationId, userId, excludeSecret = true) => {
+  const deleteApplication = async (
+    cmpApplicationId, userId, excludeSecret = true,
+    options = {},
+  ) => {
     try {
       const changes = { deleted: true };
       const cmpApplication = await updateById(
-        cmpApplicationId, userId, changes, excludeSecret, true,
+        cmpApplicationId, userId, changes, excludeSecret, true, options,
       );
       return Promise.resolve(cmpApplication);
     } catch (error) {
@@ -547,11 +597,14 @@ export default (container) => {
     }
   };
 
-  const deleteApplications = async (criteria = {}, userId, excludeSecret = true) => {
+  const deleteApplications = async (
+    criteria = {}, userId, excludeSecret = true,
+    options = {},
+  ) => {
     try {
       const changes = { deleted: true };
       const cmpApplications = await updateByCriteria(
-        criteria, userId, changes, excludeSecret, true,
+        criteria, userId, changes, excludeSecret, true, options,
       );
       return Promise.resolve(cmpApplications);
     } catch (error) {

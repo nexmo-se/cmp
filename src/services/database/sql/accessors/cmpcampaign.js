@@ -37,6 +37,9 @@ export default (container) => {
       const cmpCampaign = mapCmpCampaign(rawCmpCampaign);
       return Promise.resolve(cmpCampaign);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpCampaignId, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -83,12 +86,16 @@ export default (container) => {
         .map(cmpCampaign => mapCmpCampaign(cmpCampaign));
       return Promise.resolve(cmpCampaigns);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
-  const getOneByCriteria = async (criteria = {}, excludeDeleted = true, options = {}) => {
+  const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
+      const options = { limit: 1, offset: 0 };
       const cmpCampaigns = await getByCriteria(criteria, excludeDeleted, options);
       if (cmpCampaigns == null || cmpCampaigns.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
@@ -98,12 +105,16 @@ export default (container) => {
       const cmpCampaign = cmpCampaigns[0];
       return Promise.resolve(cmpCampaign);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getOneByCriteria(criteria, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
   const updateById = async (
     cmpCampaignId, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpCampaign } = container.databaseService.models;
@@ -121,9 +132,16 @@ export default (container) => {
       const result = await CmpCampaign.update(changes, query);
       L.trace('CmpCampaign Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpCampaign = await getById(cmpCampaignId, excludeDeleted);
       return Promise.resolve(cmpCampaign);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpCampaignId, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -143,9 +161,16 @@ export default (container) => {
       const result = await CmpCampaign.update(changes, query);
       L.trace('CmpCampaign Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpCampaigns = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpCampaigns);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -217,6 +242,19 @@ export default (container) => {
       const cmpCampaign = mapCmpCampaign(rawCmpCampaign);
       return Promise.resolve(cmpCampaign);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createCampaign(
+          name,
+          campaignStartDate,
+          campaignEndDate,
+          activeStartHour,
+          activeStartMinute,
+          activeEndHour,
+          activeEndMinute,
+          activeOnWeekends,
+          timezone,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -230,9 +268,9 @@ export default (container) => {
     }
   };
 
-  const updateCampaign = async (cmpCampaignId, changes) => {
+  const updateCampaign = async (cmpCampaignId, changes, options = {}) => {
     try {
-      const cmpCampaign = await updateById(cmpCampaignId, changes, true);
+      const cmpCampaign = await updateById(cmpCampaignId, changes, true, options);
       return Promise.resolve(cmpCampaign);
     } catch (error) {
       return Promise.reject(error);
@@ -248,20 +286,20 @@ export default (container) => {
     }
   };
 
-  const deleteCampaign = async (cmpCampaignId) => {
+  const deleteCampaign = async (cmpCampaignId, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpCampaign = await updateById(cmpCampaignId, changes, true);
+      const cmpCampaign = await updateById(cmpCampaignId, changes, true, options);
       return Promise.resolve(cmpCampaign);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteCampaigns = async (criteria = {}) => {
+  const deleteCampaigns = async (criteria = {}, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpCampaigns = await updateByCriteria(criteria, changes, true);
+      const cmpCampaigns = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpCampaigns);
     } catch (error) {
       return Promise.reject(error);

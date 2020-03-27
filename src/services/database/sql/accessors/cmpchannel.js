@@ -100,6 +100,9 @@ export default (container) => {
       const cmpChannel = mapCmpChannel(rawCmpChannel, excludeSecret);
       return Promise.resolve(cmpChannel);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByIdUser(cmpChannelId, userId, excludeSecret, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -200,6 +203,9 @@ export default (container) => {
       const cmpChannel = mapCmpChannel(rawCmpChannel, excludeSecret);
       return Promise.resolve(cmpChannel);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByIdAdmin(cmpChannelId, excludeSecret, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -309,6 +315,9 @@ export default (container) => {
         .map(cmpChannel => mapCmpChannel(cmpChannel, excludeSecret));
       return Promise.resolve(cmpChannels);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteriaUser(criteria, userId, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -415,14 +424,18 @@ export default (container) => {
         .map(cmpChannel => mapCmpChannel(cmpChannel, excludeSecret));
       return Promise.resolve(cmpChannels);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (
-    criteria = {}, userId, excludeSecret = true, excludeDeleted = true, options = {},
+    criteria = {}, userId, excludeSecret = true, excludeDeleted = true,
   ) => {
     try {
+      const options = { limit: 1, offset: 0 };
       const cmpChannels = userId ? await getByCriteriaUser(
         criteria, userId, excludeSecret, excludeDeleted, options,
       ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
@@ -434,12 +447,16 @@ export default (container) => {
       const cmpChannel = cmpChannels[0];
       return Promise.resolve(cmpChannel);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getOneByCriteria(criteria, userId, excludeSecret, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
   const updateById = async (
     cmpChannelId, userId, changes = {}, excludeSecret = true, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpChannel } = container.databaseService.models;
@@ -457,11 +474,18 @@ export default (container) => {
       const result = await CmpChannel.update(changes, query);
       L.trace('CmpChannel Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpChannel = userId ? await getByIdUser(
         cmpChannelId, userId, excludeSecret, excludeDeleted,
       ) : await getByIdAdmin(cmpChannelId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpChannel);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpChannelId, userId, changes, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -481,11 +505,18 @@ export default (container) => {
       const result = await CmpChannel.update(changes, query);
       L.trace('CmpChannel Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpChannels = userId ? await getByCriteriaUser(
         criteria, userId, excludeSecret, excludeDeleted, options,
       ) : await getByCriteriaAdmin(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpChannels);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, userId, changes, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -603,6 +634,18 @@ export default (container) => {
       const cmpChannel = mapCmpChannel(rawCmpChannel, excludeSecret);
       return Promise.resolve(cmpChannel);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createChannel(
+          name,
+          channel,
+          senderId,
+          tps,
+          cmpApplicationId,
+          cmpApiKeyId,
+          smsUseSignature,
+          excludeSecret,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -618,9 +661,13 @@ export default (container) => {
     }
   };
 
-  const updateChannel = async (cmpChannelId, userId, changes, excludeSecret = true) => {
+  const updateChannel = async (
+    cmpChannelId, userId, changes, excludeSecret = true, options = {},
+  ) => {
     try {
-      const cmpChannel = await updateById(cmpChannelId, userId, changes, excludeSecret, true);
+      const cmpChannel = await updateById(
+        cmpChannelId, userId, changes, excludeSecret, true, options,
+      );
       return Promise.resolve(cmpChannel);
     } catch (error) {
       return Promise.reject(error);
@@ -640,20 +687,29 @@ export default (container) => {
     }
   };
 
-  const deleteChannel = async (cmpChannelId, userId, excludeSecret = true) => {
+  const deleteChannel = async (
+    cmpChannelId, userId, excludeSecret = true,
+    options = { noGet: true },
+  ) => {
     try {
       const changes = { deleted: true };
-      const cmpChannel = await updateById(cmpChannelId, userId, changes, excludeSecret, true);
+      const cmpChannel = await updateById(
+        cmpChannelId, userId, changes, excludeSecret, true, options,
+      );
       return Promise.resolve(cmpChannel);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteChannels = async (criteria = {}, userId, excludeSecret = true) => {
+  const deleteChannels = async (
+    criteria = {}, userId, excludeSecret = true, options = { noGet: true },
+  ) => {
     try {
       const changes = { deleted: true };
-      const cmpChannels = await updateByCriteria(criteria, userId, changes, excludeSecret, true);
+      const cmpChannels = await updateByCriteria(
+        criteria, userId, changes, excludeSecret, true, options,
+      );
       return Promise.resolve(cmpChannels);
     } catch (error) {
       return Promise.reject(error);
