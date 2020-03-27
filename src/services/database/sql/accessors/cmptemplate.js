@@ -57,6 +57,9 @@ export default (container) => {
       const cmpTemplate = mapCmpTemplate(rawCmpTemplate, excludeSecret);
       return Promise.resolve(cmpTemplate);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpTemplateId, excludeDeleted, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -123,14 +126,18 @@ export default (container) => {
         .map(cmpTemplate => mapCmpTemplate(cmpTemplate, excludeSecret));
       return Promise.resolve(cmpTemplates);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (
-    criteria = {}, excludeSecret = true, excludeDeleted = true, options = {},
+    criteria = {}, excludeSecret = true, excludeDeleted = true,
   ) => {
     try {
+      const options = { limit: 1, offset: 0 };
       const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted, options);
       if (cmpTemplates == null || cmpTemplates.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
@@ -146,6 +153,7 @@ export default (container) => {
 
   const updateById = async (
     cmpTemplateId, changes = {}, excludeSecret = true, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpTemplate } = container.databaseService.models;
@@ -163,9 +171,16 @@ export default (container) => {
       const result = await CmpTemplate.update(changes, query);
       L.trace('CmpTemplate Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpTemplate = await getById(cmpTemplateId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpTemplate);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpTemplateId, changes, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -185,9 +200,16 @@ export default (container) => {
       const result = await CmpTemplate.update(changes, query);
       L.trace('CmpTemplate Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpTemplates = await getByCriteria(criteria, excludeSecret, excludeDeleted, options);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -298,6 +320,20 @@ export default (container) => {
       const cmpTemplate = mapCmpTemplate(rawCmpTemplate, excludeSecret);
       return Promise.resolve(cmpTemplate);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createTemplate(
+          name,
+          cmpChannelId,
+          whatsappTemplateNamespace,
+          whatsappTemplateName,
+          viberTtl,
+          facebookTag,
+          category,
+          mediaType,
+          body,
+          excludeSecret,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -311,9 +347,9 @@ export default (container) => {
     }
   };
 
-  const updateTemplate = async (cmpTemplateId, changes, excludeSecret = true) => {
+  const updateTemplate = async (cmpTemplateId, changes, excludeSecret = true, options = {}) => {
     try {
-      const cmpTemplate = await updateById(cmpTemplateId, changes, excludeSecret, true);
+      const cmpTemplate = await updateById(cmpTemplateId, changes, excludeSecret, true, options);
       return Promise.resolve(cmpTemplate);
     } catch (error) {
       return Promise.reject(error);
@@ -329,20 +365,22 @@ export default (container) => {
     }
   };
 
-  const deleteTemplate = async (cmpTemplateId, excludeSecret = true) => {
+  const deleteTemplate = async (cmpTemplateId, excludeSecret = true, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpTemplate = await updateById(cmpTemplateId, changes, excludeSecret, true);
+      const cmpTemplate = await updateById(cmpTemplateId, changes, excludeSecret, true, options);
       return Promise.resolve(cmpTemplate);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteTemplates = async (criteria = {}, excludeSecret = true) => {
+  const deleteTemplates = async (
+    criteria = {}, excludeSecret = true, options = { noGet: true },
+  ) => {
     try {
       const changes = { deleted: true };
-      const cmpTemplates = await updateByCriteria(criteria, changes, excludeSecret, true);
+      const cmpTemplates = await updateByCriteria(criteria, changes, excludeSecret, true, options);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);

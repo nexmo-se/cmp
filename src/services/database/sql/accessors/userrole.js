@@ -24,11 +24,14 @@ export default (container) => {
       const userRole = mapUserRole(rawUserRole);
       return Promise.resolve(userRole);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(userRoleId, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
       const { UserRole } = container.databaseService.models;
       const query = { where: criteria };
@@ -38,17 +41,29 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      if (options && options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      if (options && options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawUserRoles = await UserRole.findAll(query);
       const userRoles = rawUserRoles.map(mapUserRole);
       return Promise.resolve(userRoles);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const userRoles = await getByCriteria(criteria, excludeDeleted);
+      const options = { limit: 1, offset: 0 };
+      const userRoles = await getByCriteria(criteria, excludeDeleted, options);
       if (userRoles == null || userRoles.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -61,7 +76,7 @@ export default (container) => {
     }
   };
 
-  const updateById = async (userRoleId, changes = {}, excludeDeleted = true) => {
+  const updateById = async (userRoleId, changes = {}, excludeDeleted = true, options = {}) => {
     try {
       const { UserRole } = container.databaseService.models;
       const query = {
@@ -78,14 +93,24 @@ export default (container) => {
       const result = await UserRole.update(changes, query);
       L.trace('UserRole Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const userRole = await getById(userRoleId, excludeDeleted);
       return Promise.resolve(userRole);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(userRoleId, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
-  const updateByCriteria = async (criteria = {}, changes = {}, excludeDeleted = true) => {
+  const updateByCriteria = async (
+    criteria = {}, changes = {}, excludeDeleted = true,
+    options = {},
+  ) => {
     try {
       const { UserRole } = container.databaseService.models;
       const query = { where: criteria };
@@ -98,9 +123,16 @@ export default (container) => {
       const result = await UserRole.update(changes, query);
       L.trace('UserRole Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const userRoles = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(userRoles);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -115,9 +147,9 @@ export default (container) => {
     return mappedUserRole;
   };
 
-  const listUserRoles = async () => {
+  const listUserRoles = async (options = {}) => {
     try {
-      const userRoles = await getByCriteria({}, true);
+      const userRoles = await getByCriteria({}, true, options);
       return Promise.resolve(userRoles);
     } catch (error) {
       return Promise.reject(error);
@@ -140,6 +172,9 @@ export default (container) => {
       const userRole = mapUserRole(rawUserRole);
       return Promise.resolve(userRole);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createUserRole(user, role);
+      }
       return Promise.reject(error);
     }
   };
@@ -153,38 +188,38 @@ export default (container) => {
     }
   };
 
-  const updateUserRole = async (userRoleId, changes) => {
+  const updateUserRole = async (userRoleId, changes, options = {}) => {
     try {
-      const userRole = await updateById(userRoleId, changes, true);
+      const userRole = await updateById(userRoleId, changes, true, options);
       return Promise.resolve(userRole);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const updateUserRoles = async (criteria, changes) => {
+  const updateUserRoles = async (criteria, changes, options = {}) => {
     try {
-      const userRoles = await updateByCriteria(criteria, changes, true);
+      const userRoles = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(userRoles);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteUserRole = async (userRoleId) => {
+  const deleteUserRole = async (userRoleId, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const userRole = await updateById(userRoleId, changes, true);
+      const userRole = await updateById(userRoleId, changes, true, options);
       return Promise.resolve(userRole);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteUserRoles = async (criteria = {}) => {
+  const deleteUserRoles = async (criteria = {}, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const userRoles = await updateByCriteria(criteria, changes, true);
+      const userRoles = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(userRoles);
     } catch (error) {
       return Promise.reject(error);
@@ -200,9 +235,9 @@ export default (container) => {
     }
   };
 
-  const findUserRoles = async (criteria = {}, excludeDeleted = true) => {
+  const findUserRoles = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
-      const userRoles = await getByCriteria(criteria, excludeDeleted);
+      const userRoles = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(userRoles);
     } catch (error) {
       return Promise.reject(error);

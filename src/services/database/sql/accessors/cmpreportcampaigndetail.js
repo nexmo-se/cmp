@@ -29,11 +29,16 @@ export default (container) => {
       );
       return Promise.resolve(cmpReportCampaignDetail);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpReportCampaignDetailId, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (
+    criteria = {}, excludeDeleted = true, options = {},
+  ) => {
     try {
       const {
         CmpReportCampaignDetail,
@@ -47,6 +52,14 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      if (options && options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      if (options && options.offset && options.offset > 0) {
+        query.offset = options.offset;
+      }
+
       const rawCmpReportCampaignDetails = await CmpReportCampaignDetail
         .findAll(query);
       const cmpReportCampaignDetails = rawCmpReportCampaignDetails
@@ -55,13 +68,17 @@ export default (container) => {
         ));
       return Promise.resolve(cmpReportCampaignDetails);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const cmpReportCampaignDetails = await getByCriteria(criteria, excludeDeleted);
+      const options = { limit: 1, offset: 0 };
+      const cmpReportCampaignDetails = await getByCriteria(criteria, excludeDeleted, options);
       if (cmpReportCampaignDetails == null
         || cmpReportCampaignDetails.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
@@ -77,6 +94,7 @@ export default (container) => {
 
   const updateById = async (
     cmpReportCampaignDetailId, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpReportCampaignDetail } = container.databaseService.models;
@@ -94,15 +112,23 @@ export default (container) => {
       const result = await CmpReportCampaignDetail.update(changes, query);
       L.trace('CmpReportCampaignDetail Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpMedia = await getById(cmpReportCampaignDetailId, excludeDeleted);
       return Promise.resolve(cmpMedia);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpReportCampaignDetailId, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const updateByCriteria = async (
     criteria = {}, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpReportCampaignDetail } = container.databaseService.models;
@@ -116,9 +142,16 @@ export default (container) => {
       const result = await CmpReportCampaignDetail.update(changes, query);
       L.trace('CmpReportCampaignDetail Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpReportCampaignDetails = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpReportCampaignDetails);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -133,9 +166,9 @@ export default (container) => {
     return mappedCmpReportCampaignDetail;
   };
 
-  const listReportCampaignDetails = async () => {
+  const listReportCampaignDetails = async (options = {}) => {
     try {
-      const cmpReportCampaignDetails = await getByCriteria({}, true);
+      const cmpReportCampaignDetails = await getByCriteria({}, true, options);
       return Promise.resolve(cmpReportCampaignDetails);
     } catch (error) {
       return Promise.reject(error);
@@ -162,6 +195,13 @@ export default (container) => {
       );
       return Promise.resolve(cmpReportCampaignDetail);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createReportCampaignDetail(
+          cmpCampaignId,
+          from,
+          to,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -177,10 +217,10 @@ export default (container) => {
     }
   };
 
-  const updateReportCampaignDetail = async (cmpReportCampaignDetailId, changes) => {
+  const updateReportCampaignDetail = async (cmpReportCampaignDetailId, changes, options = {}) => {
     try {
       const cmpReportCampaignDetail = await updateById(
-        cmpReportCampaignDetailId, changes, true,
+        cmpReportCampaignDetailId, changes, true, options,
       );
       return Promise.resolve(cmpReportCampaignDetail);
     } catch (error) {
@@ -188,20 +228,22 @@ export default (container) => {
     }
   };
 
-  const updateReportCampaignDetails = async (criteria, changes) => {
+  const updateReportCampaignDetails = async (criteria, changes, options = {}) => {
     try {
-      const cmpReportCampaignDetails = await updateByCriteria(criteria, changes, true);
+      const cmpReportCampaignDetails = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpReportCampaignDetails);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteReportCampaignDetail = async (cmpReportCampaignDetailId) => {
+  const deleteReportCampaignDetail = async (
+    cmpReportCampaignDetailId, options = { noGet: true },
+  ) => {
     try {
       const changes = { deleted: true };
       const cmpReportCampaignDetail = await updateById(
-        cmpReportCampaignDetailId, changes, true,
+        cmpReportCampaignDetailId, changes, true, options,
       );
       return Promise.resolve(cmpReportCampaignDetail);
     } catch (error) {
@@ -209,10 +251,10 @@ export default (container) => {
     }
   };
 
-  const deleteReportCampaignDetails = async (criteria = {}) => {
+  const deleteReportCampaignDetails = async (criteria = {}, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpReportCampaignDetails = await updateByCriteria(criteria, changes, true);
+      const cmpReportCampaignDetails = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpReportCampaignDetails);
     } catch (error) {
       return Promise.reject(error);
@@ -228,9 +270,9 @@ export default (container) => {
     }
   };
 
-  const findReportCampaignDetails = async (criteria = {}, excludeDeleted = true) => {
+  const findReportCampaignDetails = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
-      const cmpReportCampaignDetails = await getByCriteria(criteria, excludeDeleted);
+      const cmpReportCampaignDetails = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpReportCampaignDetails);
     } catch (error) {
       return Promise.reject(error);

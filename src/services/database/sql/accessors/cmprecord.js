@@ -207,6 +207,9 @@ export default (container) => {
       const cmpRecord = mapCmpRecord(rawCmpRecord, excludeSecret);
       return Promise.resolve(cmpRecord);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpRecordId, excludeSecret, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -423,6 +426,9 @@ export default (container) => {
         .map(cmpRecord => mapCmpRecord(cmpRecord, excludeSecret));
       return Promise.resolve(cmpRecords);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -430,9 +436,9 @@ export default (container) => {
   const getOneByCriteria = async (
     criteria = {},
     excludeSecret = true, excludeDeleted = true,
-    options = {},
   ) => {
     try {
+      const options = { limit: 1, offset: 0 };
       const cmpRecords = await getByCriteria(
         criteria, excludeSecret, excludeDeleted, options,
       );
@@ -450,6 +456,7 @@ export default (container) => {
 
   const updateById = async (
     cmpRecordId, changes = {}, excludeSecret = true, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpRecord } = container.databaseService.models;
@@ -467,9 +474,16 @@ export default (container) => {
       const result = await CmpRecord.update(changes, query);
       L.trace('CmpRecord Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpRecord = await getById(cmpRecordId, excludeSecret, excludeDeleted);
       return Promise.resolve(cmpRecord);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpRecordId, changes, excludeSecret, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -490,6 +504,10 @@ export default (container) => {
 
       const result = await CmpRecord.update(changes, query);
       L.trace('CmpRecord Update Result', result);
+
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
 
       if (includeGet) {
         L.trace('Getting Updated CmpRecords');
@@ -832,6 +850,9 @@ export default (container) => {
       );
       return Promise.resolve(cmpRecords);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createRecordBatch(records, excludeSecret);
+      }
       return Promise.reject(error);
     }
   };
@@ -876,6 +897,21 @@ export default (container) => {
       const cmpRecord = mapCmpRecord(rawCmpRecord, excludeSecret);
       return Promise.resolve(cmpRecord);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createRecord(
+          recipient,
+          cmpCampaignId,
+          cmpTemplateId,
+          cmpMediaId,
+          activeStartHour,
+          activeStartMinute,
+          activeEndHour,
+          activeEndMinute,
+          activeOnWeekends,
+          timezone,
+          excludeSecret,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -889,9 +925,9 @@ export default (container) => {
     }
   };
 
-  const updateRecord = async (cmpRecordId, changes, excludeSecret = true) => {
+  const updateRecord = async (cmpRecordId, changes, excludeSecret = true, options = {}) => {
     try {
-      const cmpRecord = await updateById(cmpRecordId, changes, excludeSecret, true);
+      const cmpRecord = await updateById(cmpRecordId, changes, excludeSecret, true, options);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
@@ -912,20 +948,22 @@ export default (container) => {
     }
   };
 
-  const deleteRecord = async (cmpRecordId, excludeSecret = true) => {
+  const deleteRecord = async (cmpRecordId, excludeSecret = true, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpRecord = await updateById(cmpRecordId, changes, excludeSecret, true);
+      const cmpRecord = await updateById(cmpRecordId, changes, excludeSecret, true, options);
       return Promise.resolve(cmpRecord);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteRecords = async (criteria = {}, excludeSecret = true) => {
+  const deleteRecords = async (criteria = {}, excludeSecret = true, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpRecords = await updateByCriteria(criteria, changes, excludeSecret, true, true);
+      const cmpRecords = await updateByCriteria(
+        criteria, changes, excludeSecret, true, true, options,
+      );
       return Promise.resolve(cmpRecords);
     } catch (error) {
       return Promise.reject(error);
@@ -1171,6 +1209,9 @@ export default (container) => {
         .map(cmpRecord => mapCmpRecord(cmpRecord, excludeSecret));
       return Promise.resolve(cmpRecords);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getActiveRecords(limit, currentTime, excludeSecret);
+      }
       return Promise.reject(error);
     }
   };
@@ -1190,6 +1231,9 @@ export default (container) => {
       const count = await CmpRecord.count(query);
       return Promise.resolve(count);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return countPendingRecordsByCampaignId(campaignId);
+      }
       return Promise.reject(error);
     }
   };
@@ -1209,6 +1253,9 @@ export default (container) => {
       const count = await CmpRecord.count(query);
       return Promise.resolve(count);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return countPendingAndQueuingRecordsByCampaignId(campaignId);
+      }
       return Promise.reject(error);
     }
   };

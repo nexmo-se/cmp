@@ -26,6 +26,9 @@ export default (container) => {
       const cmpRecordMessage = mapCmpRecordMessage(rawCmpRecordMessage);
       return Promise.resolve(cmpRecordMessage);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpRecordMessageId, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -62,6 +65,9 @@ export default (container) => {
         .map(cmpRecordMessage => mapCmpRecordMessage(cmpRecordMessage));
       return Promise.resolve(cmpRecordMessages);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -109,6 +115,9 @@ export default (container) => {
       const cmpRecordMessage = await getById(cmpRecordMessageId, excludeDeleted);
       return Promise.resolve(cmpRecordMessage);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpRecordMessageId, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -136,6 +145,9 @@ export default (container) => {
       const cmpRecordMessages = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpRecordMessages);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -183,6 +195,9 @@ export default (container) => {
       const cmpRecordMessages = rawCreatedRecordMessages.map(mapCmpRecordMessage);
       return Promise.resolve(cmpRecordMessages);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createRecordMessageBulk(records);
+      }
       return Promise.reject(error);
     }
   };
@@ -205,6 +220,9 @@ export default (container) => {
       const cmpRecordMessage = mapCmpRecordMessage(rawCmpRecordMessage);
       return Promise.resolve(cmpRecordMessage);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createRecordMessage(cmpRecordId, messageId);
+      }
       return Promise.reject(error);
     }
   };

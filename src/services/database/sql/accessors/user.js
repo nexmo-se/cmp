@@ -34,6 +34,9 @@ export default (container) => {
       const userRole = mapUser(rawUser, excludePassword);
       return Promise.resolve(userRole);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(userId, excludePassword, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
@@ -76,14 +79,18 @@ export default (container) => {
       const users = rawUsers.map(user => mapUser(user, excludePassword));
       return Promise.resolve(users);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludePassword, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (
-    criteria = {}, excludePassword = true, excludeDeleted = true, options = {},
+    criteria = {}, excludePassword = true, excludeDeleted = true,
   ) => {
     try {
+      const options = { limit: 1, offset: 0 };
       const users = await getByCriteria(criteria, excludePassword, excludeDeleted, options);
       if (users == null || users.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
@@ -97,7 +104,10 @@ export default (container) => {
     }
   };
 
-  const updateById = async (userId, changes, excludePassword = true, excludeDeleted = true) => {
+  const updateById = async (
+    userId, changes, excludePassword = true, excludeDeleted = true,
+    options = {},
+  ) => {
     try {
       const { User } = container.databaseService.models;
       const query = {
@@ -114,9 +124,16 @@ export default (container) => {
       const result = await User.update(changes, query);
       L.trace('User Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const user = await getById(userId, excludePassword, excludeDeleted);
       return Promise.resolve(user);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(userId, changes, excludePassword, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -136,9 +153,16 @@ export default (container) => {
       const result = await User.update(changes, query);
       L.trace('User Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const users = await getByCriteria(criteria, excludePassword, excludeDeleted, options);
       return Promise.resolve(users);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludePassword, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -201,6 +225,16 @@ export default (container) => {
       const mappedUser = mapUser(rawUser, excludePassword);
       return Promise.resolve(mappedUser);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createUser(
+          username,
+          passwordHash,
+          passwordSalt,
+          firstName,
+          lastName,
+          excludePassword,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -214,9 +248,9 @@ export default (container) => {
     }
   };
 
-  const updateUser = async (userId, changes = {}, excludePassword = true) => {
+  const updateUser = async (userId, changes = {}, excludePassword = true, options = {}) => {
     try {
-      const user = await updateById(userId, changes, excludePassword, true);
+      const user = await updateById(userId, changes, excludePassword, true, options);
       return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);
@@ -234,20 +268,20 @@ export default (container) => {
     }
   };
 
-  const deleteUser = async (userId, excludePassword = true) => {
+  const deleteUser = async (userId, excludePassword = true, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const user = await updateById(userId, changes, excludePassword, true);
+      const user = await updateById(userId, changes, excludePassword, true, options);
       return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteUsers = async (criteria = {}, excludePassword = true) => {
+  const deleteUsers = async (criteria = {}, excludePassword = true, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const users = await updateByCriteria(criteria, changes, excludePassword, true);
+      const users = await updateByCriteria(criteria, changes, excludePassword, true, options);
       return Promise.resolve(users);
     } catch (error) {
       return Promise.reject(error);
@@ -255,10 +289,10 @@ export default (container) => {
   };
 
   const findUser = async (
-    criteria = {}, excludePassword = true, excludeDeleted = true, options = {},
+    criteria = {}, excludePassword = true, excludeDeleted = true,
   ) => {
     try {
-      const user = await getOneByCriteria(criteria, excludePassword, excludeDeleted, options);
+      const user = await getOneByCriteria(criteria, excludePassword, excludeDeleted);
       return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);

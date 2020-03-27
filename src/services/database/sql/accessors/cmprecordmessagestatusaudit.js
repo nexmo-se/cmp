@@ -50,11 +50,14 @@ export default (container) => {
       );
       return Promise.resolve(cmpRecordMessageStatusAudit);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getById(cmpRecordMessageStatusAuditId, excludeDeleted);
+      }
       return Promise.reject(error);
     }
   };
 
-  const getByCriteria = async (criteria = {}, excludeDeleted = true) => {
+  const getByCriteria = async (criteria = {}, excludeDeleted = true, options = {}) => {
     try {
       const {
         CmpRecordMessageStatusAudit,
@@ -90,6 +93,14 @@ export default (container) => {
         query.where.deleted = false;
       }
 
+      if (options && options.limit && options.limit > 0) {
+        query.limit = options.limit;
+      }
+
+      if (options && options.offset && options.offset > 0) {
+        query.options = options.offset;
+      }
+
       const rawCmpRecordMessageStatusAudits = await CmpRecordMessageStatusAudit.findAll(query);
       const cmpRecordMessageStatusAudits = rawCmpRecordMessageStatusAudits
         .map(cmpRecordMessageStatusAudit => mapCmpRecordMessageStatusAudit(
@@ -97,13 +108,17 @@ export default (container) => {
         ));
       return Promise.resolve(cmpRecordMessageStatusAudits);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return getByCriteria(criteria, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const getOneByCriteria = async (criteria = {}, excludeDeleted = true) => {
     try {
-      const cmpRecordMessageStatusAudits = await getByCriteria(criteria, excludeDeleted);
+      const options = { limit: 1, offset: 0 };
+      const cmpRecordMessageStatusAudits = await getByCriteria(criteria, excludeDeleted, options);
       if (cmpRecordMessageStatusAudits == null || cmpRecordMessageStatusAudits.length === 0) {
         L.trace('Empty result when trying to Get One by Criteria, returning null');
         return Promise.resolve(null);
@@ -118,6 +133,7 @@ export default (container) => {
 
   const updateById = async (
     cmpRecordMessageStatusAuditId, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpRecordMessageStatusAudit } = container.databaseService.models;
@@ -135,17 +151,25 @@ export default (container) => {
       const result = await CmpRecordMessageStatusAudit.update(changes, query);
       L.trace('CmpRecordMessageStatusAudit Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpRecordMessageStatusAudit = await getById(
         cmpRecordMessageStatusAuditId, excludeDeleted,
       );
       return Promise.resolve(cmpRecordMessageStatusAudit);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateById(cmpRecordMessageStatusAuditId, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
 
   const updateByCriteria = async (
     criteria = {}, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpRecordMessageStatusAudit } = container.databaseService.models;
@@ -159,9 +183,16 @@ export default (container) => {
       const result = await CmpRecordMessageStatusAudit.update(changes, query);
       L.trace('CmpRecordMessageStatusAudit Update Result', result);
 
+      if (options && options.noGet) {
+        return Promise.resolve();
+      }
+
       const cmpRecordMessageStatusAudits = await getByCriteria(criteria, excludeDeleted);
       return Promise.resolve(cmpRecordMessageStatusAudits);
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return updateByCriteria(criteria, changes, excludeDeleted, options);
+      }
       return Promise.reject(error);
     }
   };
@@ -206,9 +237,9 @@ export default (container) => {
     return mappedCmpRMSAudit;
   };
 
-  const listRecordMessageStatusAudits = async () => {
+  const listRecordMessageStatusAudits = async (options = {}) => {
     try {
-      const cmpRecordMessageStatusAudits = await getByCriteria({}, true);
+      const cmpRecordMessageStatusAudits = await getByCriteria({}, true, options);
       return Promise.resolve(cmpRecordMessageStatusAudits);
     } catch (error) {
       return Promise.reject(error);
@@ -230,6 +261,9 @@ export default (container) => {
       await CmpRecordMessageStatusAudit.bulkCreate(createableAudits);
       return Promise.resolve();
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createRecordMessageStatusAuditBatch(audits);
+      }
       return Promise.reject(error);
     }
   };
@@ -254,6 +288,15 @@ export default (container) => {
 
       return Promise.resolve();
     } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createRecordMessageStatusAudit(
+          id,
+          cmpRecordMessageId,
+          messageType,
+          cmpRecordMessageStatusAuditSmsId,
+          cmpRecordMessageStatusAuditMapiId,
+        );
+      }
       return Promise.reject(error);
     }
   };
@@ -267,11 +310,13 @@ export default (container) => {
     }
   };
 
-  const deleteRecordMessageStatusAudit = async (cmpRecordMessageStatusAuditId) => {
+  const deleteRecordMessageStatusAudit = async (
+    cmpRecordMessageStatusAuditId, options = { noGet: true },
+  ) => {
     try {
       const changes = { deleted: true };
       const cmpRecordMessageStatusAudit = await updateById(
-        cmpRecordMessageStatusAuditId, changes, true,
+        cmpRecordMessageStatusAuditId, changes, true, options,
       );
       return Promise.resolve(cmpRecordMessageStatusAudit);
     } catch (error) {
@@ -279,10 +324,10 @@ export default (container) => {
     }
   };
 
-  const deleteRecordMessageStatusAudits = async (criteria = {}) => {
+  const deleteRecordMessageStatusAudits = async (criteria = {}, options = { noGet: true }) => {
     try {
       const changes = { deleted: true };
-      const cmpRecordMessageStatusAudits = await updateByCriteria(criteria, changes, true);
+      const cmpRecordMessageStatusAudits = await updateByCriteria(criteria, changes, true, options);
       return Promise.resolve(cmpRecordMessageStatusAudits);
     } catch (error) {
       return Promise.reject(error);
@@ -298,9 +343,11 @@ export default (container) => {
     }
   };
 
-  const findRecordMessageStatusAudits = async (criteria = {}, excludeDeleted = true) => {
+  const findRecordMessageStatusAudits = async (
+    criteria = {}, excludeDeleted = true, options = {},
+  ) => {
     try {
-      const cmpRecordMessageStatusAudits = await getByCriteria(criteria, excludeDeleted);
+      const cmpRecordMessageStatusAudits = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpRecordMessageStatusAudits);
     } catch (error) {
       return Promise.reject(error);
