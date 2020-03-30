@@ -41,22 +41,6 @@ export default {
     useMockSms: (process.env.USE_MOCK_SMS || 'false').toLowerCase() === 'true',
     useMockWhatsapp: (process.env.USE_MOCK_WHATSAPP || 'false').toLowerCase() === 'true',
   },
-  log4js: {
-    appenders: {
-      out: {
-        type: 'stdout',
-      },
-      everything: {
-        type: 'dateFile', filename: 'logs/log.log',
-      },
-    },
-    categories: {
-      default: {
-        appenders: ['out', 'everything'],
-        level: process.env.LOGGING_LEVEL || 'info',
-      },
-    },
-  },
   database: {
     name: process.env.DATABASE_NAME || '',
     username: process.env.DATABASE_USERNAME || '',
@@ -66,6 +50,12 @@ export default {
     dialect: (process.env.DATABASE_DIALECT || 'mysql').toLowerCase(),
     useSsl: (process.env.DATABASE_USE_SSL || 'false').toLowerCase() === 'true',
     logging: (process.env.DATABASE_LOGGING || 'false').toLowerCase() === 'true',
+  },
+  logger: {
+    logToFile: (process.env.LOG_TO_FILE || 'false').toLowerCase() === 'true',
+    logToConsole: (process.env.LOG_TO_CONSOLE || 'true').toLowerCase() === 'true',
+    logFile: process.env.LOG_FILE,
+    logLevel: process.env.LOGGING_LEVEL || 'info',
   },
   enableSequelizeLog: false,
   forceSequelizeSync: false,
