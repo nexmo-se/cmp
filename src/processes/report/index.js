@@ -7,6 +7,17 @@ export default (container) => {
   const summaryReporter = SummaryReporter(container);
   const campaignDetailReporter = CampaignDetailReporter(container);
 
+  const ReportTypes = {
+    overallSummary: 'overall_summary',
+    campaignSummary: 'campaign_summary',
+    campaignDetail: 'campaign_detail',
+  };
+  const ReportGenerators = {
+    [ReportTypes.overallSummary]: summaryReporter.generateOverall,
+    [ReportTypes.campaignSummary]: summaryReporter.generateCampaign,
+    [ReportTypes.campaignDetail]: campaignDetailReporter.generateCampaign,
+  };
+
   const wait = duration => new Promise(resolve => setTimeout(resolve, duration));
 
   const runSingle = async () => {
