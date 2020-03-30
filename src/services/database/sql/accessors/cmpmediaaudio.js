@@ -135,7 +135,7 @@ export default (container) => {
         return Promise.resolve();
       }
 
-      const cmpMediaAudios = await getByCriteria(criteria, excludeDeleted);
+      const cmpMediaAudios = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpMediaAudios);
     } catch (error) {
       if (error.name === 'SequelizeConnectionAcquireTimeoutError') {

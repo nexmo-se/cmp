@@ -187,7 +187,7 @@ export default (container) => {
         return Promise.resolve();
       }
 
-      const cmpRecordMessageStatusAudits = await getByCriteria(criteria, excludeDeleted);
+      const cmpRecordMessageStatusAudits = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpRecordMessageStatusAudits);
     } catch (error) {
       if (error.name === 'SequelizeConnectionAcquireTimeoutError') {

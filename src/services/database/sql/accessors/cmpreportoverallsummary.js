@@ -144,7 +144,7 @@ export default (container) => {
         return Promise.resolve();
       }
 
-      const cmpReportOverallSummaries = await getByCriteria(criteria, excludeDeleted);
+      const cmpReportOverallSummaries = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpReportOverallSummaries);
     } catch (error) {
       if (error.name === 'SequelizeConnectionAcquireTimeoutError') {

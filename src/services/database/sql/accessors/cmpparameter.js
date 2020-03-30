@@ -135,7 +135,7 @@ export default (container) => {
         return Promise.resolve();
       }
 
-      const cmpParameters = await getByCriteria(criteria, excludeDeleted);
+      const cmpParameters = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpParameters);
     } catch (error) {
       if (error.name === 'SequelizeConnectionAcquireTimeoutError') {

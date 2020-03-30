@@ -136,7 +136,7 @@ export default (container) => {
         return Promise.resolve();
       }
 
-      const cmpMediaViberTemplates = await getByCriteria(criteria, excludeDeleted);
+      const cmpMediaViberTemplates = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(cmpMediaViberTemplates);
     } catch (error) {
       if (error.name === 'SequelizeConnectionAcquireTimeoutError') {

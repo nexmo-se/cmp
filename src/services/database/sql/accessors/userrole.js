@@ -127,7 +127,7 @@ export default (container) => {
         return Promise.resolve();
       }
 
-      const userRoles = await getByCriteria(criteria, excludeDeleted);
+      const userRoles = await getByCriteria(criteria, excludeDeleted, options);
       return Promise.resolve(userRoles);
     } catch (error) {
       if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
