@@ -30,6 +30,7 @@ export default {
   },
   report: {
     delay: parseInt(process.env.REPORT_DELAY || '5', 10),
+    filePath: process.env.REPORT_FILE_PATH,
   },
   nexmo: {
     host: process.env.NEXMO_API,
