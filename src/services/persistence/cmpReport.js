@@ -8,6 +8,10 @@ export default (container) => {
   };
 
   const mapReport = (report) => {
+    if (report == null) {
+      return null;
+    }
+
     const reportData = report;
 
     if (report.type === ReportTypes.overallSummary) {
