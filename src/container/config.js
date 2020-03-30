@@ -28,6 +28,9 @@ export default {
     recordsPerBatch: parseInt(process.env.RECORDS_PER_BATCH || '30', 10),
     useMockBlast: (process.env.USE_MOCK_BLAST || 'false').toLowerCase() === 'true',
   },
+  report: {
+    delay: parseInt(process.env.REPORT_DELAY || '5', 10),
+  },
   nexmo: {
     host: process.env.NEXMO_API,
     restHost: process.env.NEXMO_REST_API,

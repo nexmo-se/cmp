@@ -29,6 +29,7 @@ import BadRequestError from '../errors/badRequestError';
 
 import BlasterProcess from '../processes/blaster';
 import PickerProcess from '../processes/picker';
+import ReportProcess from '../processes/report';
 
 import NexmoService from '../services/nexmo';
 import SocketIoService from '../services/socketIO';
@@ -119,5 +120,6 @@ container.reportService = ReportService(container);
 // Process
 container.blasterProcess = BlasterProcess(container);
 container.pickerProcess = PickerProcess(container);
+container.reportProcess = ReportProcess(container);
 
 export default container;
