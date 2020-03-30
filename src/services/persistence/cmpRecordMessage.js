@@ -1,10 +1,10 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp RecordMessage Persistence Accessor');
 
-  const listRecordMessages = async () => {
+  const listRecordMessages = async (options = {}) => {
     try {
       const { CmpRecordMessage } = container.databaseService.accessors;
-      const cmpRecordMessages = await CmpRecordMessage.listRecordMessages();
+      const cmpRecordMessages = await CmpRecordMessage.listRecordMessages(options);
       return Promise.resolve(cmpRecordMessages);
     } catch (error) {
       return Promise.reject(error);
@@ -71,7 +71,7 @@ export default (container) => {
     }
   };
 
-  const deleteRecordMessage = async (cmpRecordMessageId, options = {}) => {
+  const deleteRecordMessage = async (cmpRecordMessageId, options = { noGet: true }) => {
     try {
       const { CmpRecordMessage } = container.databaseService.accessors;
       const cmpRecordMessage = await CmpRecordMessage.deleteRecordMessage(
@@ -83,7 +83,7 @@ export default (container) => {
     }
   };
 
-  const deleteRecordMessages = async (criteria, options = {}) => {
+  const deleteRecordMessages = async (criteria, options = { noGet: true }) => {
     try {
       const { CmpRecordMessage } = container.databaseService.accessors;
       const cmpRecordMessages = await CmpRecordMessage.deleteRecordMessages(

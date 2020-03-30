@@ -73,11 +73,11 @@ export default (container) => {
     }
   };
 
-  const updateTemplate = async (cmpTemplateId, changes, excludeSecret = true) => {
+  const updateTemplate = async (cmpTemplateId, changes, excludeSecret = true, options = {}) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
       const cmpTemplate = await CmpTemplate.updateTemplate(
-        cmpTemplateId, changes, excludeSecret,
+        cmpTemplateId, changes, excludeSecret, options,
       );
       return Promise.resolve(cmpTemplate);
     } catch (error) {
@@ -97,20 +97,20 @@ export default (container) => {
     }
   };
 
-  const deleteTemplate = async (cmpTemplateId, excludeSecret = true) => {
+  const deleteTemplate = async (cmpTemplateId, excludeSecret = true, options = { noGet: true }) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
-      const cmpTemplate = await CmpTemplate.deleteTemplate(cmpTemplateId, excludeSecret);
+      const cmpTemplate = await CmpTemplate.deleteTemplate(cmpTemplateId, excludeSecret, options);
       return Promise.resolve(cmpTemplate);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteTemplates = async (criteria, excludeSecret = true) => {
+  const deleteTemplates = async (criteria, excludeSecret = true, options = { noGet: true }) => {
     try {
       const { CmpTemplate } = container.databaseService.accessors;
-      const cmpTemplates = await CmpTemplate.deleteTemplates(criteria, excludeSecret);
+      const cmpTemplates = await CmpTemplate.deleteTemplates(criteria, excludeSecret, options);
       return Promise.resolve(cmpTemplates);
     } catch (error) {
       return Promise.reject(error);

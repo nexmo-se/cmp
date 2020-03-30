@@ -166,11 +166,11 @@ export default (container) => {
     }
   };
 
-  const updateReport = async (cmpReportId, changes) => {
+  const updateReport = async (cmpReportId, changes, options = {}) => {
     try {
       const { CmpReport } = container.databaseService.accessors;
       const cmpReport = await CmpReport.updateReport(
-        cmpReportId, changes,
+        cmpReportId, changes, options,
       );
       const mappedCmpReport = mapReport(cmpReport);
       return Promise.resolve(mappedCmpReport);
@@ -192,10 +192,10 @@ export default (container) => {
     }
   };
 
-  const deleteReport = async (cmpReportId) => {
+  const deleteReport = async (cmpReportId, options = { noGet: true }) => {
     try {
       const { CmpReport } = container.databaseService.accessors;
-      const cmpReport = await CmpReport.deleteReport(cmpReportId);
+      const cmpReport = await CmpReport.deleteReport(cmpReportId, options);
       const mappedCmpReport = mapReport(cmpReport);
       return Promise.resolve(mappedCmpReport);
     } catch (error) {
@@ -203,10 +203,10 @@ export default (container) => {
     }
   };
 
-  const deleteReports = async (criteria) => {
+  const deleteReports = async (criteria, options = { noGet: true }) => {
     try {
       const { CmpReport } = container.databaseService.accessors;
-      const cmpReports = await CmpReport.deleteReports(criteria);
+      const cmpReports = await CmpReport.deleteReports(criteria, options);
       const mappedCmpReports = cmpReports.map(mapReport);
       return Promise.resolve(mappedCmpReports);
     } catch (error) {

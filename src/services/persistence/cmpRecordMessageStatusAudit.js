@@ -18,11 +18,11 @@ export default (container) => {
     return mappedRmsAuditData;
   };
 
-  const listRecordMessageStatusAudits = async () => {
+  const listRecordMessageStatusAudits = async (options = {}) => {
     try {
       const { CmpRecordMessageStatusAudit } = container.databaseService.accessors;
       const cmpRecordMessageStatusAudits = await CmpRecordMessageStatusAudit
-        .listRecordMessageStatusAudits();
+        .listRecordMessageStatusAudits(options);
       const mappedCmpRecordMessageStatusAudits = cmpRecordMessageStatusAudits
         .map(mapRecordMessageStatusAudit);
       return Promise.resolve(mappedCmpRecordMessageStatusAudits);
@@ -229,11 +229,13 @@ export default (container) => {
     }
   };
 
-  const deleteRecordMessageStatusAudit = async (cmpRecordMessageStatusAuditId) => {
+  const deleteRecordMessageStatusAudit = async (
+    cmpRecordMessageStatusAuditId, options = { noGet: true },
+  ) => {
     try {
       const { CmpRecordMessageStatusAudit } = container.databaseService.accessors;
       const cmpRecordMessageStatusAudit = await CmpRecordMessageStatusAudit
-        .deleteRecordMessageStatusAudit(cmpRecordMessageStatusAuditId);
+        .deleteRecordMessageStatusAudit(cmpRecordMessageStatusAuditId, options);
       const mappedCmpRecordMessageStatusAudit = mapRecordMessageStatusAudit(
         cmpRecordMessageStatusAudit,
       );
@@ -243,11 +245,13 @@ export default (container) => {
     }
   };
 
-  const deleteRecordMessageStatusAudits = async (criteria) => {
+  const deleteRecordMessageStatusAudits = async (
+    criteria, options = { noGet: true },
+  ) => {
     try {
       const { CmpRecordMessageStatusAudit } = container.databaseService.accessors;
       const cmpRecordMessageStatusAudits = await CmpRecordMessageStatusAudit
-        .deleteRecordMessageStatusAudits(criteria);
+        .deleteRecordMessageStatusAudits(criteria, options);
       const mappedCmpRecordMessageStatusAudits = cmpRecordMessageStatusAudits
         .map(mapRecordMessageStatusAudit);
       return Promise.resolve(mappedCmpRecordMessageStatusAudits);

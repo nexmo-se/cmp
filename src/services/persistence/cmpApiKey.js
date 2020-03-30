@@ -98,10 +98,12 @@ export default (container) => {
     }
   };
 
-  const updateApiKey = async (cmpApiKeyId, userId, changes, excludeSecret = true) => {
+  const updateApiKey = async (cmpApiKeyId, userId, changes, excludeSecret = true, options = {}) => {
     try {
       const { CmpApiKey } = container.databaseService.accessors;
-      const cmpApiKey = await CmpApiKey.updateApiKey(cmpApiKeyId, userId, changes, excludeSecret);
+      const cmpApiKey = await CmpApiKey.updateApiKey(
+        cmpApiKeyId, userId, changes, excludeSecret, options,
+      );
       return Promise.resolve(cmpApiKey);
     } catch (error) {
       return Promise.reject(error);
@@ -121,20 +123,24 @@ export default (container) => {
     }
   };
 
-  const deleteApiKey = async (cmpApiKeyId, userId, excludeSecret = true) => {
+  const deleteApiKey = async (
+    cmpApiKeyId, userId, excludeSecret = true, options = { noGet: true },
+  ) => {
     try {
       const { CmpApiKey } = container.databaseService.accessors;
-      const cmpApiKey = await CmpApiKey.deleteApiKey(cmpApiKeyId, userId, excludeSecret);
+      const cmpApiKey = await CmpApiKey.deleteApiKey(cmpApiKeyId, userId, excludeSecret, options);
       return Promise.resolve(cmpApiKey);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteApiKeys = async (criteria, userId, excludeSecret = true) => {
+  const deleteApiKeys = async (
+    criteria, userId, excludeSecret = true, options = { noGet: true },
+  ) => {
     try {
       const { CmpApiKey } = container.databaseService.accessors;
-      const cmpApiKeys = await CmpApiKey.deleteApiKeys(criteria, userId, excludeSecret);
+      const cmpApiKeys = await CmpApiKey.deleteApiKeys(criteria, userId, excludeSecret, options);
       const filteredApiKeys = filterApiKeys(userId, cmpApiKeys);
       return Promise.resolve(filteredApiKeys);
     } catch (error) {

@@ -161,11 +161,11 @@ export default (container) => {
     }
   };
 
-  const updateRecord = async (cmpRecordId, changes, excludeSecret = true) => {
+  const updateRecord = async (cmpRecordId, changes, excludeSecret = true, options = {}) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
       const cmpRecord = await CmpRecord.updateRecord(
-        cmpRecordId, changes, excludeSecret,
+        cmpRecordId, changes, excludeSecret, options,
       );
       const mappedCmpRecord = mapRecord(cmpRecord);
       return Promise.resolve(mappedCmpRecord);
@@ -189,10 +189,10 @@ export default (container) => {
     }
   };
 
-  const deleteRecord = async (cmpRecordId, excludeSecret = true) => {
+  const deleteRecord = async (cmpRecordId, excludeSecret = true, options = { noGet: true }) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecord = await CmpRecord.deleteRecord(cmpRecordId, excludeSecret);
+      const cmpRecord = await CmpRecord.deleteRecord(cmpRecordId, excludeSecret, options);
       const mappedCmpRecord = mapRecord(cmpRecord);
       return Promise.resolve(mappedCmpRecord);
     } catch (error) {
@@ -200,10 +200,10 @@ export default (container) => {
     }
   };
 
-  const deleteRecords = async (criteria, excludeSecret = true) => {
+  const deleteRecords = async (criteria, excludeSecret = true, options = { noGet: true }) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
-      const cmpRecords = await CmpRecord.deleteRecords(criteria, excludeSecret);
+      const cmpRecords = await CmpRecord.deleteRecords(criteria, excludeSecret, options);
       const mappedCmpRecords = cmpRecords.map(mapRecord);
       return Promise.resolve(mappedCmpRecords);
     } catch (error) {

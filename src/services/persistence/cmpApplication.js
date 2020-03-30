@@ -110,11 +110,12 @@ export default (container) => {
     }
   };
 
-  const updateApplication = async (cmpApplicationId, userId, changes, excludeSecret = true) => {
+  const updateApplication = async (
+    cmpApplicationId, userId, changes, excludeSecret = true, options = {}) => {
     try {
       const { CmpApplication } = container.databaseService.accessors;
       const cmpApplication = await CmpApplication.updateApplication(
-        cmpApplicationId, userId, changes, excludeSecret,
+        cmpApplicationId, userId, changes, excludeSecret, options,
       );
       return Promise.resolve(cmpApplication);
     } catch (error) {
@@ -137,11 +138,13 @@ export default (container) => {
     }
   };
 
-  const deleteApplication = async (cmpApplicationId, userId, excludeSecret = true) => {
+  const deleteApplication = async (
+    cmpApplicationId, userId, excludeSecret = true, options = { noGet: true },
+  ) => {
     try {
       const { CmpApplication } = container.databaseService.accessors;
       const cmpApplication = await CmpApplication.deleteApplication(
-        cmpApplicationId, userId, excludeSecret,
+        cmpApplicationId, userId, excludeSecret, options,
       );
       return Promise.resolve(cmpApplication);
     } catch (error) {
@@ -149,11 +152,13 @@ export default (container) => {
     }
   };
 
-  const deleteApplications = async (criteria, userId, excludeSecret = true) => {
+  const deleteApplications = async (
+    criteria, userId, excludeSecret = true, options = { noGet: true },
+  ) => {
     try {
       const { CmpApplication } = container.databaseService.accessors;
       const cmpApplications = await CmpApplication.deleteApplications(
-        criteria, userId, excludeSecret,
+        criteria, userId, excludeSecret, options,
       );
       const filteredApplications = filterApplications(userId, cmpApplications);
       return Promise.resolve(filteredApplications);

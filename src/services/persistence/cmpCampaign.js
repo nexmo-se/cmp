@@ -71,11 +71,11 @@ export default (container) => {
     }
   };
 
-  const updateCampaign = async (cmpCampaignId, changes) => {
+  const updateCampaign = async (cmpCampaignId, changes, options = {}) => {
     try {
       const { CmpCampaign } = container.databaseService.accessors;
       const cmpCampaign = await CmpCampaign.updateCampaign(
-        cmpCampaignId, changes,
+        cmpCampaignId, changes, options,
       );
       return Promise.resolve(cmpCampaign);
     } catch (error) {
@@ -93,20 +93,20 @@ export default (container) => {
     }
   };
 
-  const deleteCampaign = async (cmpCampaignId) => {
+  const deleteCampaign = async (cmpCampaignId, options = { noGet: true }) => {
     try {
       const { CmpCampaign } = container.databaseService.accessors;
-      const cmpCampaign = await CmpCampaign.deleteCampaign(cmpCampaignId);
+      const cmpCampaign = await CmpCampaign.deleteCampaign(cmpCampaignId, options);
       return Promise.resolve(cmpCampaign);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteCampaigns = async (criteria) => {
+  const deleteCampaigns = async (criteria, options = { noGet: true }) => {
     try {
       const { CmpCampaign } = container.databaseService.accessors;
-      const cmpCampaigns = await CmpCampaign.deleteCampaigns(criteria);
+      const cmpCampaigns = await CmpCampaign.deleteCampaigns(criteria, options);
       return Promise.resolve(cmpCampaigns);
     } catch (error) {
       return Promise.reject(error);

@@ -1,10 +1,10 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Parameter Persistence Accessor');
 
-  const listParameters = async () => {
+  const listParameters = async (options = {}) => {
     try {
       const { CmpParameter } = container.databaseService.accessors;
-      const cmpParameters = await CmpParameter.listParameters();
+      const cmpParameters = await CmpParameter.listParameters(options);
       return Promise.resolve(cmpParameters);
     } catch (error) {
       return Promise.reject(error);
@@ -49,11 +49,11 @@ export default (container) => {
     }
   };
 
-  const updateParameter = async (cmpParameterId, changes) => {
+  const updateParameter = async (cmpParameterId, changes, options = {}) => {
     try {
       const { CmpParameter } = container.databaseService.accessors;
       const cmpParameter = await CmpParameter.updateParameter(
-        cmpParameterId, changes,
+        cmpParameterId, changes, options,
       );
       return Promise.resolve(cmpParameter);
     } catch (error) {
@@ -61,30 +61,30 @@ export default (container) => {
     }
   };
 
-  const updateParameters = async (criteria, changes) => {
+  const updateParameters = async (criteria, changes, options = {}) => {
     try {
       const { CmpParameter } = container.databaseService.accessors;
-      const cmpParameters = await CmpParameter.updateParameters(criteria, changes);
+      const cmpParameters = await CmpParameter.updateParameters(criteria, changes, options);
       return Promise.resolve(cmpParameters);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteParameter = async (cmpParameterId) => {
+  const deleteParameter = async (cmpParameterId, options = { noGet: true }) => {
     try {
       const { CmpParameter } = container.databaseService.accessors;
-      const cmpParameter = await CmpParameter.deleteParameter(cmpParameterId);
+      const cmpParameter = await CmpParameter.deleteParameter(cmpParameterId, options);
       return Promise.resolve(cmpParameter);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteParameters = async (criteria) => {
+  const deleteParameters = async (criteria, options = { noGet: true }) => {
     try {
       const { CmpParameter } = container.databaseService.accessors;
-      const cmpParameters = await CmpParameter.deleteParameters(criteria);
+      const cmpParameters = await CmpParameter.deleteParameters(criteria, options);
       return Promise.resolve(cmpParameters);
     } catch (error) {
       return Promise.reject(error);

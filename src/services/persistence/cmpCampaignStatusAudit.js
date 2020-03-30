@@ -1,11 +1,11 @@
 export default (container) => {
   const { L } = container.defaultLogger('Cmp RMS Audit Persistence Accessor');
 
-  const listCampaignStatusAudits = async () => {
+  const listCampaignStatusAudits = async (options = {}) => {
     try {
       const { CmpCampaignStatusAudit } = container.databaseService.accessors;
       const cmpCampaignStatusAudits = await CmpCampaignStatusAudit
-        .listCampaignStatusAudits();
+        .listCampaignStatusAudits(options);
       return Promise.resolve(cmpCampaignStatusAudits);
     } catch (error) {
       return Promise.reject(error);
@@ -47,22 +47,22 @@ export default (container) => {
     }
   };
 
-  const deleteCampaignStatusAudit = async (cmpCampaignStatusAuditId) => {
+  const deleteCampaignStatusAudit = async (cmpCampaignStatusAuditId, options = { noGet: true }) => {
     try {
       const { CmpCampaignStatusAudit } = container.databaseService.accessors;
       const cmpCampaignStatusAudit = await CmpCampaignStatusAudit
-        .deleteCampaignStatusAudit(cmpCampaignStatusAuditId);
+        .deleteCampaignStatusAudit(cmpCampaignStatusAuditId, options);
       return Promise.resolve(cmpCampaignStatusAudit);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteCampaignStatusAudits = async (criteria) => {
+  const deleteCampaignStatusAudits = async (criteria, options = { noGet: true }) => {
     try {
       const { CmpCampaignStatusAudit } = container.databaseService.accessors;
       const cmpCampaignStatusAudits = await CmpCampaignStatusAudit
-        .deleteCampaignStatusAudits(criteria);
+        .deleteCampaignStatusAudits(criteria, options);
       return Promise.resolve(cmpCampaignStatusAudits);
     } catch (error) {
       return Promise.reject(error);

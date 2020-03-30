@@ -26,10 +26,10 @@ export default (container) => {
     return mediaData;
   };
 
-  const listMedias = async () => {
+  const listMedias = async (options = {}) => {
     try {
       const { CmpMedia } = container.databaseService.accessors;
-      const cmpMedias = await CmpMedia.listMedias();
+      const cmpMedias = await CmpMedia.listMedias(options);
       const mappedCmpMedias = cmpMedias.map(mapMedia);
       return Promise.resolve(mappedCmpMedias);
     } catch (error) {
@@ -265,10 +265,10 @@ export default (container) => {
     }
   };
 
-  const deleteMedia = async (cmpMediaId) => {
+  const deleteMedia = async (cmpMediaId, options = { noGet: true }) => {
     try {
       const { CmpMedia } = container.databaseService.accessors;
-      const cmpMedia = await CmpMedia.deleteMedia(cmpMediaId);
+      const cmpMedia = await CmpMedia.deleteMedia(cmpMediaId, options);
       const mappedCmpMedia = mapMedia(cmpMedia);
       return Promise.resolve(mappedCmpMedia);
     } catch (error) {
@@ -276,10 +276,10 @@ export default (container) => {
     }
   };
 
-  const deleteMedias = async (criteria) => {
+  const deleteMedias = async (criteria, options = { noGet: true }) => {
     try {
       const { CmpMedia } = container.databaseService.accessors;
-      const cmpMedias = await CmpMedia.deleteMedias(criteria);
+      const cmpMedias = await CmpMedia.deleteMedias(criteria, options);
       const mappedCmpMedias = cmpMedias.map(mapMedia);
       return Promise.resolve(mappedCmpMedias);
     } catch (error) {

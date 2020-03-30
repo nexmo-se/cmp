@@ -80,10 +80,10 @@ export default (container) => {
     }
   };
 
-  const updateUser = async (userId, changes, excludePassword = true) => {
+  const updateUser = async (userId, changes, excludePassword = true, options = {}) => {
     try {
       const { User } = container.databaseService.accessors;
-      const user = await User.updateUser(userId, changes, excludePassword);
+      const user = await User.updateUser(userId, changes, excludePassword, options);
       return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);
@@ -100,20 +100,20 @@ export default (container) => {
     }
   };
 
-  const deleteUser = async (userId, excludePassword = true) => {
+  const deleteUser = async (userId, excludePassword = true, options = { noGet: true }) => {
     try {
       const { User } = container.databaseService.accessors;
-      const user = await User.deleteUser(userId, excludePassword);
+      const user = await User.deleteUser(userId, excludePassword, options);
       return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteUsers = async (criteria, excludePassword = true) => {
+  const deleteUsers = async (criteria, excludePassword = true, options = { noGet: true }) => {
     try {
       const { User } = container.databaseService.accessors;
-      const user = await User.deleteUsers(criteria, excludePassword);
+      const user = await User.deleteUsers(criteria, excludePassword, options);
       return Promise.resolve(user);
     } catch (error) {
       return Promise.reject(error);

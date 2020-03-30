@@ -126,11 +126,13 @@ export default (container) => {
     }
   };
 
-  const updateChannel = async (cmpChannelId, userId, changes, excludeSecret = true) => {
+  const updateChannel = async (
+    cmpChannelId, userId, changes, excludeSecret = true, options = {},
+  ) => {
     try {
       const { CmpChannel } = container.databaseService.accessors;
       const cmpChannel = await CmpChannel.updateChannel(
-        cmpChannelId, userId, changes, excludeSecret,
+        cmpChannelId, userId, changes, excludeSecret, options,
       );
       return Promise.resolve(cmpChannel);
     } catch (error) {
@@ -153,20 +155,28 @@ export default (container) => {
     }
   };
 
-  const deleteChannel = async (cmpChannelId, userId, excludeSecret = true) => {
+  const deleteChannel = async (
+    cmpChannelId, userId, excludeSecret = true, options = { noGet: true },
+  ) => {
     try {
       const { CmpChannel } = container.databaseService.accessors;
-      const cmpChannel = await CmpChannel.deleteChannel(cmpChannelId, userId, excludeSecret);
+      const cmpChannel = await CmpChannel.deleteChannel(
+        cmpChannelId, userId, excludeSecret, options,
+      );
       return Promise.resolve(cmpChannel);
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const deleteChannels = async (criteria, userId, excludeSecret = true) => {
+  const deleteChannels = async (
+    criteria, userId, excludeSecret = true, options = { noGet: true },
+  ) => {
     try {
       const { CmpChannel } = container.databaseService.accessors;
-      const cmpChannels = await CmpChannel.deleteChannels(criteria, userId, excludeSecret);
+      const cmpChannels = await CmpChannel.deleteChannels(
+        criteria, userId, excludeSecret, options,
+      );
       const filteredChannels = filterChannels(userId, cmpChannels);
       return Promise.resolve(filteredChannels);
     } catch (error) {
