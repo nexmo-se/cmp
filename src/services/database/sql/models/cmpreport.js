@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     url: {
       type: DataTypes.STRING(2000),
-      allowNull: false,
+      allowNull: true,
     },
     status: {
       type: DataTypes.STRING(45),

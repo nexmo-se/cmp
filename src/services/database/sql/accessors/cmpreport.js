@@ -157,6 +157,7 @@ export default (container) => {
         id: container.uuid(),
         type,
         name,
+        submitTime: new Date(),
         cmpReportOverallSummaryId,
         cmpReportCampaignSummaryId,
         cmpReportCampaignDetailId,
