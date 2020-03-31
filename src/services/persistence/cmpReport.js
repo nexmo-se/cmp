@@ -22,6 +22,17 @@ export default (container) => {
       reportData.content = report.cmpReportCampaignDetail;
     }
 
+    if (reportData.url === '') {
+      delete reportData.url;
+    }
+
+    delete reportData.cmpReportOverallSummaryId;
+    delete reportData.cmpReportCampaignSummaryId;
+    delete reportData.cmpReportCampaignDetailId;
+    delete reportData.cmpReportOverallSummary;
+    delete reportData.cmpReportCampaignSummary;
+    delete reportData.cmpReportCampaignDetail;
+
     return reportData;
   };
 

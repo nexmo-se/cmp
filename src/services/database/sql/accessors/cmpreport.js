@@ -273,6 +273,8 @@ export default (container) => {
         id: container.uuid(),
         type,
         name,
+        status: 'pending',
+        url: '',
         submitTime: new Date(),
         cmpReportOverallSummaryId,
         cmpReportCampaignSummaryId,
