@@ -1,12 +1,38 @@
 export default (container) => {
   const { L } = container.defaultLogger('Report Process - Summary');
 
-  const generateOverall = async (content, filePath) => {
+  const appendOverallToFile = async (filePath, campaigns) => {
+    try {
+      L.trace(campaigns);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateOverallNextBatch = async (content, filePath, limit, offset) => {
     try {
       const { from, to } = content;
       const { summary: summaryService } = container.reportService;
       const paginatedResults = await summaryService.getOverallSummary(from, to, limit, offset);
-      return Promise.resolve(paginatedResults);
+      const { results } = paginatedResults;
+
+      await appendOverallToFile(filePath, results);
+
+      if (results.length <= 0) {
+        return Promise.resolve();
+      }
+
+      return generateOverallNextBatch(content, filePath, limit, offset + results.length);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateOverall = async (content, filePath) => {
+    try {
+      await generateOverallNextBatch(content, filePath, 100, 0);
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
@@ -17,7 +43,11 @@ export default (container) => {
       const { cmpCampaignId, from, to } = content;
       const { summary: summaryService } = container.reportService;
       const campaignSummary = await summaryService.getCampaignSummary(cmpCampaignId, from, to);
-      return Promise.resolve(campaignSummary);
+      if (campaignSummary == null) {
+        throw new Error('Campaign Report Not Available');
+      }
+      await appendOverallToFile(filePath, [campaignSummary]);
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }

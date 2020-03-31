@@ -22,7 +22,39 @@ export default (container) => {
 
   const runSingle = async () => {
     try {
-      L.trace('Meow');
+      const { CmpReport } = container.persistenceService;
+      const { filePath } = container.config.report;
+      const criteria = { status: 'pending' };
+      const cmpReport = await CmpReport.findReport(criteria);
+
+      if (cmpReport == null) {
+        // No Pending Report
+        return Promise.resolve();
+      }
+
+      const { id, type, content } = cmpReport;
+      L.trace(`Report (${id}) - ${type}`, content);
+
+      // Update Report Status to Started
+      const startChanges = {
+        status: 'started',
+        startTime: new Date(),
+      };
+      await CmpReport.updateReport(id, startChanges, { noGet: true });
+
+      // Generate Report
+      const fullPath = `${filePath}/${id}.csv`;
+      const reportGenerator = ReportGenerators[type];
+      await reportGenerator(content, fullPath);
+
+      // Update Report Status
+      const endChanges = {
+        status: 'completed',
+        endTime: new Date(),
+        url: '',
+      };
+      await CmpReport.updateReport(id, endChanges, { noGet: true });
+
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);

@@ -1,13 +1,39 @@
 export default (container) => {
   const { L } = container.defaultLogger('Report Process - Campaign Detail');
 
-  const generateCampaign = async (content, filePath) => {
+  const appendOverallToFile = async (filePath, records) => {
+    try {
+      L.trace(records);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateCampaignNextBatch = async (content, filePath, limit, offset) => {
     try {
       const { cmpCampaignId } = content;
       const { campaignDetail: campaignDetailService } = container.reportService;
-      const campaignSummary = await campaignDetailService
+      const paginatedResults = await campaignDetailService
         .getCampaignDetails(cmpCampaignId, limit, offset);
-      return Promise.resolve(campaignSummary);
+
+      const { results } = paginatedResults;
+
+      await appendOverallToFile(filePath, results);
+
+      if (results.length <= 0) {
+        return Promise.resolve();
+      }
+      return generateCampaignNextBatch(content, filePath, limit, offset + results.length);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateCampaign = async (content, filePath) => {
+    try {
+      await generateCampaignNextBatch(content, filePath, 100, 0);
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
