@@ -258,7 +258,7 @@ export default (container) => {
       const text = container.templateService.getText(body, parameters);
 
       let result;
-      if (type === 'text') {
+      if (type == null || type === 'text') {
         result = await container.nexmoService.viber.sendText(
           senderId, recipient, text, `rec_${record.id}`,
           category, viberTtl,
