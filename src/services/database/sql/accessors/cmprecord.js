@@ -214,7 +214,7 @@ export default (container) => {
   const getByCriteria = async (
     criteria = {},
     excludeSecret = true, excludeDeleted = true,
-    options = {},
+    options = { limit: 30, offset: 0 },
   ) => {
     try {
       const {
