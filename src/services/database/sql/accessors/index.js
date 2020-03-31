@@ -23,6 +23,10 @@ import CmpMediaLocation from './cmpmedialocation';
 import CmpRecordMessageStatusAuditMapi from './cmprecordmessagestatusauditmapi';
 import CmpRecordMessageStatusAuditSms from './cmprecordmessagestatusauditsms';
 
+import CmpReportOverallSummary from './cmpreportoverallsummary';
+import CmpReportCampaignSummary from './cmpreportcampaignsummary';
+import CmpReportCampaignDetail from './cmpreportcampaigndetail';
+
 export default container => ({
   User: User(container),
   UserRole: UserRole(container),
@@ -48,4 +52,8 @@ export default container => ({
 
   CmpRecordMessageStatusAuditMapi: CmpRecordMessageStatusAuditMapi(container),
   CmpRecordMessageStatusAuditSms: CmpRecordMessageStatusAuditSms(container),
+
+  CmpReportOverallSummary: CmpReportOverallSummary(container),
+  CmpReportCampaignSummary: CmpReportCampaignSummary(container),
+  CmpReportCampaignDetail: CmpReportCampaignDetail(container),
 });

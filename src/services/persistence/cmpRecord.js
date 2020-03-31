@@ -33,7 +33,7 @@ export default (container) => {
     return mappedCmpRecord;
   };
 
-  const listRecords = async (excludeSecret = true, options = {}) => {
+  const listRecords = async (excludeSecret = true, options = { limit: 30, offset: 0 }) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
       const cmpRecords = await CmpRecord.listRecords(excludeSecret, options);
@@ -60,7 +60,9 @@ export default (container) => {
     }
   };
 
-  const findRecords = async (criteria = {}, excludeSecret = true, options = {}) => {
+  const findRecords = async (
+    criteria = {}, excludeSecret = true, options = { limit: 30, offset: 0 },
+  ) => {
     try {
       const { CmpRecord } = container.databaseService.accessors;
       const cmpRecords = await CmpRecord.findRecords(

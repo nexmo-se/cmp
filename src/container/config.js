@@ -28,6 +28,11 @@ export default {
     recordsPerBatch: parseInt(process.env.RECORDS_PER_BATCH || '30', 10),
     useMockBlast: (process.env.USE_MOCK_BLAST || 'false').toLowerCase() === 'true',
   },
+  report: {
+    delay: parseInt(process.env.REPORT_DELAY || '5', 10),
+    filePath: process.env.REPORT_FILE_PATH,
+    batchLimit: parseInt(process.env.REPORT_BATCH_LIMIT || '1000', 10),
+  },
   webhook: {
     useQueue: (process.env.USE_QUEUE || 'false').toLowerCase() === 'true',
     queueDelay: parseInt(process.env.QUEUE_DELAY || '1', 10),

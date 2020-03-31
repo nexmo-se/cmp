@@ -139,7 +139,9 @@ export default (container) => {
   const createCsvReport = async (req, res, next) => {
     try {
       const { type, name, content } = req.body;
-      throw new container.BadRequestError('Invalid report format');
+      const { CmpReport } = container.persistenceService;
+      const cmpReport = await CmpReport.createReport(type, name, content);
+      res.json(cmpReport);
     } catch (error) {
       next(error);
     }

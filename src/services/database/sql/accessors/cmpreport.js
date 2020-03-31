@@ -3,11 +3,45 @@ export default (container) => {
 
   const getById = async (cmpReportId, excludeDeleted = true) => {
     try {
-      const { CmpReport } = container.databaseService.models;
+      const {
+        CmpReport,
+        CmpReportOverallSummary,
+        CmpReportCampaignSummary,
+        CmpReportCampaignDetail,
+      } = container.databaseService.models;
       const query = {
         where: {
           id: cmpReportId,
         },
+        include: [
+          {
+            model: CmpReportOverallSummary,
+            as: 'cmpReportOverallSummary',
+            foreignKey: 'cmpReportOverallSummaryId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpReportCampaignSummary,
+            as: 'cmpReportCampaignSummary',
+            foreignKey: 'cmpReportOverallSummaryId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpReportCampaignDetail,
+            as: 'cmpReportCampaignDetail',
+            foreignKey: 'cmpReportCampaignDetailId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+        ],
       };
 
       // Check Deleted
@@ -35,9 +69,43 @@ export default (container) => {
     criteria = {}, excludeDeleted = true, options = {},
   ) => {
     try {
-      const { CmpReport } = container.databaseService.models;
+      const {
+        CmpReport,
+        CmpReportOverallSummary,
+        CmpReportCampaignSummary,
+        CmpReportCampaignDetail,
+      } = container.databaseService.models;
       const query = {
         where: criteria,
+        include: [
+          {
+            model: CmpReportOverallSummary,
+            as: 'cmpReportOverallSummary',
+            foreignKey: 'cmpReportOverallSummaryId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpReportCampaignSummary,
+            as: 'cmpReportCampaignSummary',
+            foreignKey: 'cmpReportOverallSummaryId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpReportCampaignDetail,
+            as: 'cmpReportCampaignDetail',
+            foreignKey: 'cmpReportCampaignDetailId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+        ],
       };
 
       // Check Deleted
@@ -85,7 +153,8 @@ export default (container) => {
   };
 
   const updateById = async (
-    cmpReportId, changes = {}, excludeDeleted = true, options = {},
+    cmpReportId, changes = {}, excludeDeleted = true,
+    options = {},
   ) => {
     try {
       const { CmpReport } = container.databaseService.models;
@@ -146,8 +215,56 @@ export default (container) => {
     }
   };
 
+  const mapCmpReportOverallSummary = (cmpReportOverallSummary) => {
+    const mappedCmpReportOverallSummary = cmpReportOverallSummary.dataValues;
+
+    delete mappedCmpReportOverallSummary.deleted;
+    delete mappedCmpReportOverallSummary.createdAt;
+    delete mappedCmpReportOverallSummary.updatedAt;
+
+    return mappedCmpReportOverallSummary;
+  };
+
+  const mapCmpReportCampaignSummary = (cmpReportCampaignSummary) => {
+    const mappedCmpReportCampaignSummary = cmpReportCampaignSummary.dataValues;
+
+    delete mappedCmpReportCampaignSummary.deleted;
+    delete mappedCmpReportCampaignSummary.createdAt;
+    delete mappedCmpReportCampaignSummary.updatedAt;
+
+    return mappedCmpReportCampaignSummary;
+  };
+
+  const mapCmpReportCampaignDetail = (cmpReportCampaignDetail) => {
+    const mappedCmpReportCampaignDetail = cmpReportCampaignDetail.dataValues;
+
+    delete mappedCmpReportCampaignDetail.deleted;
+    delete mappedCmpReportCampaignDetail.createdAt;
+    delete mappedCmpReportCampaignDetail.updatedAt;
+
+    return mappedCmpReportCampaignDetail;
+  };
+
   const mapCmpReport = (cmpReport) => {
     const mappedCmpReport = cmpReport.dataValues;
+
+    if (mappedCmpReport.cmpReportOverallSummary) {
+      mappedCmpReport.cmpReportOverallSummary = mapCmpReportOverallSummary(
+        mappedCmpReport.cmpReportOverallSummary,
+      );
+    }
+
+    if (mappedCmpReport.cmpReportCampaignSummary) {
+      mappedCmpReport.cmpReportCampaignSummary = mapCmpReportCampaignSummary(
+        mappedCmpReport.cmpReportCampaignSummary,
+      );
+    }
+
+    if (mappedCmpReport.cmpReportCampaignDetail) {
+      mappedCmpReport.cmpReportCampaignDetail = mapCmpReportCampaignDetail(
+        mappedCmpReport.cmpReportCampaignDetail,
+      );
+    }
 
     delete mappedCmpReport.deleted;
     delete mappedCmpReport.createdAt;
@@ -178,6 +295,9 @@ export default (container) => {
         id: container.uuid(),
         type,
         name,
+        status: 'pending',
+        url: '',
+        submitTime: new Date(),
         cmpReportOverallSummaryId,
         cmpReportCampaignSummaryId,
         cmpReportCampaignDetailId,

@@ -6,6 +6,8 @@ export default (container) => {
   const router = container.express.Router();
   const controller = Controller(container);
 
+  const { filePath } = container.config.report;
+
   const { authorize } = container.authorizer;
   const { checkAuthentication } = container.authenticator;
   const { map } = container.controllerMapper;
@@ -20,6 +22,8 @@ export default (container) => {
         { roles: ['user'], controller: controller.listMyReports },
       ]),
     );
+
+  router.use('/archive', container.express.static(filePath));
 
   router.route('/json')
     .post(

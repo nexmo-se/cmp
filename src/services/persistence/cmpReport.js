@@ -8,6 +8,10 @@ export default (container) => {
   };
 
   const mapReport = (report) => {
+    if (report == null) {
+      return null;
+    }
+
     const reportData = report;
 
     if (report.type === ReportTypes.overallSummary) {
@@ -17,6 +21,17 @@ export default (container) => {
     } else if (report.type === ReportTypes.campaignDetail) {
       reportData.content = report.cmpReportCampaignDetail;
     }
+
+    if (reportData.url === '') {
+      delete reportData.url;
+    }
+
+    delete reportData.cmpReportOverallSummaryId;
+    delete reportData.cmpReportCampaignSummaryId;
+    delete reportData.cmpReportCampaignDetailId;
+    delete reportData.cmpReportOverallSummary;
+    delete reportData.cmpReportCampaignSummary;
+    delete reportData.cmpReportCampaignDetail;
 
     return reportData;
   };

@@ -16,7 +16,7 @@ module.exports = {
     },
     url: {
       type: Sequelize.STRING(2000),
-      allowNull: false,
+      allowNull: true,
     },
     status: {
       type: Sequelize.STRING(45),
