@@ -247,7 +247,7 @@ export default (container) => {
         type, url, caption, actionUrl,
       } = cmpMedia || {};
       const {
-        viberTtl, category, body, cmpChannel,
+        viberTtl = 600, category = 'transaction', body, cmpChannel,
       } = cmpTemplate;
       const { senderId, cmpApplication } = cmpChannel;
       const { applicationId, privateKey } = cmpApplication || {};

@@ -39,10 +39,10 @@ export default (container) => {
             text,
           },
         },
-        viber_service_msg: {
-          category,
-          ttl,
-        },
+        // viber_service_msg: {
+        //   category,
+        //   ttl,
+        // },
         client_ref: clientRef,
       };
 
@@ -87,10 +87,10 @@ export default (container) => {
             },
           },
         },
-        viber_service_msg: {
-          category,
-          ttl,
-        },
+        // viber_service_msg: {
+        //   category,
+        //   ttl,
+        // },
         client_ref: clientRef,
       };
 
@@ -139,10 +139,10 @@ export default (container) => {
             },
           },
         },
-        viber_service_msg: {
-          category,
-          ttl,
-        },
+        // viber_service_msg: {
+        //   category,
+        //   ttl,
+        // },
         client_ref: clientRef,
       };
 
