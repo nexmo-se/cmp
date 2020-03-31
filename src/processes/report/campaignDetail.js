@@ -23,21 +23,22 @@ export default (container) => {
       const startTime = new Date().getTime();
 
       // Write Content
-      const content = records.map(() => ([]));
+      const timePattern = 'YYYY/MM/DD HH:mm:ss';
+      const content = records.map(record => ([
+        record.id,
+        record.recipient,
+        (record.cmpChannel || {}).channel,
+        (record.cmpTemplate || {}).name,
+        record.status,
+        record.statusTime ? container.moment(record.statusTime).format(timePattern) : null,
+        record.submitTime ? container.moment(record.submitTime).format(timePattern) : null,
+      ]));
+
       const contentCsv = await container.csvService.toCsv(content);
       await container.fileService.writeContent(filePath, contentCsv);
 
       const endTime = new Date().getTime();
       L.debug(`Time Taken (Append Content) [${records.length}]: ${endTime - startTime}`);
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const appendOverallToFile = async (filePath, records) => {
-    try {
-      L.trace(records);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
@@ -53,7 +54,7 @@ export default (container) => {
 
       const { results } = paginatedResults;
 
-      await appendOverallToFile(filePath, results);
+      await appendContent(filePath, results);
 
       if (results.length <= 0) {
         return Promise.resolve();
@@ -66,6 +67,7 @@ export default (container) => {
 
   const generateCampaign = async (content, filePath) => {
     try {
+      await appendHeader(filePath);
       await generateCampaignNextBatch(content, filePath, 100, 0);
       return Promise.resolve();
     } catch (error) {
