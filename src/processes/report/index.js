@@ -23,7 +23,8 @@ export default (container) => {
   const runSingle = async () => {
     try {
       const { CmpReport } = container.persistenceService;
-      const { filePath } = container.config.report;
+      const { hostUrl, report } = container.config;
+      const { filePath } = report;
       const criteria = { status: 'pending' };
       const cmpReport = await CmpReport.findReport(criteria);
 
@@ -43,7 +44,8 @@ export default (container) => {
       await CmpReport.updateReport(id, startChanges, { noGet: true });
 
       // Generate Report
-      const fullPath = `${filePath}/${id}.csv`;
+      const fileName = `${id}.csv`;
+      const fullPath = `${filePath}/${fileName}`;
       const reportGenerator = ReportGenerators[type];
       await reportGenerator(content, fullPath);
 
@@ -51,7 +53,7 @@ export default (container) => {
       const endChanges = {
         status: 'completed',
         endTime: new Date(),
-        url: '',
+        url: `${hostUrl}reports/archive/${fileName}`,
       };
       await CmpReport.updateReport(id, endChanges, { noGet: true });
 
