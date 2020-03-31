@@ -51,4 +51,11 @@ export default {
     },
     body: {},
   },
+  getReportArchive: {
+    query: {},
+    params: {
+      fileName: Joi.string().min(1).required(),
+    },
+    body: {},
+  },
 };

@@ -172,6 +172,19 @@ export default (container) => {
     }
   };
 
+  const getReportArchive = async (req, res, next) => {
+    try {
+      L.warn('Temporary: User can read all Reports');
+      const { fileName } = req.params;
+      const { filePath } = container.config.report;
+
+      const fullPath = `${filePath}/${fileName}`;
+      res.sendFile(fullPath);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   return {
     findAllReports,
     findMyReports,
@@ -184,5 +197,7 @@ export default (container) => {
 
     readReport,
     readMyReport,
+
+    getReportArchive,
   };
 };

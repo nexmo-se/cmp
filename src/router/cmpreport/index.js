@@ -23,7 +23,14 @@ export default (container) => {
       ]),
     );
 
-  router.use('/archive', container.express.static(filePath));
+  // router.use('/archive', container.express.static(filePath));
+  router.route('/archive/:fileName')
+    .get(
+      checkAuthentication,
+      authorize(['user', 'admin']),
+      validate(validator.getReportArchive),
+      controller.getReportArchive,
+    );
 
   router.route('/json')
     .post(
