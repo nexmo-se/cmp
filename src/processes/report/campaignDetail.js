@@ -67,8 +67,9 @@ export default (container) => {
 
   const generateCampaign = async (content, filePath) => {
     try {
+      const { batchLimit } = container.config.report;
       await appendHeader(filePath);
-      await generateCampaignNextBatch(content, filePath, 100, 0);
+      await generateCampaignNextBatch(content, filePath, batchLimit, 0);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);

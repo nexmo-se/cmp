@@ -31,6 +31,7 @@ export default {
   report: {
     delay: parseInt(process.env.REPORT_DELAY || '5', 10),
     filePath: process.env.REPORT_FILE_PATH,
+    batchLimit: parseInt(process.env.REPORT_BATCH_LIMIT || '1000', 10),
   },
   nexmo: {
     host: process.env.NEXMO_API,

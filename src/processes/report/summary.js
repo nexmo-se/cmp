@@ -66,8 +66,9 @@ export default (container) => {
 
   const generateOverall = async (content, filePath) => {
     try {
+      const { batchLimit } = container.config.report;
       await appendHeader(filePath);
-      await generateOverallNextBatch(content, filePath, 100, 0);
+      await generateOverallNextBatch(content, filePath, batchLimit, 0);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
