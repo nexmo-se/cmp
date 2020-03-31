@@ -181,11 +181,11 @@ export default (container) => {
     }
   };
 
-  const updateReport = async (cmpReportId, changes) => {
+  const updateReport = async (cmpReportId, changes, options = {}) => {
     try {
       const { CmpReport } = container.databaseService.accessors;
       const cmpReport = await CmpReport.updateReport(
-        cmpReportId, changes,
+        cmpReportId, changes, options,
       );
       const mappedCmpReport = mapReport(cmpReport);
       return Promise.resolve(mappedCmpReport);
