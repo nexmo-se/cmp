@@ -1,9 +1,44 @@
 export default (container) => {
   const { L } = container.defaultLogger('Report Process - Summary');
 
-  const appendOverallToFile = async (filePath, campaigns) => {
+  const appendHeader = async (filePath) => {
     try {
-      L.trace(campaigns);
+      const startTime = new Date().getTime();
+
+      // Write Header
+      const header = [['id', 'name', 'total', 'draft', 'pending', 'requested', 'submitted', 'delivered', 'rejected']];
+      const headerCsv = await container.csvService.toCsv(header);
+      await container.fileService.writeContent(filePath, headerCsv);
+
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Append Header): ${endTime - startTime}`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const appendContent = async (filePath, campaigns) => {
+    try {
+      const startTime = new Date().getTime();
+
+      // Write Content
+      const content = campaigns.map(campaign => ([
+        campaign.id,
+        campaign.name,
+        (campaign.summary || {}).total || 0,
+        (campaign.summary || {}).draft || 0,
+        (campaign.summary || {}).pending || 0,
+        (campaign.summary || {}).requested || 0,
+        (campaign.summary || {}).submitted || 0,
+        (campaign.summary || {}).delivered || 0,
+        (campaign.summary || {}).rejected || 0,
+      ]));
+      const contentCsv = await container.csvService.toCsv(content);
+      await container.fileService.writeContent(filePath, contentCsv);
+
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Append Content) [${campaigns.length}]: ${endTime - startTime}`);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
@@ -17,7 +52,7 @@ export default (container) => {
       const paginatedResults = await summaryService.getOverallSummary(from, to, limit, offset);
       const { results } = paginatedResults;
 
-      await appendOverallToFile(filePath, results);
+      await appendContent(filePath, results);
 
       if (results.length <= 0) {
         return Promise.resolve();
@@ -31,6 +66,7 @@ export default (container) => {
 
   const generateOverall = async (content, filePath) => {
     try {
+      await appendHeader(filePath);
       await generateOverallNextBatch(content, filePath, 100, 0);
       return Promise.resolve();
     } catch (error) {
@@ -46,7 +82,8 @@ export default (container) => {
       if (campaignSummary == null) {
         throw new Error('Campaign Report Not Available');
       }
-      await appendOverallToFile(filePath, [campaignSummary]);
+      await appendHeader(filePath);
+      await appendContent(filePath, [campaignSummary]);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);

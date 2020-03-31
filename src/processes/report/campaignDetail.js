@@ -1,6 +1,40 @@
 export default (container) => {
   const { L } = container.defaultLogger('Report Process - Campaign Detail');
 
+  const appendHeader = async (filePath) => {
+    try {
+      const startTime = new Date().getTime();
+
+      // Write Header
+      const header = [['id', 'recipient', 'channel', 'template', 'status', 'status time', 'submit time']];
+      const headerCsv = await container.csvService.toCsv(header);
+      await container.fileService.writeContent(filePath, headerCsv);
+
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Append Header): ${endTime - startTime}`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const appendContent = async (filePath, records) => {
+    try {
+      const startTime = new Date().getTime();
+
+      // Write Content
+      const content = records.map(() => ([]));
+      const contentCsv = await container.csvService.toCsv(content);
+      await container.fileService.writeContent(filePath, contentCsv);
+
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Append Content) [${records.length}]: ${endTime - startTime}`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const appendOverallToFile = async (filePath, records) => {
     try {
       L.trace(records);
