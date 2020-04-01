@@ -78,10 +78,18 @@ export default (container) => {
       controller.createRecordBatch,
     );
 
+  router.route('/csv/:cmpCampaignId/:cmpTemplateId/metadata')
+    .post(
+      checkAuthentication,
+      authorize(['admin', 'user']),
+      validate(validator.createCsvMetadata),
+      controller.createCsvMetadata,
+    );
+
   router.route('/csv/:cmpCampaignId/:cmpTemplateId')
     .post(
       checkAuthentication,
-      authorize(['admin']),
+      authorize(['admin', 'user']),
       validate(validator.uploadCsv),
       upload.single('file'),
       controller.uploadCsv,

@@ -440,6 +440,25 @@ export default (container) => {
     }
   };
 
+  const createCsvMetadata = async (req, res, next) => {
+    try {
+      const { uploadPath } = container.config.csv;
+      const { cmpCampaignId, cmpTemplateId } = req.params;
+      const { body: metadata } = req;
+
+      L.trace(metadata);
+
+      const fileName = `${cmpCampaignId}_${cmpTemplateId}.metadata`;
+      const filePath = `${uploadPath}/${fileName}`;
+      const jsonBody = JSON.stringify(metadata);
+
+      await container.fileService.writeContent(filePath, jsonBody);
+      res.json({ status: 'ok' });
+    } catch (error) {
+      next(error);
+    }
+  };
+
   return {
     findAllRecords,
     findMyRecords,
@@ -456,6 +475,7 @@ export default (container) => {
     readMyRecord,
     deleteRecord,
 
+    createCsvMetadata,
     uploadCsv,
   };
 };

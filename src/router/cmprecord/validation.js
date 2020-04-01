@@ -70,6 +70,45 @@ export default {
     params: {},
     body: {},
   },
+  createCsvMetadata: {
+    query: {},
+    params: {
+      cmpCampaignId: Joi.string().min(1).required(),
+      cmpTemplateId: Joi.string().min(1).required(),
+    },
+    body: {
+      mediaType: Joi.string()
+        .min(1)
+        .valid(
+          'none', // no media (body text only)
+          'audio', // facebook, whatsapp
+          'file', // facebook, whatsapp
+          'image', // facebook, whatsapp, viber
+          'location', // whatsapp
+          'text', // whatsapp (header)
+          'viber_template', // viber
+          'video', // facebook, whatsapp
+        )
+        .default('none'),
+      columns: Joi.array()
+        .items(
+          Joi.string().valid(
+            'recipient',
+            'text', // text
+            'url', // audio, file, image, viber_template, video
+            'caption', // file, image, viber_template, video
+            'fileName', // file,
+            'latitude', // location
+            'longitude', // location
+            'name', // location
+            'address', // location
+            'actionUrl', // viber_template
+            'parameter', // body text parameter (multiple)
+          ),
+        )
+        .default([]),
+    },
+  },
   uploadCsv: {
     query: {},
     body: {},
