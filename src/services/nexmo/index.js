@@ -4,6 +4,7 @@ import Sms from './sms';
 import Whatsapp from './whatsapp';
 import Viber from './viber';
 import Facebook from './facebook';
+import Voice from './voice';
 
 export default container => ({
   jwt: Jwt(container),
@@ -12,4 +13,5 @@ export default container => ({
   whatsapp: Whatsapp(container),
   viber: Viber(container),
   facebook: Facebook(container),
+  voice: Voice(container),
 });
