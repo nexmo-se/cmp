@@ -2,10 +2,34 @@ export default (container) => {
   const { L } = container.defaultLogger('Nexmo Viber Service');
 
   const getUrl = () => {
-    const { host } = container.config.nexmo;
+    const {
+      host, useViberSandbox, useMockViber, mockViberUrl,
+    } = container.config.nexmo;
 
-    const url = `${host}/v0.1/messages`;
+    let url = `${host}/v0.1/messages`;
+    if (useMockViber) {
+      L.info('Using Mock Viber Url');
+      url = mockViberUrl;
+    } else if (useViberSandbox) {
+      L.info('Using APAC Viber Sandbox Url');
+      url = 'http://nexmoapac.hopto.me/sandbox/whatsapp.php';
+    }
+
     return url;
+  };
+
+  const getFromId = (senderId) => {
+    const { useViberSandbox, useMockViber } = container.config.nexmo;
+
+    let from = senderId;
+    if (useMockViber) {
+      L.info('Using Mock Viber, use provided mobile number');
+    } else if (useViberSandbox) {
+      L.info('Using APAC Viber Sandbox Mobile Number');
+      from = '13219';
+    }
+
+    return from;
   };
 
   const sendText = async (
@@ -16,6 +40,7 @@ export default (container) => {
   ) => {
     try {
       const url = getUrl();
+      const senderId = getFromId(from);
       const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
 
       const config = {
@@ -31,7 +56,7 @@ export default (container) => {
         },
         from: {
           type: 'viber_service_msg',
-          id: from,
+          id: senderId,
         },
         message: {
           content: {
@@ -62,6 +87,7 @@ export default (container) => {
   ) => {
     try {
       const url = getUrl();
+      const senderId = getFromId(from);
       const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
 
       const config = {
@@ -77,7 +103,7 @@ export default (container) => {
         },
         from: {
           type: 'viber_service_msg',
-          id: from,
+          id: senderId,
         },
         message: {
           content: {
@@ -111,6 +137,7 @@ export default (container) => {
   ) => {
     try {
       const url = getUrl();
+      const senderId = getFromId(from);
       const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
 
       const config = {
@@ -126,7 +153,7 @@ export default (container) => {
         },
         from: {
           type: 'viber_service_msg',
-          id: from,
+          id: senderId,
         },
         message: {
           content: {

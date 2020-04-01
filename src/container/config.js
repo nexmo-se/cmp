@@ -42,9 +42,12 @@ export default {
     restHost: process.env.NEXMO_REST_API,
     mockSmsUrl: process.env.MOCK_SMS_URL,
     mockWhatsappUrl: process.env.MOCK_WHATSAPP_URL,
+    mockViberUrl: process.env.MOCK_VIBER_URL,
     useWhatsappSandbox: (process.env.USE_SANDBOX_WHATSAPP || 'false').toLowerCase() === 'true',
+    useViberSandbox: (process.env.USE_SANDBOX_VIBER || 'false').toLowerCase() === 'true',
     useMockSms: (process.env.USE_MOCK_SMS || 'false').toLowerCase() === 'true',
     useMockWhatsapp: (process.env.USE_MOCK_WHATSAPP || 'false').toLowerCase() === 'true',
+    useMockViber: (process.env.USE_MOCK_VIBER || 'false').toLowerCase() === 'true',
   },
   database: {
     name: process.env.DATABASE_NAME || '',
