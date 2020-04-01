@@ -3,13 +3,31 @@ export default (container) => {
 
   const updateWebhook = async (apiKey, apiSecret, applicationId) => {
     try {
+      // const routes = {
+      //   inbound: 'webhook/mapi/inbound',
+      //   status: 'webhook/mapi/status',
+      // };
       const routes = {
-        inbound: 'webhook/mapi/inbound',
-        status: 'webhook/mapi/status',
+        mapi: {
+          inbound: 'webhook/mapi/inbound',
+          status: 'webhook/mapi/status',
+        },
+        vapi: {
+          event: 'webhook/vapi/event',
+          answer: 'webhook/vapi/answer',
+          fallbackAnswer: 'webhook/vapi/fallbackAnswer',
+        },
       };
 
+      L.trace('Setting MAPI Webhooks');
       await container.nexmoService.webhook.registerMapi(
-        apiKey, apiSecret, applicationId, routes.inbound, routes.status,
+        apiKey, apiSecret, applicationId, routes.mapi.inbound, routes.mapi.status,
+      );
+
+      L.trace('Setting VAPI Webhooks');
+      await container.nexmoService.webhook.registerVapi(
+        apiKey, apiSecret, applicationId,
+        routes.vapi.event, routes.vapi.answer, routes.vapi.fallbackAnswer,
       );
       return Promise.resolve();
     } catch (error) {
