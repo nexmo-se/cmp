@@ -319,6 +319,29 @@ export default (container) => {
     }
   };
 
+  const blastVoice = async (record, axios) => {
+    try {
+      const { recipient, cmpTemplate, cmpParameters } = record;
+      const { body, cmpChannel } = cmpTemplate;
+      const { senderId, cmpApplication } = cmpChannel;
+      const { applicationId, privateKey } = cmpApplication || {};
+
+      const parameters = cmpParameters
+        .sort((a, b) => a.order - b.order)
+        .map(cmpParameter => cmpParameter.parameter);
+      const text = container.templateService.getText(body, parameters);
+
+      const result = await container.nexmoService.voice.callTalk(
+        senderId, recipient, text, applicationId, privateKey, axios,
+      );
+
+      const callUuids = [result.uuid];
+      return Promise.resolve(callUuids);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
 
   const blastRecord = async (record) => {
     try {
@@ -341,6 +364,8 @@ export default (container) => {
         result = await blastFacebook(record, axios);
       } else if (channel === 'viber') {
         result = await blastViber(record, axios);
+      } else if (channel === 'voice') {
+        result = await blastVoice(record, axios);
       }
       L.trace(`Blast Result - ${record.id}`, result);
 
