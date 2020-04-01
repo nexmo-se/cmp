@@ -165,6 +165,28 @@ export default (container) => {
     }
   };
 
+  const createMediaLocationBatch = async (mediaList) => {
+    try {
+      const { CmpMediaLocation } = container.databaseService.models;
+      const creatableMediaList = mediaList.map(mediaItem => ({
+        id: mediaItem.id || container.uuid(),
+        latitude: mediaItem.latitude,
+        longitude: mediaItem.longitude,
+        name: mediaItem.name,
+        address: mediaItem.address,
+        deleted: false,
+      }));
+      const rawCmpMediaLocations = await CmpMediaLocation.bulkCreate(creatableMediaList);
+      const cmpMediaLocations = rawCmpMediaLocations.map(mapCmpMediaLocation);
+      return Promise.resolve(cmpMediaLocations);
+    } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createMediaLocationBatch(mediaList);
+      }
+      return Promise.reject(error);
+    }
+  };
+
   const createMediaLocation = async (
     latitude, longitude, name, address,
   ) => {
@@ -258,6 +280,8 @@ export default (container) => {
     listMediaLocations,
 
     createMediaLocation,
+    createMediaLocationBatch,
+
     readMediaLocation,
 
     updateMediaLocation,

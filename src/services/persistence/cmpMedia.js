@@ -37,6 +37,77 @@ export default (container) => {
     }
   };
 
+  const createMediaBatch = async (mediaList) => {
+    try {
+      const mediaTextList = [];
+      const mediaImageList = [];
+      const mediaAudioList = [];
+      const mediaVideoList = [];
+      const mediaFileList = [];
+      const mediaLocationList = [];
+      const mediaViberTemplateList = [];
+
+      for (let i = 0; i < mediaList.length; i += 1) {
+        const mediaItem = mediaList[i];
+        const { type } = mediaItem;
+        if (type === 'text') {
+          mediaTextList.push(mediaItem);
+        } else if (type === 'image') {
+          mediaImageList.push(mediaItem);
+        } else if (type === 'audio') {
+          mediaAudioList.push(mediaItem);
+        } else if (type === 'video') {
+          mediaVideoList.push(mediaItem);
+        } else if (type === 'file') {
+          mediaFileList.push(mediaItem);
+        } else if (type === 'location') {
+          mediaLocationList.push(mediaItem);
+        } else if (type === 'viber_template') {
+          mediaViberTemplateList.push(mediaItem);
+        }
+      }
+
+      if (mediaTextList.length > 0) {
+        L.trace(`Batch Creating Text Media [${mediaTextList.length}]`);
+        await createMediaTextBatch(mediaTextList);
+      }
+
+      if (mediaImageList.length > 0) {
+        L.trace(`Batch Creating Image Media [${mediaImageList.length}]`);
+        await createMediaImageBatch(mediaImageList);
+      }
+
+      if (mediaAudioList.length > 0) {
+        L.trace(`Batch Creating Audio Media [${mediaAudioList.length}]`);
+        await createMediaAudioBatch(mediaAudioList);
+      }
+
+      if (mediaVideoList.length > 0) {
+        L.trace(`Batch Creating Video Media [${mediaVideoList.length}]`);
+        await createMediaVideoBatch(mediaVideoList);
+      }
+
+      if (mediaFileList.length > 0) {
+        L.trace(`Batch Creating File Media [${mediaFileList.length}]`);
+        await createMediaFileBatch(mediaFileList);
+      }
+
+      if (mediaLocationList.length > 0) {
+        L.trace(`Batch Creating Location Media [${mediaLocationList.length}]`);
+        await createMediaLocationBatch(mediaLocationList);
+      }
+
+      if (mediaViberTemplateList.length > 0) {
+        L.trace(`Batch Creating Viber Template Media [${mediaViberTemplateList.length}]`);
+        await createMediaViberTemplateBatch(mediaViberTemplateList);
+      }
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createMedia = async (
     type, text, url, caption, fileName, latitude, longitude, name, address, actionUrl,
   ) => {
@@ -61,6 +132,44 @@ export default (container) => {
       }
 
       return Promise.resolve(media);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaTextBatch = async (mediaList) => {
+    try {
+      const { CmpMedia, CmpMediaText } = container.databaseService.accessors;
+      const creatableMediaList = [];
+      const creatableMediaTextList = [];
+
+      for (let i = 0; i < mediaList.length; i += 1) {
+        const mediaItem = mediaList[i];
+
+        const cmpMediaId = mediaItem.id || container.uuid();
+        const cmpMediaTextId = container.uuid();
+
+        creatableMediaTextList.push({
+          id: cmpMediaTextId,
+          text: mediaItem.text,
+        });
+
+        creatableMediaList.push({
+          id: cmpMediaId,
+          mediaType: 'text',
+          cmpMediaTextId,
+          cmpMediaImageId: null,
+          cmpMediaAudioId: null,
+          cmpMediaVideoId: null,
+          cmpMediaFileId: null,
+          cmpMediaLocationId: null,
+          cmpMediaViberTemplateId: null,
+        });
+      }
+
+      await CmpMediaText.createMediaTextBatch(creatableMediaTextList);
+      await CmpMedia.createMediaBatch(creatableMediaList);
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
@@ -92,6 +201,45 @@ export default (container) => {
     }
   };
 
+  const createMediaImageBatch = async (mediaList) => {
+    try {
+      const { CmpMedia, CmpMediaImage } = container.databaseService.accessors;
+      const creatableMediaList = [];
+      const creatableMediaImageList = [];
+
+      for (let i = 0; i < mediaList.length; i += 1) {
+        const mediaItem = mediaList[i];
+
+        const cmpMediaId = container.uuid();
+        const cmpMediaImageId = container.uuid();
+
+        creatableMediaImageList.push({
+          id: cmpMediaImageId,
+          url: mediaItem.url,
+          caption: mediaItem.caption,
+        });
+
+        creatableMediaList.push({
+          id: cmpMediaId,
+          mediaType: 'image',
+          cmpMediaTextId: null,
+          cmpMediaImageId,
+          cmpMediaAudioId: null,
+          cmpMediaVideoId: null,
+          cmpMediaFileId: null,
+          cmpMediaLocationId: null,
+          cmpMediaViberTemplateId: null,
+        });
+      }
+
+      await CmpMediaImage.createMediaImageBatch(creatableMediaImageList);
+      await CmpMedia.createMediaBatch(creatableMediaList);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createMediaImage = async (url, caption) => {
     try {
       const { CmpMedia, CmpMediaImage } = container.databaseService.accessors;
@@ -113,6 +261,44 @@ export default (container) => {
       );
       const mappedCmpMedia = mapMedia(cmpMedia);
       return Promise.resolve(mappedCmpMedia);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaAudioBatch = async (mediaList) => {
+    try {
+      const { CmpMedia, CmpMediaAudio } = container.databaseService.accessors;
+      const creatableMediaList = [];
+      const creatableMediaAudioList = [];
+
+      for (let i = 0; i < mediaList.length; i += 1) {
+        const mediaItem = mediaList[i];
+
+        const cmpMediaId = container.uuid();
+        const cmpMediaAudioId = container.uuid();
+
+        creatableMediaAudioList.push({
+          id: cmpMediaAudioId,
+          url: mediaItem.url,
+        });
+
+        creatableMediaList.push({
+          id: cmpMediaId,
+          mediaType: 'audio',
+          cmpMediaTextId: null,
+          cmpMediaImageId: null,
+          cmpMediaAudioId,
+          cmpMediaVideoId: null,
+          cmpMediaFileId: null,
+          cmpMediaLocationId: null,
+          cmpMediaViberTemplateId: null,
+        });
+      }
+
+      await CmpMediaAudio.createMediaAudioBatch(creatableMediaAudioList);
+      await CmpMedia.createMediaBatch(creatableMediaList);
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
@@ -144,6 +330,45 @@ export default (container) => {
     }
   };
 
+  const createMediaVideoBatch = async (mediaList) => {
+    try {
+      const { CmpMedia, CmpMediaVideo } = container.databaseService.accessors;
+      const creatableMediaList = [];
+      const creatableMediaVideoList = [];
+
+      for (let i = 0; i < mediaList.length; i += 1) {
+        const mediaItem = mediaList[i];
+
+        const cmpMediaId = container.uuid();
+        const cmpMediaVideoId = container.uuid();
+
+        creatableMediaVideoList.push({
+          id: cmpMediaVideoId,
+          url: mediaItem.url,
+          caption: mediaItem.caption,
+        });
+
+        creatableMediaList.push({
+          id: cmpMediaId,
+          mediaType: 'video',
+          cmpMediaTextId: null,
+          cmpMediaImageId: null,
+          cmpMediaAudioId: null,
+          cmpMediaVideoId,
+          cmpMediaFileId: null,
+          cmpMediaLocationId: null,
+          cmpMediaViberTemplateId: null,
+        });
+      }
+
+      await CmpMediaVideo.createMediaVideoBatch(creatableMediaVideoList);
+      await CmpMedia.createMediaBatch(creatableMediaList);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createMediaVideo = async (url, caption) => {
     try {
       const { CmpMedia, CmpMediaVideo } = container.databaseService.accessors;
@@ -165,6 +390,46 @@ export default (container) => {
       );
       const mappedCmpMedia = mapMedia(cmpMedia);
       return Promise.resolve(mappedCmpMedia);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaFileBatch = async (mediaList) => {
+    try {
+      const { CmpMedia, CmpMediaFile } = container.databaseService.accessors;
+      const creatableMediaList = [];
+      const creatableMediaFileList = [];
+
+      for (let i = 0; i < mediaList.length; i += 1) {
+        const mediaItem = mediaList[i];
+
+        const cmpMediaId = container.uuid();
+        const cmpMediaFileId = container.uuid();
+
+        creatableMediaFileList.push({
+          id: cmpMediaFileId,
+          url: mediaItem.url,
+          caption: mediaItem.caption,
+          fileName: mediaItem.fileName,
+        });
+
+        creatableMediaList.push({
+          id: cmpMediaId,
+          mediaType: 'file',
+          cmpMediaTextId: null,
+          cmpMediaImageId: null,
+          cmpMediaAudioId: null,
+          cmpMediaVideoId: null,
+          cmpMediaFileId,
+          cmpMediaLocationId: null,
+          cmpMediaViberTemplateId: null,
+        });
+      }
+
+      await CmpMediaFile.createMediaFileBatch(creatableMediaFileList);
+      await CmpMedia.createMediaBatch(creatableMediaList);
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
@@ -196,6 +461,47 @@ export default (container) => {
     }
   };
 
+  const createMediaLocationBatch = async (mediaList) => {
+    try {
+      const { CmpMedia, CmpMediaLocation } = container.databaseService.accessors;
+      const creatableMediaList = [];
+      const creatableMediaLocationList = [];
+
+      for (let i = 0; i < mediaList.length; i += 1) {
+        const mediaItem = mediaList[i];
+
+        const cmpMediaId = container.uuid();
+        const cmpMediaLocationId = container.uuid();
+
+        creatableMediaLocationList.push({
+          id: cmpMediaLocationId,
+          latitude: mediaItem.latitude,
+          longitude: mediaItem.longitude,
+          name: mediaItem.name,
+          address: mediaItem.address,
+        });
+
+        creatableMediaList.push({
+          id: cmpMediaId,
+          mediaType: 'location',
+          cmpMediaTextId: null,
+          cmpMediaImageId: null,
+          cmpMediaAudioId: null,
+          cmpMediaVideoId: null,
+          cmpMediaFileId: null,
+          cmpMediaLocationId,
+          cmpMediaViberTemplateId: null,
+        });
+      }
+
+      await CmpMediaLocation.createMediaLocationBatch(creatableMediaLocationList);
+      await CmpMedia.createMediaBatch(creatableMediaList);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createMediaLocation = async (
     latitude, longitude, name, address,
   ) => {
@@ -221,6 +527,46 @@ export default (container) => {
       );
       const mappedCmpMedia = mapMedia(cmpMedia);
       return Promise.resolve(mappedCmpMedia);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createMediaViberTemplateBatch = async (mediaList) => {
+    try {
+      const { CmpMedia, CmpMediaViberTemplate } = container.databaseService.accessors;
+      const creatableMediaList = [];
+      const creatableMediaViberTemplateList = [];
+
+      for (let i = 0; i < mediaList.length; i += 1) {
+        const mediaItem = mediaList[i];
+
+        const cmpMediaId = container.uuid();
+        const cmpMediaViberTemplateId = container.uuid();
+
+        creatableMediaViberTemplateList.push({
+          id: cmpMediaViberTemplateId,
+          url: mediaItem.url,
+          caption: mediaItem.caption,
+          actionUrl: mediaItem.actionUrl,
+        });
+
+        creatableMediaList.push({
+          id: cmpMediaId,
+          mediaType: 'viber_template',
+          cmpMediaTextId: null,
+          cmpMediaImageId: null,
+          cmpMediaAudioId: null,
+          cmpMediaVideoId: null,
+          cmpMediaFileId: null,
+          cmpMediaLocationId: null,
+          cmpMediaViberTemplateId,
+        });
+      }
+
+      await CmpMediaViberTemplate.createMediaViberTemplateBatch(creatableMediaViberTemplateList);
+      await CmpMedia.createMediaBatch(creatableMediaList);
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
@@ -292,6 +638,8 @@ export default (container) => {
     listMedias,
 
     createMedia,
+    createMediaBatch,
+
     readMedia,
 
     deleteMedia,

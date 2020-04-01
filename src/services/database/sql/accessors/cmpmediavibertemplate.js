@@ -165,6 +165,27 @@ export default (container) => {
     }
   };
 
+  const createMediaViberTemplateBatch = async (mediaList) => {
+    try {
+      const { CmpMediaViberTemplate } = container.databaseService.models;
+      const creatableMediaList = mediaList.map(mediaItem => ({
+        id: mediaItem.id || container.uuid(),
+        url: mediaItem.url,
+        caption: mediaItem.caption,
+        actionUrl: mediaItem.actionUrl,
+        deleted: false,
+      }));
+      const rawCmpMediaViberTemplates = await CmpMediaViberTemplate.bulkCreate(creatableMediaList);
+      const cmpMediaViberTemplate = rawCmpMediaViberTemplates.map(mapCmpMediaViberTemplate);
+      return Promise.resolve(cmpMediaViberTemplate);
+    } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createMediaViberTemplateBatch(mediaList);
+      }
+      return Promise.reject(error);
+    }
+  };
+
   const createMediaViberTemplate = async (
     url, caption, actionUrl,
   ) => {
@@ -261,6 +282,8 @@ export default (container) => {
     listMediaViberTemplates,
 
     createMediaViberTemplate,
+    createMediaViberTemplateBatch,
+
     readMediaViberTemplate,
 
     updateMediaViberTemplate,

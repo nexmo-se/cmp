@@ -393,6 +393,32 @@ export default (container) => {
     }
   };
 
+  const createMediaBatch = async (mediaList) => {
+    try {
+      const { CmpMedia } = container.databaseService.models;
+      const creatableMediaList = mediaList.map(mediaItem => ({
+        id: mediaItem.id || container.uuid(),
+        mediaType: mediaItem.mediaType,
+        cmpMediaTextId: mediaItem.cmpMediaTextId,
+        cmpMediaImageId: mediaItem.cmpMediaImageId,
+        cmpMediaAudioId: mediaItem.cmpMediaAudioId,
+        cmpMediaVideoId: mediaItem.cmpMediaVideoId,
+        cmpMediaFileId: mediaItem.cmpMediaFileId,
+        cmpMediaLocationId: mediaItem.cmpMediaLocationId,
+        cmpMediaViberTemplateId: mediaItem.cmpMediaViberTemplateId,
+        deleted: false,
+      }));
+      const rawCmpMedias = await CmpMedia.bulkCreate(creatableMediaList);
+      const cmpMedias = rawCmpMedias.map(mapCmpMediaAudio);
+      return Promise.resolve(cmpMedias);
+    } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createMediaBatch(mediaList);
+      }
+      return Promise.reject(error);
+    }
+  };
+
   const createMedia = async (
     mediaType,
     cmpMediaTextId,
@@ -507,6 +533,8 @@ export default (container) => {
     listMedias,
 
     createMedia,
+    createMediaBatch,
+
     readMedia,
 
     updateMedia,

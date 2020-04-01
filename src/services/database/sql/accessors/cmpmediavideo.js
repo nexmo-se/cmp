@@ -164,6 +164,26 @@ export default (container) => {
     }
   };
 
+  const createMediaVideoBatch = async (mediaList) => {
+    try {
+      const { CmpMediaVideo } = container.databaseService.models;
+      const creatableMediaList = mediaList.map(mediaItem => ({
+        id: mediaItem.id || container.uuid(),
+        url: mediaItem.url,
+        caption: mediaItem.caption,
+        deleted: false,
+      }));
+      const rawCmpMediaVideos = await CmpMediaVideo.bulkCreate(creatableMediaList);
+      const cmpMediaVideo = rawCmpMediaVideos.map(mapCmpMediaVideo);
+      return Promise.resolve(cmpMediaVideo);
+    } catch (error) {
+      if (error.name === 'SequelizeConnectionAcquireTimeoutError') {
+        return createMediaVideoBatch(mediaList);
+      }
+      return Promise.reject(error);
+    }
+  };
+
   const createMediaVideo = async (
     url, caption,
   ) => {
@@ -255,6 +275,8 @@ export default (container) => {
     listMediaVideos,
 
     createMediaVideo,
+    createMediaVideoBatch,
+
     readMediaVideo,
 
     updateMediaVideo,
