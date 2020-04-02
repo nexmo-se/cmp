@@ -8,8 +8,28 @@ export default (container) => {
       const { dataloadPath } = container.config.csv;
       const recordFilePath = `${dataloadPath}/records.csv`;
       const parametersFilePath = `${dataloadPath}/parameters.csv`;
+      const mediaFilePath = `${dataloadPath}/mediaList.csv`;
+
+      const mediaAudioFilePath = `${dataloadPath}/mediaAudioList.csv`;
+      const mediaFileFilePath = `${dataloadPath}/mediaFileList.csv`;
+      const mediaImageFilePath = `${dataloadPath}/mediaImageList.csv`;
+      const mediaLocationFilePath = `${dataloadPath}/mediaLocationList.csv`;
+      const mediaTextFilePath = `${dataloadPath}/mediaTextList.csv`;
+      const mediaViberTemplateFilePath = `${dataloadPath}/mediaViberTemplateList.csv`;
+      const mediaVideoFilePath = `${dataloadPath}/mediaVideoList.csv`;
+
+
       const recordsSql = `LOAD DATA LOCAL INFILE '${recordFilePath}' INTO TABLE CmpRecords FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
       const parametersSql = `LOAD DATA LOCAL INFILE '${parametersFilePath}' INTO TABLE CmpParameters FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+      const mediaListSql = `LOAD DATA LOCAL INFILE '${mediaFilePath}' INTO TABLE CmpMedia FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+
+      const mediaAudioSql = `LOAD DATA LOCAL INFILE '${mediaAudioFilePath}' INTO TABLE CmpMediaAudios FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+      const mediaFileSql = `LOAD DATA LOCAL INFILE '${mediaFileFilePath}' INTO TABLE CmpMediaFiles FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+      const mediaImageSql = `LOAD DATA LOCAL INFILE '${mediaImageFilePath}' INTO TABLE CmpMediaImages FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+      const mediaLocationSql = `LOAD DATA LOCAL INFILE '${mediaLocationFilePath}' INTO TABLE CmpMediaLocations FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+      const mediaTextSql = `LOAD DATA LOCAL INFILE '${mediaTextFilePath}' INTO TABLE CmpMediaTexts FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+      const mediaViberTemplateSql = `LOAD DATA LOCAL INFILE '${mediaViberTemplateFilePath}' INTO TABLE CmpMediaViberTemplates FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+      const mediaVideoSql = `LOAD DATA LOCAL INFILE '${mediaVideoFilePath}' INTO TABLE CmpMediaVideos FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
 
       const loadingStart = new Date().getTime();
 
@@ -26,6 +46,14 @@ export default (container) => {
       await client.query(parametersSql);
       const parametersEnd = new Date().getTime();
       L.debug(`Time Taken (DataLoading Parameters): ${parametersEnd - parametersStart}ms`);
+
+      // Dataload MediaList
+      L.trace('DataLoading Parameters');
+      const mediaStart = new Date().getTime();
+      await client.query(mediaListSql);
+      const mediaEnd = new Date().getTime();
+      L.debug(`Time Taken (DataLoading Media): ${mediaEnd - mediaStart}ms`);
+
 
       const loadingEnd = new Date().getTime();
       L.debug(`Time Taken (DataLoading Total): ${loadingEnd - loadingStart}ms`);
