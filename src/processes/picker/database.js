@@ -1,131 +1,100 @@
+import CreatableGenerator from './creatableGenerator';
+
 export default (container) => {
   const { L } = container.defaultLogger('Picker Process (Database)');
 
-  const generateCreatableRecord = (cmpRecordId, cmpMediaId, record) => {
-    const {
-      recipient,
-      cmpCampaignId, cmpTemplateId, cmpMedia,
-      activeStartHour, activeStartMinute,
-      activeEndHour, activeEndMinute,
-      activeOnWeekends, timezone,
-    } = record;
-    const sanitizedStart = container.dateTimeService
-      .getDateInUtc(activeStartHour, activeStartMinute, timezone);
-    const sanitizedEnd = container.dateTimeService
-      .getDateInUtc(activeEndHour, activeEndMinute, timezone);
+  const generator = CreatableGenerator(container);
 
-    const creatableRecord = {
-      id: cmpRecordId,
-      recipient,
-      cmpCampaignId,
-      cmpTemplateId,
-      activeStartHour: sanitizedStart.getUTCHours(),
-      activeStartMinute: sanitizedStart.getUTCMinutes(),
-      activeEndHour: sanitizedEnd.getUTCHours(),
-      activeEndMinute: sanitizedEnd.getUTCMinutes(),
-      activeOnWeekends,
-      timezone: container.dateTimeService.tzUTC,
-      status: 'pending',
-      statusTime: new Date(),
-    };
-    if (cmpMedia) {
-      creatableRecord.cmpMediaId = cmpMediaId;
-    }
-
-    return creatableRecord;
-  };
-
-  const generateCreatableParameters = (cmpRecordId, record) => {
-    const { cmpParameters } = record;
-
+  const createCreatableLists = (records) => {
+    const creatableRecords = [];
     const creatableParameters = [];
+    const creatableMediaList = [];
 
-    for (let i = 0; i < cmpParameters.length; i += 1) {
-      const creatableParameter = {
-        cmpRecordId,
-        parameter: cmpParameters[i],
-        order: i,
-      };
+    for (let i = 0; i < records.length; i += 1) {
+      const record = records[i];
 
-      creatableParameters.push(creatableParameter);
-    }
+      const cmpRecordId = container.uuid();
+      const cmpMediaId = container.uuid();
 
-    return creatableParameters;
-  };
+      // Record
+      const creatableRecord = generator.generateCreatableRecord(cmpRecordId, cmpMediaId, record);
+      creatableRecords.push(creatableRecord);
 
-  const generateCreatableMedia = (cmpMediaId, record) => {
-    const { cmpMedia } = record;
-
-    if (cmpMedia) {
-      const creatableMedia = {
-        id: cmpMediaId,
-        type: cmpMedia.type,
-        text: cmpMedia.text,
-        url: cmpMedia.url,
-        caption: cmpMedia.caption,
-        fileName: cmpMedia.fileName,
-        latitude: cmpMedia.latitude,
-        longitude: cmpMedia.longitude,
-        name: cmpMedia.name,
-        address: cmpMedia.address,
-        actionUrl: cmpMedia.actionUrl,
-      };
-
-      return creatableMedia;
-    }
-
-    return null;
-  };
-
-  const createRecordsDatabase = async (records) => {
-    try {
-      const { CmpRecord, CmpParameter, CmpMedia } = container.persistenceService;
-
-      const creatableRecords = [];
-      const creatableParameters = [];
-      const creatableMediaList = [];
-
-      for (let i = 0; i < records.length; i += 1) {
-        const record = records[i];
-
-        const cmpRecordId = container.uuid();
-        const cmpMediaId = container.uuid();
-
-        // Record
-        const creatableRecord = generateCreatableRecord(cmpRecordId, cmpMediaId, record);
-        creatableRecords.push(creatableRecord);
-
-        // Parameters
-        const creatableParameterList = generateCreatableParameters(cmpRecordId, record);
-        for (let j = 0; j < creatableParameterList.length; j += 1) {
-          const creatableParameter = creatableParameterList[j];
-          creatableParameters.push(creatableParameter);
-        }
-
-        // Media
-        const creatableMedia = generateCreatableMedia(cmpMediaId, record);
-        creatableMediaList.push(creatableMedia);
+      // Parameters
+      const creatableParameterList = generator.generateCreatableParameters(cmpRecordId, record);
+      for (let j = 0; j < creatableParameterList.length; j += 1) {
+        const creatableParameter = creatableParameterList[j];
+        creatableParameters.push(creatableParameter);
       }
 
-      // Create Media
-      const createMediaStart = new Date().getTime();
-      await CmpMedia.createMediaBatch(creatableParameters);
-      const createMediaEnd = new Date().getTime();
-      L.debug(`Time Taken (Create Media): ${createMediaEnd - createMediaStart}ms`);
+      // Media
+      const creatableMedia = generator.generateCreatableMedia(cmpMediaId, record);
+      if (creatableMedia != null) {
+        creatableMediaList.push(creatableMedia);
+      }
+    }
 
-      // Create Parameters
+    return {
+      records: creatableRecords,
+      parameters: creatableParameters,
+      media: creatableMediaList,
+    };
+  };
+
+  const insertRecords = async (creatableRecords) => {
+    try {
+      const { CmpRecord } = container.persistenceService;
+
+      const createRecordStart = new Date().getTime();
+      await CmpRecord.createRecordBatch(creatableRecords);
+      const createRecordEnd = new Date().getTime();
+      L.debug(`Time Taken (Create Records): ${createRecordEnd - createRecordStart}ms`);
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const insertParameters = async (creatableParameters) => {
+    try {
+      const { CmpParameter } = container.persistenceService;
+
       const createParameterStart = new Date().getTime();
       await CmpParameter.createParameterBatch(creatableParameters);
       const createParameterEnd = new Date().getTime();
       L.debug(`Time Taken (Create Parameters): ${createParameterEnd - createParameterStart}ms`);
 
-      // Create Records
-      const createRecordStart = new Date().getTime();
-      const createdRecords = await CmpRecord.createRecordBatch(creatableRecords);
-      const createRecordEnd = new Date().getTime();
-      L.debug(`Time Taken (Create Records): ${createRecordEnd - createRecordStart}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
 
-      return Promise.resolve(createdRecords);
+  const insertMedia = async (creatableMediaList) => {
+    try {
+      const { CmpMedia } = container.persistenceService;
+
+      const createMediaStart = new Date().getTime();
+      await CmpMedia.createMediaBatch(creatableMediaList);
+      const createMediaEnd = new Date().getTime();
+      L.debug(`Time Taken (Create Media): ${createMediaEnd - createMediaStart}ms`);
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createRecordsDatabase = async (records) => {
+    try {
+      const creatableLists = createCreatableLists(records);
+
+      await insertMedia(creatableLists.media);
+      await insertParameters(creatableLists.parameters);
+      await insertRecords(creatableLists.records);
+
+      return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }

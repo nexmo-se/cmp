@@ -1,69 +1,65 @@
+import CreatableGenerator from './creatableGenerator';
+
 export default (container) => {
   const { L } = container.defaultLogger('Picker Process (CSV)');
 
+  const generator = CreatableGenerator(container);
 
-  const dataLoadCsv = async () => {
+  const timePattern = 'YYYY-MM-DD HH:mm:ss';
+
+  const CsvTypes = {
+    record: 'records',
+    parameter: 'parameters',
+    media: 'media',
+
+    mediaAudio: 'mediaAudio',
+    mediaFile: 'mediaFile',
+    mediaImage: 'mediaImage',
+    mediaLocation: 'mediaLocation',
+    mediaText: 'mediaText',
+    mediaViberTemplate: 'mediaViberTemplate',
+    mediaVideo: 'mediaVideo',
+  };
+
+  const TableNames = {
+    record: 'CmpRecords',
+    parameter: 'CmpParameters',
+    media: 'CmpMedia',
+
+    mediaAudio: 'CmpMediaAudios',
+    mediaFile: 'CmpMediaFiles',
+    mediaImage: 'CmpMediaImages',
+    mediaLocation: 'CmpMediaLocations',
+    mediaText: 'CmpMediaTexts',
+    mediaViberTemplate: 'CmpMediaViberTemplates',
+    mediaVideo: 'CmpMediaVideos',
+  };
+
+  const getCsvPath = (csvType) => {
+    const { dataloadPath } = container.config.csv;
+    return `${dataloadPath}/${csvType}.csv`;
+  };
+
+  const getDataLoadSql = (csvType, tableName) => {
+    const filePath = getCsvPath(csvType);
+    return `LOAD DATA LOCAL INFILE '${filePath}' INTO TABLE ${tableName} FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
+  };
+
+  const dataLoadCsvType = async (csvType, tableName) => {
     try {
       const { client } = container.databaseService;
-      const { dataloadPath } = container.config.csv;
-      const recordFilePath = `${dataloadPath}/records.csv`;
-      const parametersFilePath = `${dataloadPath}/parameters.csv`;
-      const mediaFilePath = `${dataloadPath}/mediaList.csv`;
 
-      const mediaAudioFilePath = `${dataloadPath}/mediaAudioList.csv`;
-      const mediaFileFilePath = `${dataloadPath}/mediaFileList.csv`;
-      const mediaImageFilePath = `${dataloadPath}/mediaImageList.csv`;
-      const mediaLocationFilePath = `${dataloadPath}/mediaLocationList.csv`;
-      const mediaTextFilePath = `${dataloadPath}/mediaTextList.csv`;
-      const mediaViberTemplateFilePath = `${dataloadPath}/mediaViberTemplateList.csv`;
-      const mediaVideoFilePath = `${dataloadPath}/mediaVideoList.csv`;
+      const sql = getDataLoadSql(csvType, tableName);
 
+      L.trace(`DataLoading ${csvType}`);
+      const startTime = new Date().getTime();
+      await client.query(sql);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (DataLoading ${csvType}): ${endTime - startTime}ms`);
 
-      const recordsSql = `LOAD DATA LOCAL INFILE '${recordFilePath}' INTO TABLE CmpRecords FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-      const parametersSql = `LOAD DATA LOCAL INFILE '${parametersFilePath}' INTO TABLE CmpParameters FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-      const mediaListSql = `LOAD DATA LOCAL INFILE '${mediaFilePath}' INTO TABLE CmpMedia FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-
-      const mediaAudioSql = `LOAD DATA LOCAL INFILE '${mediaAudioFilePath}' INTO TABLE CmpMediaAudios FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-      const mediaFileSql = `LOAD DATA LOCAL INFILE '${mediaFileFilePath}' INTO TABLE CmpMediaFiles FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-      const mediaImageSql = `LOAD DATA LOCAL INFILE '${mediaImageFilePath}' INTO TABLE CmpMediaImages FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-      const mediaLocationSql = `LOAD DATA LOCAL INFILE '${mediaLocationFilePath}' INTO TABLE CmpMediaLocations FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-      const mediaTextSql = `LOAD DATA LOCAL INFILE '${mediaTextFilePath}' INTO TABLE CmpMediaTexts FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-      const mediaViberTemplateSql = `LOAD DATA LOCAL INFILE '${mediaViberTemplateFilePath}' INTO TABLE CmpMediaViberTemplates FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-      const mediaVideoSql = `LOAD DATA LOCAL INFILE '${mediaVideoFilePath}' INTO TABLE CmpMediaVideos FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n'`;
-
-      const loadingStart = new Date().getTime();
-
-      // Dataload Records
-      L.trace('DataLoading Records');
-      const recordsStart = new Date().getTime();
-      await client.query(recordsSql);
-      const recordsEnd = new Date().getTime();
-      L.debug(`Time Taken (DataLoading Records): ${recordsEnd - recordsStart}ms`);
-
-      // Dataload Parameters
-      L.trace('DataLoading Parameters');
-      const parametersStart = new Date().getTime();
-      await client.query(parametersSql);
-      const parametersEnd = new Date().getTime();
-      L.debug(`Time Taken (DataLoading Parameters): ${parametersEnd - parametersStart}ms`);
-
-      // Dataload MediaList
-      L.trace('DataLoading Parameters');
-      const mediaStart = new Date().getTime();
-      await client.query(mediaListSql);
-      const mediaEnd = new Date().getTime();
-      L.debug(`Time Taken (DataLoading Media): ${mediaEnd - mediaStart}ms`);
-
-
-      const loadingEnd = new Date().getTime();
-      L.debug(`Time Taken (DataLoading Total): ${loadingEnd - loadingStart}ms`);
-
-      // Delete Dataload Files
-      L.trace('Deleting DataLoad Files');
-      container.fileService.deleteFile(recordFilePath);
-      L.trace('Records DataLoad File deleted');
-      container.fileService.deleteFile(parametersFilePath);
-      L.trace('Parameters DataLoad File deleted');
+      L.trace(`Deleting DataLoad File (${csvType})`);
+      const csvPath = getCsvPath(csvType);
+      container.fileService.deleteFile(csvPath);
 
       return Promise.resolve();
     } catch (error) {
@@ -71,83 +67,114 @@ export default (container) => {
     }
   };
 
-  const generateCsvForDataLoad = async (records) => {
+  const dataLoadCsv = async () => {
     try {
-      const { dataloadPath } = container.config.csv;
-      const creatableRecords = records.map((record) => {
-        const {
-          recipient,
-          cmpCampaignId, cmpTemplateId, actualCmpMediaId,
-          activeStartHour, activeStartMinute,
-          activeEndHour, activeEndMinute,
-          activeOnWeekends, timezone,
-        } = record;
-        const sanitizedStart = container.dateTimeService
-          .getDateInUtc(activeStartHour, activeStartMinute, timezone);
-        const sanitizedEnd = container.dateTimeService
-          .getDateInUtc(activeEndHour, activeEndMinute, timezone);
-        return {
-          id: container.uuid(),
-          recipient,
-          cmpCampaignId,
-          cmpTemplateId,
-          actualCmpMediaId,
-          activeStartHour: sanitizedStart.getUTCHours(),
-          activeStartMinute: sanitizedStart.getUTCMinutes(),
-          activeEndHour: sanitizedEnd.getUTCHours(),
-          activeEndMinute: sanitizedEnd.getUTCMinutes(),
-          activeOnWeekends,
-          timezone: container.dateTimeService.tzUTC,
-          status: 'pending',
-          statusTime: new Date(),
-        };
-      });
+      const loadingStart = new Date().getTime();
 
-      const creatableParameters = [];
-      for (let i = 0; i < records.length; i += 1) {
-        const record = records[i];
-        const creatableRecord = creatableRecords[i];
+      await dataLoadCsvType(CsvTypes.record, TableNames.record);
+      await dataLoadCsvType(CsvTypes.parameter, TableNames.parameter);
+      await dataLoadCsvType(CsvTypes.media, TableNames.media);
 
-        const { cmpParameters } = record;
-        const { id } = creatableRecord;
+      await dataLoadCsvType(CsvTypes.mediaAudio, TableNames.mediaAudio);
+      await dataLoadCsvType(CsvTypes.mediaFile, TableNames.mediaFile);
+      await dataLoadCsvType(CsvTypes.mediaImage, TableNames.mediaImage);
+      await dataLoadCsvType(CsvTypes.mediaLocation, TableNames.mediaLocation);
+      await dataLoadCsvType(CsvTypes.mediaText, TableNames.mediaText);
+      await dataLoadCsvType(CsvTypes.mediaViberTemplate, TableNames.mediaViberTemplate);
+      await dataLoadCsvType(CsvTypes.mediaVideo, TableNames.mediaVideo);
 
-        for (let j = 0; j < cmpParameters.length; j += 1) {
-          const parameterItem = {
-            id: container.uuid(),
-            cmpRecordId: id,
-            parameter: cmpParameters[j],
-            order: j,
-          };
-          creatableParameters.push(parameterItem);
-        }
+      const loadingEnd = new Date().getTime();
+      L.debug(`Time Taken (DataLoading Total): ${loadingEnd - loadingStart}ms`);
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateCreatableLists = (records) => {
+    const creatableLists = {
+      records: [],
+      parameters: [],
+      media: [],
+
+      mediaAudio: [],
+      mediaFile: [],
+      mediaImage: [],
+      mediaLocation: [],
+      mediaText: [],
+      mediaViberTemplate: [],
+      mediaVideo: [],
+    };
+
+    for (let i = 0; i < records.length; i += 1) {
+      const record = records[i];
+
+      const cmpRecordId = container.uuid();
+      const cmpMediaId = container.uuid();
+      const cmpMediaTypeId = container.uuid();
+
+      const creatableRecord = generator.generateCreatableRecord(cmpRecordId, cmpMediaId, record);
+      creatableLists.records.push(creatableRecord);
+
+      const creatableParameterList = generator.generateCreatableParameters(cmpRecordId, record);
+      for (let j = 0; j < creatableParameterList.length; j += 1) {
+        const creatableParameter = creatableParameterList[j];
+        creatableLists.parameters.push(creatableParameter);
       }
 
-      const timePattern = 'YYYY-MM-DD HH:mm:ss';
+      const { cmpMedia } = record;
+      if (cmpMedia != null) {
+        const { type } = cmpMedia;
 
-      // Create Parameters
-      const createParameterStart = new Date().getTime();
-      const parametersCsvArray = creatableParameters.map(parameter => ([
-        parameter.id,
-        parameter.cmpRecordId,
-        parameter.parameter,
-        parameter.order,
-        0,
-        container.moment().format(timePattern).toUpperCase(),
-        container.moment().format(timePattern).toUpperCase(),
-      ]));
-      const parametersCsvString = await container.csvService.toCsv(parametersCsvArray);
-      await container.fileService.writeContent(`${dataloadPath}/parameters.csv`, parametersCsvString);
-      const createParameterEnd = new Date().getTime();
-      L.debug(`Time Taken (Create Dataload CSV Parameters): ${createParameterEnd - createParameterStart}ms`);
+        if (type === 'audio') {
+          const creatableMediaAudio = generator
+            .generateCreatableMediaAudio(cmpMediaTypeId, record);
+          creatableLists.mediaAudio.push(creatableMediaAudio);
+        } else if (type === 'file') {
+          const creatableMediaFile = generator
+            .generateCreatableMediaFile(cmpMediaTypeId, record);
+          creatableLists.mediaFile.push(creatableMediaFile);
+        } else if (type === 'image') {
+          const creatableMediaImage = generator
+            .generateCreatableMediaImage(cmpMediaTypeId, record);
+          creatableLists.mediaImage.push(creatableMediaImage);
+        } else if (type === 'location') {
+          const creatableMediaLocation = generator
+            .generateCreatableMediaLocation(cmpMediaTypeId, record);
+          creatableLists.mediaLocation.push(creatableMediaLocation);
+        } else if (type === 'text') {
+          const creatableMediaText = generator
+            .generateCreatableMediaText(cmpMediaTypeId, record);
+          creatableLists.mediaText.push(creatableMediaText);
+        } else if (type === 'viber_template') {
+          const creatableMediaViberTemplate = generator
+            .generateCreatableMediaViberTemplate(cmpMediaTypeId, record);
+          creatableLists.mediaViberTemplate.push(creatableMediaViberTemplate);
+        } else if (type === 'video') {
+          const creatableMediaVideo = generator
+            .generateCreatableMediaVideo(cmpMediaTypeId, record);
+          creatableLists.mediaVideo.push(creatableMediaVideo);
+        }
 
-      // Create Records
+        const creatableMedia = generator
+          .generateCreatableMediaRaw(cmpMediaId, cmpMediaTypeId, record);
+        creatableLists.media.push(creatableMedia);
+      }
+    }
+
+    return creatableLists;
+  };
+
+  const generateRecordCsv = async (records) => {
+    try {
       const createRecordStart = new Date().getTime();
-      const recordsCsvArray = creatableRecords.map(record => ([
+      const recordsCsvArray = records.map(record => ([
         record.id,
         record.recipient,
         record.cmpCampaignId,
         record.cmpTemplateId,
-        null,
+        record.cmpMediaId,
         record.activeStartHour,
         record.activeStartMinute,
         record.activeEndHour,
@@ -164,9 +191,214 @@ export default (container) => {
         (record.activeEndHour * 60) + record.activeEndMinute,
       ]));
       const recordsCsvString = await container.csvService.toCsv(recordsCsvArray);
-      await container.fileService.writeContent(`${dataloadPath}/records.csv`, recordsCsvString);
+      const csvPath = getCsvPath(CsvTypes.record);
+      await container.fileService.writeContent(csvPath, recordsCsvString);
       const createRecordEnd = new Date().getTime();
       L.debug(`Time Taken (Create Dataload CSV Records): ${createRecordEnd - createRecordStart}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateParameterCsv = async (parameters) => {
+    try {
+      const createParameterStart = new Date().getTime();
+      const parametersCsvArray = parameters.map(parameter => ([
+        parameter.id,
+        parameter.cmpRecordId,
+        parameter.parameter,
+        parameter.order,
+        0,
+        container.moment().format(timePattern).toUpperCase(),
+        container.moment().format(timePattern).toUpperCase(),
+      ]));
+      const parametersCsvString = await container.csvService.toCsv(parametersCsvArray);
+      const csvPath = getCsvPath(CsvTypes.parameter);
+      await container.fileService.writeContent(csvPath, parametersCsvString);
+      const createParameterEnd = new Date().getTime();
+      L.debug(`Time Taken (Create Dataload CSV Parameters): ${createParameterEnd - createParameterStart}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateMediaCsv = async (mediaList) => {
+    try {
+      const startTime = new Date().getTime();
+      const csvArray = mediaList.map(mediaItem => ([
+        mediaItem.id,
+        0, // deleted
+        container.moment().format(timePattern).toUpperCase(), // createdAt
+        container.moment().format(timePattern).toUpperCase(), // updatedAt
+      ]));
+      const csvString = await container.csvService.toCsv(csvArray);
+      const csvPath = getCsvPath(CsvTypes.media);
+      await container.fileService.writeContent(csvPath, csvString);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Create Dataload CSV Media): ${endTime - startTime}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateMediaAudioCsv = async (mediaList) => {
+    try {
+      const startTime = new Date().getTime();
+      const csvArray = mediaList.map(mediaItem => ([
+        mediaItem.id,
+        0, // deleted
+        container.moment().format(timePattern).toUpperCase(), // createdAt
+        container.moment().format(timePattern).toUpperCase(), // updatedAt
+      ]));
+      const csvString = await container.csvService.toCsv(csvArray);
+      const csvPath = getCsvPath(CsvTypes.mediaAudio);
+      await container.fileService.writeContent(csvPath, csvString);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Create Dataload CSV Media Audio): ${endTime - startTime}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateMediaFileCsv = async (mediaList) => {
+    try {
+      const startTime = new Date().getTime();
+      const csvArray = mediaList.map(mediaItem => ([
+        mediaItem.id,
+        0, // deleted
+        container.moment().format(timePattern).toUpperCase(), // createdAt
+        container.moment().format(timePattern).toUpperCase(), // updatedAt
+      ]));
+      const csvString = await container.csvService.toCsv(csvArray);
+      const csvPath = getCsvPath(CsvTypes.mediaFile);
+      await container.fileService.writeContent(csvPath, csvString);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Create Dataload CSV Media File): ${endTime - startTime}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateMediaImageCsv = async (mediaList) => {
+    try {
+      const startTime = new Date().getTime();
+      const csvArray = mediaList.map(mediaItem => ([
+        mediaItem.id,
+        0, // deleted
+        container.moment().format(timePattern).toUpperCase(), // createdAt
+        container.moment().format(timePattern).toUpperCase(), // updatedAt
+      ]));
+      const csvString = await container.csvService.toCsv(csvArray);
+      const csvPath = getCsvPath(CsvTypes.mediaImage);
+      await container.fileService.writeContent(csvPath, csvString);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Create Dataload CSV Media Image): ${endTime - startTime}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateMediaLocationCsv = async (mediaList) => {
+    try {
+      const startTime = new Date().getTime();
+      const csvArray = mediaList.map(mediaItem => ([
+        mediaItem.id,
+        0, // deleted
+        container.moment().format(timePattern).toUpperCase(), // createdAt
+        container.moment().format(timePattern).toUpperCase(), // updatedAt
+      ]));
+      const csvString = await container.csvService.toCsv(csvArray);
+      const csvPath = getCsvPath(CsvTypes.mediaLocation);
+      await container.fileService.writeContent(csvPath, csvString);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Create Dataload CSV Media Location): ${endTime - startTime}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateMediaTextCsv = async (mediaList) => {
+    try {
+      const startTime = new Date().getTime();
+      const csvArray = mediaList.map(mediaItem => ([
+        mediaItem.id,
+        0, // deleted
+        container.moment().format(timePattern).toUpperCase(), // createdAt
+        container.moment().format(timePattern).toUpperCase(), // updatedAt
+      ]));
+      const csvString = await container.csvService.toCsv(csvArray);
+      const csvPath = getCsvPath(CsvTypes.mediaText);
+      await container.fileService.writeContent(csvPath, csvString);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Create Dataload CSV Media Text): ${endTime - startTime}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateMediaViberTemplateCsv = async (mediaList) => {
+    try {
+      const startTime = new Date().getTime();
+      const csvArray = mediaList.map(mediaItem => ([
+        mediaItem.id,
+        0, // deleted
+        container.moment().format(timePattern).toUpperCase(), // createdAt
+        container.moment().format(timePattern).toUpperCase(), // updatedAt
+      ]));
+      const csvString = await container.csvService.toCsv(csvArray);
+      const csvPath = getCsvPath(CsvTypes.mediaViberTemplate);
+      await container.fileService.writeContent(csvPath, csvString);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Create Dataload CSV Media Viber Template): ${endTime - startTime}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateMediaVideoCsv = async (mediaList) => {
+    try {
+      const startTime = new Date().getTime();
+      const csvArray = mediaList.map(mediaItem => ([
+        mediaItem.id,
+        0, // deleted
+        container.moment().format(timePattern).toUpperCase(), // createdAt
+        container.moment().format(timePattern).toUpperCase(), // updatedAt
+      ]));
+      const csvString = await container.csvService.toCsv(csvArray);
+      const csvPath = getCsvPath(CsvTypes.mediaVideo);
+      await container.fileService.writeContent(csvPath, csvString);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Create Dataload CSV Media Video): ${endTime - startTime}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateCsvForDataLoad = async (records) => {
+    try {
+      const creatableLists = generateCreatableLists(records);
+
+      await generateRecordCsv(creatableLists.records);
+      await generateParameterCsv(creatableLists.parameters);
+      await generateMediaCsv(creatableLists.media);
+
+      await generateMediaAudioCsv(creatableLists.mediaAudio);
+      await generateMediaFileCsv(creatableLists.mediaFile);
+      await generateMediaImageCsv(creatableLists.mediaImage);
+      await generateMediaLocationCsv(creatableLists.mediaLocation);
+      await generateMediaTextCsv(creatableLists.mediaText);
+      await generateMediaViberTemplateCsv(creatableLists.mediaViberTemplate);
+      await generateMediaVideoCsv(creatableLists.mediaVideo);
 
       return Promise.resolve();
     } catch (error) {
