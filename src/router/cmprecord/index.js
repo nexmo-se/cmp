@@ -19,7 +19,7 @@ export default (container) => {
       const second = `0${now.getSeconds()}`.slice(-2);
       const prefix = `${year}${month}${date}${hour}${minute}${second}`;
       console.log(req.params);
-      cb(null, `${prefix}_${req.params.cmpCampaignId}_${req.params.cmpTemplateId}_${file.originalname}`);
+      cb(null, `${prefix}_${req.params.cmpCampaignId}_${req.params.cmpTemplateId}_${file.originalname}.tmp`);
     },
   });
   const upload = container.multer({ storage });

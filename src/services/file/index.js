@@ -58,6 +58,15 @@ export default (container) => {
     }
   };
 
+  const renameFile = async (oldPath, newPath) => {
+    try {
+      container.fs.renameSync(oldPath, newPath);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const deleteFile = async (path) => {
     try {
       container.fs.unlinkSync(path);
@@ -77,6 +86,7 @@ export default (container) => {
     writeContent,
     writeBuffer,
 
+    renameFile,
     deleteFile,
   };
 };
