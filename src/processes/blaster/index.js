@@ -1,5 +1,9 @@
+import CampaignDetailReporter from './campaignDetail';
+
 export default (container) => {
   const { L } = container.defaultLogger('Blaster Process');
+
+  const campaignDetailReporter = CampaignDetailReporter(container);
 
   const getRecords = async (recordSize) => {
     try {
@@ -142,6 +146,7 @@ export default (container) => {
 
   const updateCampaignStatus = async (campaign, isStart = true, isEnd = true) => {
     try {
+      const { generateReport } = container.config.blaster;
       const { CmpRecord, CmpCampaign } = container.persistenceService;
       const cmpCampaignId = campaign.id;
       const currentTime = new Date();
@@ -166,15 +171,37 @@ export default (container) => {
         L.debug(`Time Taken (Count Pending/Queuing Records): ${duration}ms`);
 
         if (recordsCount === 0) {
-          const actualStartDate = campaign.actualStartDate || currentTime;
           // End, last record
-          changes.status = 'completed';
-          changes.statusTime = currentTime;
+          const actualStartDate = campaign.actualStartDate || currentTime;
           changes.actualEndDate = currentTime;
           changes.actualDuration = currentTime.getTime() - actualStartDate.getTime();
-          L.trace(`Updating Campaign ${cmpCampaignId} Status to completed at ${currentTime}`);
 
-          await publishCampaignStatusAudit(campaign, 'completed');
+          if (generateReport) {
+            // Reporting State
+            changes.status = 'reporting';
+            changes.statusTime = currentTime;
+            L.trace(`Updating Campaign ${cmpCampaignId} Status to reporting at ${currentTime}`);
+
+            await publishCampaignStatusAudit(campaign, 'reporting');
+
+            // Generate Report
+            const { filePath } = container.config.report;
+            const fileName = `${cmpCampaignId}.csv`;
+            const fullPath = `${filePath}/${fileName}`;
+            campaignDetailReporter.generateCampaign(cmpCampaignId, fullPath)
+              .then(() => publishCampaignStatusAudit(campaign, 'completed'))
+              .then(() => CmpCampaign.updateCampaign(cmpCampaignId, {
+                status: 'completed',
+                statusTime: new Date(),
+              }));
+          } else {
+            // Direct Complete
+            changes.status = 'completed';
+            changes.statusTime = currentTime;
+            L.trace(`Updating Campaign ${cmpCampaignId} Status to completed at ${currentTime}`);
+
+            await publishCampaignStatusAudit(campaign, 'completed');
+          }
         }
       }
 
