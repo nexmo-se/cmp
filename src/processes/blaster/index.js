@@ -188,12 +188,12 @@ export default (container) => {
             const { filePath } = container.config.report;
             const fileName = `${cmpCampaignId}.csv`;
             const fullPath = `${filePath}/${fileName}`;
-            campaignDetailReporter.generateCampaign(cmpCampaignId, fullPath)
+            setTimeout(() => campaignDetailReporter.generateCampaign(cmpCampaignId, fullPath)
               .then(() => publishCampaignStatusAudit(campaign, 'completed'))
               .then(() => CmpCampaign.updateCampaign(cmpCampaignId, {
                 status: 'completed',
                 statusTime: new Date(),
-              }));
+              })), 60000);
           } else {
             // Direct Complete
             changes.status = 'completed';
