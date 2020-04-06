@@ -37,6 +37,10 @@ export default {
     useQueue: (process.env.USE_QUEUE || 'false').toLowerCase() === 'true',
     queueDelay: parseInt(process.env.QUEUE_DELAY || '1', 10),
   },
+  audit: {
+    saveRecordAudits: (process.env.SAVE_RECORDS_AUDITS || 'false').toLowerCase() === 'true',
+    saveCampaignAudits: (process.env.SAVE_CAMPAIGNS_AUDITS || 'false').toLowerCase() === 'true',
+  },
   nexmo: {
     host: process.env.NEXMO_API,
     restHost: process.env.NEXMO_REST_API,

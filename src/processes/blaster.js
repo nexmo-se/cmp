@@ -99,11 +99,18 @@ export default (container) => {
 
   const publishCampaignStatusAudit = async (campaign, status) => {
     try {
+      const { saveCampaignAudits } = container.config.audit;
       const { CmpCampaignStatusAudit } = container.persistenceService;
+
       const statusTime = new Date();
       const startTime = new Date().getTime();
-      const cmpCampaignStatusAudit = await CmpCampaignStatusAudit
-        .createCampaignStatusAudit(campaign.id, status, statusTime);
+
+      let cmpCampaignStatusAudit;
+      if (saveCampaignAudits) {
+        cmpCampaignStatusAudit = await CmpCampaignStatusAudit
+          .createCampaignStatusAudit(campaign.id, status, statusTime);
+      }
+
       const endTime = new Date().getTime();
       const duration = endTime - startTime;
       L.debug(`Time Taken (Publish Campaign Status Audit): ${duration}ms`);
