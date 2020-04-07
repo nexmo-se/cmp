@@ -27,6 +27,7 @@ export default {
     secondsPerBatch: parseInt(process.env.SECONDS_PER_BATCH || '5', 10),
     recordsPerBatch: parseInt(process.env.RECORDS_PER_BATCH || '30', 10),
     useMockBlast: (process.env.USE_MOCK_BLAST || 'false').toLowerCase() === 'true',
+    generateReport: (process.env.BLASTER_GENERATE_REPORT || 'false').toLowerCase() === 'true',
   },
   report: {
     delay: parseInt(process.env.REPORT_DELAY || '5', 10),
@@ -36,6 +37,10 @@ export default {
   webhook: {
     useQueue: (process.env.USE_QUEUE || 'false').toLowerCase() === 'true',
     queueDelay: parseInt(process.env.QUEUE_DELAY || '1', 10),
+  },
+  audit: {
+    saveRecordAudits: (process.env.SAVE_RECORDS_AUDITS || 'false').toLowerCase() === 'true',
+    saveCampaignAudits: (process.env.SAVE_CAMPAIGNS_AUDITS || 'false').toLowerCase() === 'true',
   },
   nexmo: {
     host: process.env.NEXMO_API,

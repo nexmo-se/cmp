@@ -51,7 +51,13 @@ export default (container) => {
   const publishMapiStatusAudit = async (data) => {
     try {
       const { useQueue } = container.config.webhook;
+      const { saveRecordAudits } = container.config.audit;
       const { CmpRecordMessageStatusAudit } = container.persistenceService;
+
+      if (!saveRecordAudits) {
+        return Promise.resolve();
+      }
+
       const {
         to, from,
         timestamp, status,
@@ -114,7 +120,13 @@ export default (container) => {
   const publishSmsStatusAudit = async (data) => {
     try {
       const { useQueue } = container.config.webhook;
+      const { saveRecordAudits } = container.config.audit;
       const { CmpRecordMessageStatusAudit } = container.persistenceService;
+
+      if (!saveRecordAudits) {
+        return Promise.resolve();
+      }
+
       const {
         msisdn, to,
         messageId,

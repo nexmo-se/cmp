@@ -66,6 +66,17 @@ export default (container) => {
       const statusBuckets = {};
       const messageIds = Object.keys(updates);
 
+      // Make sure all message ids are available
+      const recordMessageIdMap = await getRecordMessageIdMap(messageIds);
+      for (let i = 0; i < messageIds.length; i += 1) {
+        const messageId = messageIds[i];
+        if (recordMessageIdMap[messageId] == null) {
+          // Not yet created, back into queue
+          queue.recordMessageUpdates[messageId] = updates[messageId];
+          delete updates[messageId];
+        }
+      }
+
       if (messageIds.length > 0) {
         const mapStartTime = new Date().getTime();
         const totalStartTime = new Date().getTime();
@@ -157,24 +168,31 @@ export default (container) => {
 
         // Inject Record Message ID
         const injectStartTime = new Date().getTime();
+        const availableAudits = [];
         for (let i = 0; i < audits.length; i += 1) {
           const audit = audits[i];
           const { messageUuid } = audit;
-          audits[i].cmpRecordMessageId = recordMessageIdMap[messageUuid];
+          if (recordMessageIdMap[messageUuid] == null) {
+            // Record Message not available, back into queue
+            queue.mapiStatusAudits.push(audit[i]);
+          } else {
+            audits[i].cmpRecordMessageId = recordMessageIdMap[messageUuid];
+            availableAudits.push(audits[i]);
+          }
         }
         const injectEndTime = new Date().getTime();
         L.debug(`Time Taken (MAPI Record Message ID Inject): ${injectEndTime - injectStartTime}ms`);
 
         // Bulk Insert
         const createStartTime = new Date().getTime();
-        await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditMapiBatch(audits);
+        await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditMapiBatch(availableAudits);
         const createEndTime = new Date().getTime();
         L.debug(`Time Taken (MAPI Audit Create): ${createEndTime - createStartTime}ms`);
         /* End of Do Something */
 
         const endTime = new Date().getTime();
-        L.debug(`Time Taken (MAPI Status Audits Saving)[${audits.length}]: ${endTime - startTime}ms`);
-        L.trace(`${audits.length} MAPI Status Audits saved`);
+        L.debug(`Time Taken (MAPI Status Audits Saving)[${availableAudits.length}]: ${endTime - startTime}ms`);
+        L.trace(`${availableAudits.length} MAPI Status Audits saved`);
       } else {
         L.trace('Nothing to save for MAPI Status Audits');
       }
@@ -202,24 +220,31 @@ export default (container) => {
 
         // Inject Record Message ID
         const injectStartTime = new Date().getTime();
+        const availableAudits = [];
         for (let i = 0; i < audits.length; i += 1) {
           const audit = audits[i];
           const { messageId } = audit;
-          audits[i].cmpRecordMessageId = recordMessageIdMap[messageId];
+          if (recordMessageIdMap[messageId] == null) {
+            // Record Message not available, back into queue
+            queue.smsStatusAudits.push(audit[i]);
+          } else {
+            audits[i].cmpRecordMessageId = recordMessageIdMap[messageId];
+            availableAudits.push(audits[i]);
+          }
         }
         const injectEndTime = new Date().getTime();
         L.debug(`Time Taken (SMS Record Message ID Inject): ${injectEndTime - injectStartTime}ms`);
 
         // Bulk Insert
         const createStartTime = new Date().getTime();
-        await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditSmsBatch(audits);
+        await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditSmsBatch(availableAudits);
         const createEndTime = new Date().getTime();
         L.debug(`Time Taken (SMS Audit Create): ${createEndTime - createStartTime}ms`);
         /* End of Do Something */
 
         const endTime = new Date().getTime();
-        L.debug(`Time Taken (SMS Status Audits Saving)[${audits.length}]: ${endTime - startTime}ms`);
-        L.trace(`${audits.length} SMS Status Audits saved`);
+        L.debug(`Time Taken (SMS Status Audits Saving)[${availableAudits.length}]: ${endTime - startTime}ms`);
+        L.trace(`${availableAudits.length} SMS Status Audits saved`);
       } else {
         L.trace('Nothing to save for SMS Status Audits');
       }

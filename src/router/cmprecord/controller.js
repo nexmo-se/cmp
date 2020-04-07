@@ -434,6 +434,13 @@ export default (container) => {
         filename: file.filename,
         size: file.size,
       };
+
+      const oldPath = `${container.config.csv.uploadPath}/${file.filename}`;
+      const newPath = oldPath.replace(/.tmp/g, '');
+      L.debug(oldPath);
+      L.debug(newPath);
+
+      await container.fileService.renameFile(oldPath, newPath);
       res.status(200).json(uploadedFile);
     } catch (error) {
       next(error);
