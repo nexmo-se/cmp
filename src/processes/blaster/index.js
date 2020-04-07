@@ -146,7 +146,7 @@ export default (container) => {
 
   const updateCampaignStatus = async (campaign, isStart = true, isEnd = true) => {
     try {
-      const { generateReport } = container.config.blaster;
+      const { generateReport, reportDelay } = container.config.blaster;
       const { CmpRecord, CmpCampaign } = container.persistenceService;
       const cmpCampaignId = campaign.id;
       const currentTime = new Date();
@@ -193,7 +193,7 @@ export default (container) => {
               .then(() => CmpCampaign.updateCampaign(cmpCampaignId, {
                 status: 'completed',
                 statusTime: new Date(),
-              })), 60000);
+              })), reportDelay * 1000);
           } else {
             // Direct Complete
             changes.status = 'completed';
