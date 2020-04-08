@@ -174,7 +174,7 @@ export default (container) => {
           const { messageUuid } = audit;
           if (recordMessageIdMap[messageUuid] == null) {
             // Record Message not available, back into queue
-            queue.mapiStatusAudits.push(audit[i]);
+            queue.mapiStatusAudits.push(audits[i]);
           } else {
             audits[i].cmpRecordMessageId = recordMessageIdMap[messageUuid];
             availableAudits.push(audits[i]);
@@ -226,7 +226,7 @@ export default (container) => {
           const { messageId } = audit;
           if (recordMessageIdMap[messageId] == null) {
             // Record Message not available, back into queue
-            queue.smsStatusAudits.push(audit[i]);
+            queue.smsStatusAudits.push(audits[i]);
           } else {
             audits[i].cmpRecordMessageId = recordMessageIdMap[messageId];
             availableAudits.push(audits[i]);
