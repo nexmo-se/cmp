@@ -7,6 +7,36 @@ export default (container) => {
     smsStatusAudits: [],
   };
 
+  const StatusHierarchy = {
+    draft: 0,
+    pending: 1,
+    queuing: 2,
+    requested: 3,
+    submitted: 4,
+    delivered: 5,
+    rejected: 5,
+    undeliverable: 5,
+    read: 6,
+  };
+
+  const getOverwritableStatuses = (status) => {
+    const keys = Object.keys(StatusHierarchy);
+    const overwritableStatuses = [];
+
+    const hierarchy = StatusHierarchy[status] || 0;
+
+    for (let i = 0; i < keys.length; i += 1) {
+      const key = keys[i];
+      const keyHierarchy = StatusHierarchy[key];
+
+      if (keyHierarchy <= hierarchy) {
+        overwritableStatuses.push(key);
+      }
+    }
+
+    return overwritableStatuses;
+  };
+
   const initialize = () => {
     const { queueDelay } = container.config.webhook;
     L.trace('Initialize Queue Service');
@@ -72,7 +102,14 @@ export default (container) => {
         const messageId = messageIds[i];
         if (recordMessageIdMap[messageId] == null) {
           // Not yet created, back into queue
-          queue.recordMessageUpdates[messageId] = updates[messageId];
+          const currentStatus = queue.recordMessageUpdates[messageId];
+          const status = updates[messageId];
+          if (currentStatus == null) {
+            queue.recordMessageUpdates[messageId] = status;
+          } else if (StatusHierarchy[status] >= StatusHierarchy[currentStatus]) {
+            queue.recordMessageUpdates[messageId] = status;
+          }
+
           delete updates[messageId];
         }
       }
@@ -115,7 +152,18 @@ export default (container) => {
               }
 
               // Update Record Message
-              const criteria = { messageId: messageIdsMap };
+              const { Op } = container.Sequelize;
+              const criteria = {
+                messageId: messageIdsMap,
+                [Op.or]: [
+                  { status: getOverwritableStatuses(status) },
+                  {
+                    status: {
+                      [Op.is]: null,
+                    },
+                  },
+                ],
+              };
               const changes = { status, statusTime: new Date() };
               const options = { noGet: true };
               await CmpRecordMessage.updateRecordMessages(criteria, changes, options);
@@ -256,7 +304,12 @@ export default (container) => {
   };
 
   const pushRecordMessageUpdate = (messageId, status) => {
-    queue.recordMessageUpdates[messageId] = status;
+    const currentStatus = queue.recordMessageUpdates[messageId];
+    if (currentStatus == null) {
+      queue.recordMessageUpdates[messageId] = status;
+    } else if (StatusHierarchy[status] >= StatusHierarchy[currentStatus]) {
+      queue.recordMessageUpdates[messageId] = status;
+    }
   };
 
   const pushMapiStatusAudit = (data) => {
