@@ -28,6 +28,7 @@ export default {
     recordsPerBatch: parseInt(process.env.RECORDS_PER_BATCH || '30', 10),
     useMockBlast: (process.env.USE_MOCK_BLAST || 'false').toLowerCase() === 'true',
     generateReport: (process.env.BLASTER_GENERATE_REPORT || 'false').toLowerCase() === 'true',
+    reportDelay: parseInt(process.env.BLASTER_REPORT_DELAY || '5', 10),
   },
   report: {
     delay: parseInt(process.env.REPORT_DELAY || '5', 10),
