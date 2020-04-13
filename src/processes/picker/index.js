@@ -22,7 +22,7 @@ export default (container) => {
     }
 
     // Load Columns
-    for (let i = 1; i < csvRecord.length; i += 1) {
+    for (let i = 0; i < csvRecord.length; i += 1) {
       const column = columns[i];
       const data = csvRecord[i].trim();
 
