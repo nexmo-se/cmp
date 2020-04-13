@@ -283,6 +283,9 @@ export default (container) => {
 
         // Archive
         await archiveFile(csvFile);
+
+        // Update Count
+        numFilesPicked = 1;
       }
 
       L.info(`${numFilesPicked} files processed`);
