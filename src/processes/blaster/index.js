@@ -337,6 +337,7 @@ export default (container) => {
 
       let media = cmpMedia;
       if (type === 'text') {
+        L.trace('Sending Facebook Text');
         const parameters = cmpParameters
           .sort((a, b) => a.order - b.order)
           .map(cmpParameter => cmpParameter.parameter);
