@@ -156,7 +156,6 @@ export default (container) => {
     type: 'image',
     image: {
       link: image.url,
-      caption: image.caption,
     },
   });
 
@@ -171,7 +170,6 @@ export default (container) => {
     type: 'video',
     video: {
       link: video.url,
-      caption: video.caption,
     },
   });
 
@@ -179,7 +177,6 @@ export default (container) => {
     type: 'document',
     document: {
       link: file.url,
-      caption: file.caption,
       filename: file.fileName,
     },
   });
