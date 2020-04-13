@@ -229,6 +229,14 @@ export default (container) => {
       const startTime = new Date().getTime();
       const csvArray = mediaList.map(mediaItem => ([
         mediaItem.id,
+        mediaItem.mediaType || '',
+        mediaItem.cmpMediaTextId || '',
+        mediaItem.cmpMediaImageId || '',
+        mediaItem.cmpMediaAudioId || '',
+        mediaItem.cmpMediaVideoId || '',
+        mediaItem.cmpMediaFileId || '',
+        mediaItem.cmpMediaLocationId || '',
+        mediaItem.cmpMediaViberTemplateId || '',
         0, // deleted
         container.moment().format(timePattern).toUpperCase(), // createdAt
         container.moment().format(timePattern).toUpperCase(), // updatedAt
@@ -249,6 +257,7 @@ export default (container) => {
       const startTime = new Date().getTime();
       const csvArray = mediaList.map(mediaItem => ([
         mediaItem.id,
+        mediaItem.url,
         0, // deleted
         container.moment().format(timePattern).toUpperCase(), // createdAt
         container.moment().format(timePattern).toUpperCase(), // updatedAt
@@ -269,6 +278,9 @@ export default (container) => {
       const startTime = new Date().getTime();
       const csvArray = mediaList.map(mediaItem => ([
         mediaItem.id,
+        mediaItem.url,
+        mediaItem.caption,
+        mediaItem.fileName,
         0, // deleted
         container.moment().format(timePattern).toUpperCase(), // createdAt
         container.moment().format(timePattern).toUpperCase(), // updatedAt
@@ -289,6 +301,8 @@ export default (container) => {
       const startTime = new Date().getTime();
       const csvArray = mediaList.map(mediaItem => ([
         mediaItem.id,
+        mediaItem.url,
+        mediaItem.caption,
         0, // deleted
         container.moment().format(timePattern).toUpperCase(), // createdAt
         container.moment().format(timePattern).toUpperCase(), // updatedAt
@@ -309,6 +323,10 @@ export default (container) => {
       const startTime = new Date().getTime();
       const csvArray = mediaList.map(mediaItem => ([
         mediaItem.id,
+        mediaItem.latitude,
+        mediaItem.longitude,
+        mediaItem.name,
+        mediaItem.address,
         0, // deleted
         container.moment().format(timePattern).toUpperCase(), // createdAt
         container.moment().format(timePattern).toUpperCase(), // updatedAt
@@ -329,6 +347,7 @@ export default (container) => {
       const startTime = new Date().getTime();
       const csvArray = mediaList.map(mediaItem => ([
         mediaItem.id,
+        mediaItem.text,
         0, // deleted
         container.moment().format(timePattern).toUpperCase(), // createdAt
         container.moment().format(timePattern).toUpperCase(), // updatedAt
@@ -349,6 +368,9 @@ export default (container) => {
       const startTime = new Date().getTime();
       const csvArray = mediaList.map(mediaItem => ([
         mediaItem.id,
+        mediaItem.url,
+        mediaItem.caption,
+        mediaItem.actionUrl,
         0, // deleted
         container.moment().format(timePattern).toUpperCase(), // createdAt
         container.moment().format(timePattern).toUpperCase(), // updatedAt
@@ -369,6 +391,8 @@ export default (container) => {
       const startTime = new Date().getTime();
       const csvArray = mediaList.map(mediaItem => ([
         mediaItem.id,
+        mediaItem.url,
+        mediaItem.caption,
         0, // deleted
         container.moment().format(timePattern).toUpperCase(), // createdAt
         container.moment().format(timePattern).toUpperCase(), // updatedAt
