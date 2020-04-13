@@ -125,33 +125,33 @@ export default (container) => {
 
       const { cmpMedia } = record;
       if (cmpMedia != null) {
-        const { type } = cmpMedia;
+        const { mediaType } = cmpMedia;
 
-        if (type === 'audio') {
+        if (mediaType === 'audio') {
           const creatableMediaAudio = generator
             .generateCreatableMediaAudio(cmpMediaTypeId, record);
           creatableLists.mediaAudio.push(creatableMediaAudio);
-        } else if (type === 'file') {
+        } else if (mediaType === 'file') {
           const creatableMediaFile = generator
             .generateCreatableMediaFile(cmpMediaTypeId, record);
           creatableLists.mediaFile.push(creatableMediaFile);
-        } else if (type === 'image') {
+        } else if (mediaType === 'image') {
           const creatableMediaImage = generator
             .generateCreatableMediaImage(cmpMediaTypeId, record);
           creatableLists.mediaImage.push(creatableMediaImage);
-        } else if (type === 'location') {
+        } else if (mediaType === 'location') {
           const creatableMediaLocation = generator
             .generateCreatableMediaLocation(cmpMediaTypeId, record);
           creatableLists.mediaLocation.push(creatableMediaLocation);
-        } else if (type === 'text') {
+        } else if (mediaType === 'text') {
           const creatableMediaText = generator
             .generateCreatableMediaText(cmpMediaTypeId, record);
           creatableLists.mediaText.push(creatableMediaText);
-        } else if (type === 'viber_template') {
+        } else if (mediaType === 'viber_template') {
           const creatableMediaViberTemplate = generator
             .generateCreatableMediaViberTemplate(cmpMediaTypeId, record);
           creatableLists.mediaViberTemplate.push(creatableMediaViberTemplate);
-        } else if (type === 'video') {
+        } else if (mediaType === 'video') {
           const creatableMediaVideo = generator
             .generateCreatableMediaVideo(cmpMediaTypeId, record);
           creatableLists.mediaVideo.push(creatableMediaVideo);
