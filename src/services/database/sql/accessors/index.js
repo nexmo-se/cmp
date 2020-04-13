@@ -19,6 +19,7 @@ import CmpMediaAudio from './cmpmediaaudio';
 import CmpMediaVideo from './cmpmediavideo';
 import CmpMediaFile from './cmpmediafile';
 import CmpMediaLocation from './cmpmedialocation';
+import CmpMediaViberTemplate from './cmpmediavibertemplate';
 
 import CmpRecordMessageStatusAuditMapi from './cmprecordmessagestatusauditmapi';
 import CmpRecordMessageStatusAuditSms from './cmprecordmessagestatusauditsms';
@@ -49,6 +50,7 @@ export default container => ({
   CmpMediaVideo: CmpMediaVideo(container),
   CmpMediaFile: CmpMediaFile(container),
   CmpMediaLocation: CmpMediaLocation(container),
+  CmpMediaViberTemplate: CmpMediaViberTemplate(container),
 
   CmpRecordMessageStatusAuditMapi: CmpRecordMessageStatusAuditMapi(container),
   CmpRecordMessageStatusAuditSms: CmpRecordMessageStatusAuditSms(container),
