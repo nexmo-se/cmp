@@ -251,7 +251,7 @@ export default (container) => {
       const {
         recipient, cmpTemplate, cmpParameters, cmpMedia,
       } = record;
-      const { type } = cmpMedia || {};
+      const { mediaType: type } = cmpMedia || {};
       const { whatsappTemplateNamespace, whatsappTemplateName, cmpChannel } = cmpTemplate;
       const { senderId, cmpApplication } = cmpChannel;
       const { applicationId, privateKey } = cmpApplication || {};
