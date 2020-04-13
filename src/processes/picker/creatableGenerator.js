@@ -7,6 +7,7 @@ export default (container) => {
       activeEndHour, activeEndMinute,
       activeOnWeekends, timezone,
     } = record;
+
     const sanitizedStart = container.dateTimeService
       .getDateInUtc(activeStartHour, activeStartMinute, timezone);
     const sanitizedEnd = container.dateTimeService
@@ -57,7 +58,7 @@ export default (container) => {
     if (cmpMedia) {
       const creatableMedia = {
         id: cmpMediaId,
-        type: cmpMedia.type,
+        type: cmpMedia.mediaType,
         text: cmpMedia.text,
         url: cmpMedia.url,
         caption: cmpMedia.caption,
@@ -81,29 +82,29 @@ export default (container) => {
     if (cmpMedia) {
       const creatableMedia = {
         id: cmpMediaId,
-        mediaType: cmpMedia.type,
+        mediaType: cmpMedia.mediaType,
       };
 
 
-      if (cmpMedia.type === 'text') {
+      if (cmpMedia.mediaType === 'text') {
         creatableMedia.cmpMediaTextId = cmpMediaTypeId;
       }
-      if (cmpMedia.type === 'image') {
+      if (cmpMedia.mediaType === 'image') {
         creatableMedia.cmpMediaImageId = cmpMediaTypeId;
       }
-      if (cmpMedia.type === 'audio') {
+      if (cmpMedia.mediaType === 'audio') {
         creatableMedia.cmpMediaAudioId = cmpMediaTypeId;
       }
-      if (cmpMedia.type === 'video') {
+      if (cmpMedia.mediaType === 'video') {
         creatableMedia.cmpMediaVideoId = cmpMediaTypeId;
       }
-      if (cmpMedia.type === 'file') {
+      if (cmpMedia.mediaType === 'file') {
         creatableMedia.cmpMediaFileId = cmpMediaTypeId;
       }
-      if (cmpMedia.type === 'location') {
+      if (cmpMedia.mediaType === 'location') {
         creatableMedia.cmpMediaLocationId = cmpMediaTypeId;
       }
-      if (cmpMedia.type === 'viber_template') {
+      if (cmpMedia.mediaType === 'viber_template') {
         creatableMedia.cmpMediaViberTemplateId = cmpMediaTypeId;
       }
 
