@@ -210,7 +210,7 @@ export default (container) => {
       for (let i = 0; i < mediaList.length; i += 1) {
         const mediaItem = mediaList[i];
 
-        const cmpMediaId = container.uuid();
+        const cmpMediaId = mediaItem.id || container.uuid();
         const cmpMediaImageId = container.uuid();
 
         creatableMediaImageList.push({
@@ -275,7 +275,7 @@ export default (container) => {
       for (let i = 0; i < mediaList.length; i += 1) {
         const mediaItem = mediaList[i];
 
-        const cmpMediaId = container.uuid();
+        const cmpMediaId = mediaItem.id || container.uuid();
         const cmpMediaAudioId = container.uuid();
 
         creatableMediaAudioList.push({
@@ -339,7 +339,7 @@ export default (container) => {
       for (let i = 0; i < mediaList.length; i += 1) {
         const mediaItem = mediaList[i];
 
-        const cmpMediaId = container.uuid();
+        const cmpMediaId = mediaItem.id || container.uuid();
         const cmpMediaVideoId = container.uuid();
 
         creatableMediaVideoList.push({
@@ -404,7 +404,7 @@ export default (container) => {
       for (let i = 0; i < mediaList.length; i += 1) {
         const mediaItem = mediaList[i];
 
-        const cmpMediaId = container.uuid();
+        const cmpMediaId = mediaItem.id || container.uuid();
         const cmpMediaFileId = container.uuid();
 
         creatableMediaFileList.push({
@@ -470,7 +470,7 @@ export default (container) => {
       for (let i = 0; i < mediaList.length; i += 1) {
         const mediaItem = mediaList[i];
 
-        const cmpMediaId = container.uuid();
+        const cmpMediaId = mediaItem.id || container.uuid();
         const cmpMediaLocationId = container.uuid();
 
         creatableMediaLocationList.push({
@@ -541,7 +541,7 @@ export default (container) => {
       for (let i = 0; i < mediaList.length; i += 1) {
         const mediaItem = mediaList[i];
 
-        const cmpMediaId = container.uuid();
+        const cmpMediaId = mediaItem.id || container.uuid();
         const cmpMediaViberTemplateId = container.uuid();
 
         creatableMediaViberTemplateList.push({
