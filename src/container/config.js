@@ -21,6 +21,7 @@ export default {
   },
   picker: {
     delay: parseInt(process.env.PICKER_DELAY || '5', 10),
+    parallelPick: (process.env.PICKER_PARALLEL_PICK || 'false').toLowerCase() === 'true',
   },
   blaster: {
     rateLimiter: (process.env.RATE_LIMITER || 'axiosratelimiter').toLowerCase(),
