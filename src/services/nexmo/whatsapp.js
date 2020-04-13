@@ -251,23 +251,26 @@ export default (container) => {
         message: {
           content: {
             type: 'custom',
-            template: {
-              namespace,
-              name,
-              language: {
-                policy: 'deterministic',
-                locale: 'en_GB',
+            custom: {
+              type: 'template',
+              template: {
+                namespace,
+                name,
+                language: {
+                  policy: 'deterministic',
+                  code: 'en_GB',
+                },
+                components: [
+                  {
+                    type: 'header',
+                    parameters: [mediaParameter],
+                  },
+                  {
+                    type: 'body',
+                    parameters: parameters.map(parameter => getTextParameter(parameter)),
+                  },
+                ],
               },
-              components: [
-                {
-                  type: 'header',
-                  parameters: [mediaParameter],
-                },
-                {
-                  type: 'body',
-                  parameters: parameters.map(parameter => getTextParameter(parameter)),
-                },
-              ],
             },
           },
         },
