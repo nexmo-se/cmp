@@ -198,22 +198,22 @@ export default (container) => {
     let parameter = { type: 'text', text: media };
     if (mediaType === 'text') {
       L.trace('MTM Text');
-      parameter = getTextParameter(media);
+      parameter = getTextParameter(media.cmpMediaText);
     } else if (mediaType === 'image') {
       L.trace('MTM Image');
-      parameter = getImageParameter(media);
+      parameter = getImageParameter(media.cmpMediaImage);
     } else if (mediaType === 'audio') {
       L.trace('MTM Audio');
-      parameter = getAudioParameter(media);
+      parameter = getAudioParameter(media.cmpMediaAudio);
     } else if (mediaType === 'video') {
       L.trace('MTM Video');
-      parameter = getVideoParameter(media);
+      parameter = getVideoParameter(media.cmpMediaVideo);
     } else if (mediaType === 'file') {
       L.trace('MTM File');
-      parameter = getFileParameter(media);
+      parameter = getFileParameter(media.cmpMediaFile);
     } else if (mediaType === 'location') {
       L.trace('MTM Location');
-      parameter = getLocationParameter(media);
+      parameter = getLocationParameter(media.cmpMediaLocation);
     } else {
       L.trace('MTM Unknown - Default');
     }
