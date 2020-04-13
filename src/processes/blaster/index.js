@@ -277,9 +277,7 @@ export default (container) => {
       const {
         recipient, cmpTemplate, cmpParameters, cmpMedia,
       } = record;
-      const {
-        type, url, caption, actionUrl,
-      } = cmpMedia || {};
+      const { mediaType: type } = cmpMedia || {};
       const {
         viberTtl = 600, category = 'transaction', body, cmpChannel,
       } = cmpTemplate;
@@ -293,18 +291,23 @@ export default (container) => {
 
       let result;
       if (type == null || type === 'text') {
+        L.trace('Sending Viber Text');
         result = await container.nexmoService.viber.sendText(
           senderId, recipient, text, `rec_${record.id}`,
           category, viberTtl,
           applicationId, privateKey, axios,
         );
       } else if (type === 'image') {
+        L.trace('Sending Viber Image');
+        const { url } = cmpMedia.cmpMediaImage;
         result = await container.nexmoService.viber.sendImage(
           senderId, recipient, url, `rec_${record.id}`,
           category, viberTtl,
           applicationId, privateKey, axios,
         );
       } else if (type === 'viber_template') {
+        L.trace('Sending Viber Template');
+        const { url, caption, actionUrl } = cmpMedia.cmpMediaViberTemplate;
         result = await container.nexmoService.viber.sendTemplate(
           senderId, recipient,
           text, url, caption, actionUrl,
@@ -325,7 +328,7 @@ export default (container) => {
       const {
         recipient, cmpTemplate, cmpParameters, cmpMedia,
       } = record;
-      const { type } = cmpMedia || {};
+      const { mediaType: type } = cmpMedia || {};
       const {
         facebookTag, category, body, cmpChannel,
       } = cmpTemplate;
