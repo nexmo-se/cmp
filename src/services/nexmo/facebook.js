@@ -1,3 +1,6 @@
+import windows1252 from 'windows-1252';
+import utf8 from 'utf8';
+
 export default (container) => {
   const { L } = container.defaultLogger('Nexmo Facebook Messenger Service');
 
@@ -8,9 +11,18 @@ export default (container) => {
     return url;
   };
 
+  const convertToUtf8 = (text) => {
+    if (text == null) {
+      return null;
+    }
+    const encoded = windows1252.encode(text);
+    const decoded = utf8.decode(encoded);
+    return decoded;
+  };
+
   const getTextMediaContentBody = text => ({
     type: 'text',
-    text,
+    text: convertToUtf8(text),
   });
 
   const getImageMediaContentBody = image => ({

@@ -19,6 +19,9 @@ export default (container) => {
   const isUnicode = text => /[^\u0000-\u00ff]/.test(text);
 
   const convertToUtf8 = (text) => {
+    if (text == null) {
+      return null;
+    }
     const encoded = windows1252.encode(text);
     const decoded = utf8.decode(encoded);
     return decoded;

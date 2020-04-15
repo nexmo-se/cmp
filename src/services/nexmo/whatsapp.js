@@ -1,3 +1,6 @@
+import windows1252 from 'windows-1252';
+import utf8 from 'utf8';
+
 export default (container) => {
   const { L } = container.defaultLogger('Nexmo Whatsapp Service');
   const getUrl = () => {
@@ -15,6 +18,15 @@ export default (container) => {
     }
 
     return url;
+  };
+
+  const convertToUtf8 = (text) => {
+    if (text == null) {
+      return null;
+    }
+    const encoded = windows1252.encode(text);
+    const decoded = utf8.decode(encoded);
+    return decoded;
   };
 
   const getFromNumber = (senderId) => {
@@ -59,7 +71,7 @@ export default (container) => {
         message: {
           content: {
             type: 'text',
-            text,
+            text: convertToUtf8(text),
           },
         },
         client_ref: clientRef,
@@ -128,7 +140,7 @@ export default (container) => {
             type: 'template',
             template: {
               name: `${namespace}:${name}`,
-              parameters: parameters.map(parameter => ({ default: parameter })),
+              parameters: parameters.map(parameter => ({ default: convertToUtf8(parameter) })),
             },
           },
           whatsapp: {
@@ -149,14 +161,14 @@ export default (container) => {
 
   const getTextParameter = text => ({
     type: 'text',
-    text,
+    text: convertToUtf8(text),
   });
 
   const getImageParameter = image => ({
     type: 'image',
     image: {
       link: image.url,
-      caption: image.caption,
+      caption: convertToUtf8(image.caption),
     },
   });
 
@@ -171,7 +183,7 @@ export default (container) => {
     type: 'video',
     video: {
       link: video.url,
-      caption: video.caption,
+      caption: convertToUtf8(video.caption),
     },
   });
 
@@ -179,8 +191,8 @@ export default (container) => {
     type: 'document',
     document: {
       link: file.url,
-      caption: file.caption,
-      filename: file.fileName,
+      caption: convertToUtf8(file.caption),
+      filename: convertToUtf8(file.fileName),
     },
   });
 
@@ -189,8 +201,8 @@ export default (container) => {
     location: {
       longitude: location.longitude,
       latitude: location.latitude,
-      name: location.name,
-      address: location.address,
+      name: convertToUtf8(location.name),
+      address: convertToUtf8(location.address),
     },
   });
 

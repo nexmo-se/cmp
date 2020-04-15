@@ -33,12 +33,18 @@ console.log('This is the Trigger Script');
 
 const container = require('./container').default;
 
-container.persistenceService.CmpParameter.listParameters({ limit: 100 })
-  .then(parameters => parameters.map(parameter => parameter.parameter))
-  .then(parameters => parameters.map((parameter) => {
-    const encoded = windows1252.encode(parameter);
-    const decoded = utf8.decode(encoded);
-    console.log(decoded);
-    return parameter;
-  }))
-  .catch(error => console.error(error));
+// container.persistenceService.CmpParameter.listParameters({ limit: 100 })
+//   .then(parameters => parameters.map(parameter => parameter.parameter))
+//   .then(parameters => parameters.map((parameter) => {
+//     const encoded = windows1252.encode(parameter);
+//     const decoded = utf8.decode(encoded);
+//     console.log(decoded);
+//     return parameter;
+//   }))
+//   .catch(error => console.error(error));
+
+const parameter = null;
+const encoded = windows1252.encode(parameter);
+const decoded = utf8.decode(encoded);
+console.log(encoded);
+console.log(decoded);
