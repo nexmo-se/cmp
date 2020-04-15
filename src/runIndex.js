@@ -1,8 +1,8 @@
 require('@babel/polyfill');
 require('dotenv').config();
+const windows1252 = require('windows-1252');
+const utf8 = require('utf8');
 
-const axios = require('axios');
-const mysql = require('mysql2');
 const packageJson = require('../package.json');
 
 /* eslint-disable global-require */
@@ -33,13 +33,18 @@ console.log('This is the Trigger Script');
 
 const container = require('./container').default;
 
-const from = new Date(1168445696000);
-const to = new Date();
-const cmpCampaignId = '8fef82b5-86ac-4ab2-8327-a72158264cfd';
+// container.persistenceService.CmpParameter.listParameters({ limit: 100 })
+//   .then(parameters => parameters.map(parameter => parameter.parameter))
+//   .then(parameters => parameters.map((parameter) => {
+//     const encoded = windows1252.encode(parameter);
+//     const decoded = utf8.decode(encoded);
+//     console.log(decoded);
+//     return parameter;
+//   }))
+//   .catch(error => console.error(error));
 
-container.reportService.summary.getOverallSummary(from, to)
-// container.reportService.summary.getCampaignSummary(cmpCampaignId, from, to)
-  .then(results => console.log(results))
-  .then(() => console.log('done'))
-  .then(() => process.exit(0))
-  .catch(console.error);
+const parameter = null;
+const encoded = windows1252.encode(parameter);
+const decoded = utf8.decode(encoded);
+console.log(encoded);
+console.log(decoded);

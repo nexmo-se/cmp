@@ -1,3 +1,6 @@
+import windows1252 from 'windows-1252';
+import utf8 from 'utf8';
+
 export default (container) => {
   const { L } = container.defaultLogger('Nexmo Viber Service');
 
@@ -16,6 +19,15 @@ export default (container) => {
     }
 
     return url;
+  };
+
+  const convertToUtf8 = (text) => {
+    if (text == null) {
+      return null;
+    }
+    const encoded = windows1252.encode(text);
+    const decoded = utf8.decode(encoded);
+    return decoded;
   };
 
   const getFromId = (senderId) => {
@@ -61,7 +73,7 @@ export default (container) => {
         message: {
           content: {
             type: 'text',
-            text,
+            text: convertToUtf8(text),
           },
         },
         // viber_service_msg: {
@@ -159,9 +171,9 @@ export default (container) => {
           content: {
             type: 'custom',
             custom: {
-              '#txt': text,
+              '#txt': convertToUtf8(text),
               '#img': imageUrl,
-              '#caption': caption,
+              '#caption': convertToUtf8(text),
               '#action': actionUrl,
             },
           },
