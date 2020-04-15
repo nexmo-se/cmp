@@ -1,3 +1,6 @@
+import windows1252 from 'windows-1252';
+import utf8 from 'utf8';
+
 export default (container) => {
   const { L } = container.defaultLogger('Nexmo SMS Service');
 
@@ -12,6 +15,15 @@ export default (container) => {
     return `${restHost}/sms/json`;
   };
 
+  // eslint-disable-next-line no-control-regex
+  const isUnicode = text => /[^\u0000-\u00ff]/.test(text);
+
+  const convertToUtf8 = (text) => {
+    const encoded = windows1252.encode(text);
+    const decoded = utf8.decode(encoded);
+    return decoded;
+  };
+
   const sendText = async (
     to, text, type, senderId,
     apiKey, apiSecret,
@@ -19,12 +31,14 @@ export default (container) => {
     axios = container.axios) => {
     try {
       const url = getUrl();
+      const sanitizedText = convertToUtf8(text);
+      const sanitizedType = isUnicode(sanitizedText) ? 'unicode' : 'text';
       const body = {
         api_key: apiKey,
         from: senderId,
         to,
-        text,
-        type,
+        text: sanitizedText,
+        type: sanitizedType,
       };
 
       if (smsUseSignature) {
