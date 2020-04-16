@@ -248,6 +248,7 @@ export default (container) => {
 
   const blastWhatsapp = async (record, axios) => {
     try {
+      const { clientRefPrefix } = container.config.blaster;
       const {
         recipient, cmpTemplate, cmpParameters, cmpMedia,
       } = record;
@@ -261,7 +262,7 @@ export default (container) => {
         .map(cmpParameter => cmpParameter.parameter);
       const result = await container.nexmoService.whatsapp.sendTemplate(
         senderId, recipient, whatsappTemplateNamespace, whatsappTemplateName,
-        type || 'text', cmpMedia, parameters, `rec_${record.id}`,
+        type || 'text', cmpMedia, parameters, `${clientRefPrefix}${record.id}`,
         applicationId, privateKey, axios,
       );
 
@@ -274,6 +275,7 @@ export default (container) => {
 
   const blastViber = async (record, axios) => {
     try {
+      const { clientRefPrefix } = container.config.blaster;
       const {
         recipient, cmpTemplate, cmpParameters, cmpMedia,
       } = record;
@@ -294,13 +296,13 @@ export default (container) => {
       let result;
       if (type == null || type === 'text') {
         result = await container.nexmoService.viber.sendText(
-          senderId, recipient, text, `rec_${record.id}`,
+          senderId, recipient, text, `${clientRefPrefix}${record.id}`,
           category, viberTtl,
           applicationId, privateKey, axios,
         );
       } else if (type === 'image') {
         result = await container.nexmoService.viber.sendImage(
-          senderId, recipient, url, `rec_${record.id}`,
+          senderId, recipient, url, `${clientRefPrefix}${record.id}`,
           category, viberTtl,
           applicationId, privateKey, axios,
         );
@@ -308,7 +310,7 @@ export default (container) => {
         result = await container.nexmoService.viber.sendTemplate(
           senderId, recipient,
           text, url, caption, actionUrl,
-          `rec_${record.id}`, category, viberTtl,
+          `${clientRefPrefix}${record.id}`, category, viberTtl,
           applicationId, privateKey, axios,
         );
       }
@@ -322,6 +324,7 @@ export default (container) => {
 
   const blastFacebook = async (record, axios) => {
     try {
+      const { clientRefPrefix } = container.config.blaster;
       const {
         recipient, cmpTemplate, cmpParameters, cmpMedia,
       } = record;
@@ -341,7 +344,7 @@ export default (container) => {
       }
 
       const result = await container.nexmoService.facebook.sendMedia(
-        senderId, recipient, type, media, `rec_${record.id}`,
+        senderId, recipient, type, media, `${clientRefPrefix}${record.id}`,
         category, facebookTag,
         applicationId, privateKey, axios,
       );

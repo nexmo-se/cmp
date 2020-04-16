@@ -30,6 +30,7 @@ export default {
     useMockBlast: (process.env.USE_MOCK_BLAST || 'false').toLowerCase() === 'true',
     generateReport: (process.env.BLASTER_GENERATE_REPORT || 'false').toLowerCase() === 'true',
     reportDelay: parseInt(process.env.BLASTER_REPORT_DELAY || '5', 10),
+    clientRefPrefix: process.env.BLASTER_CLIENT_REF_PREFIX || 'cmp_',
   },
   report: {
     delay: parseInt(process.env.REPORT_DELAY || '5', 10),
