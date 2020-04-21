@@ -81,6 +81,34 @@ export default (container) => {
     }
   };
 
+  const updateRecordErrorBulk = async (records) => {
+    try {
+      if (records.length === 0) {
+        return Promise.resolve();
+      }
+
+      const { CmpRecord } = container.persistenceService;
+      const criteria = {
+        id: records.map(record => record.id),
+        status: ['queuing', 'pending'],
+      };
+      const changes = {
+        status: 'error',
+        statusTime: new Date(),
+        sendTime: new Date(),
+      };
+
+      const startTime = new Date().getTime();
+      const updatedRecord = await CmpRecord.updateRecords(criteria, changes, true, false, {});
+      const endTime = new Date().getTime();
+      const duration = endTime - startTime;
+      L.debug(`Time Taken (Update Record Error Time Bulk: ${duration}ms`);
+      return Promise.resolve(updatedRecord);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecordMessagesBulk = async (records) => {
     try {
       if (records.length === 0) {
@@ -394,7 +422,7 @@ export default (container) => {
       } else {
         L.error(error.message, error);
       }
-      return Promise.reject(error);
+      return Promise.resolve({ cmpRecordId: record.id });
     }
   };
 
@@ -411,7 +439,24 @@ export default (container) => {
       L.debug(`Time Taken (Blast Records): ${duration}ms`);
 
       const postStartTime = new Date().getTime();
-      await updateRecordSendTimeBulk(records);
+
+      const sentRecords = [];
+      const errorRecords = [];
+      for (let i = 0; i < results.length; i += 1) {
+        const record = records[i];
+        const result = results[i];
+        if (result.messageIds == null) {
+          errorRecords.push(record);
+        } else if (result.messageIds.length <= 0) {
+          errorRecords.push(record);
+        } else if (result.messageIds[0] == null) {
+          errorRecords.push(record);
+        } else {
+          sentRecords.push(record);
+        }
+      }
+      await updateRecordSendTimeBulk(sentRecords);
+      await updateRecordErrorBulk(errorRecords);
       await createRecordMessagesBulk(results);
       const postEndTime = new Date().getTime();
       const postDuration = [postEndTime] - postStartTime;

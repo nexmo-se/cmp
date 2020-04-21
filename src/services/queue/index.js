@@ -8,6 +8,7 @@ export default (container) => {
   };
 
   const StatusHierarchy = {
+    error: -1,
     unknown: -1,
     draft: 0,
     pending: 1,

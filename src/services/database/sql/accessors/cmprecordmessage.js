@@ -180,14 +180,16 @@ export default (container) => {
         const { cmpRecordId, messageIds = [] } = record;
         for (let j = 0; j < messageIds.length; j += 1) {
           const messageId = messageIds[j];
-          creatableRecordMessages.push({
-            id: container.uuid(),
-            cmpRecordId,
-            messageId,
-            status: 'requested',
-            statusTime: new Date(),
-            deleted: false,
-          });
+          if (messageId != null) {
+            creatableRecordMessages.push({
+              id: container.uuid(),
+              cmpRecordId,
+              messageId,
+              status: 'requested',
+              statusTime: new Date(),
+              deleted: false,
+            });
+          }
         }
       }
 
