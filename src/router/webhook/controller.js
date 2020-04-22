@@ -85,8 +85,8 @@ export default (container) => {
       L.trace(combined);
       const startTime = new Date().getTime();
 
-      const { messageId, status } = combined;
-      await container.webhookService.updateRecordMessage(messageId, status);
+      const { messageId, status, price } = combined;
+      await container.webhookService.updateRecordMessage(messageId, status, price);
       await container.webhookService.publishSmsStatusAudit(combined);
 
       const endTime = new Date().getTime();
@@ -182,9 +182,10 @@ export default (container) => {
 
       const startTime = new Date().getTime();
 
-      const { status } = req.body;
+      const { status, usage } = req.body;
       const messageId = req.body.message_uuid;
-      await container.webhookService.updateRecordMessage(messageId, status);
+      const { price } = usage || {};
+      await container.webhookService.updateRecordMessage(messageId, status, price);
       await container.webhookService.publishMapiStatusAudit(req.body);
 
       const endTime = new Date().getTime();
