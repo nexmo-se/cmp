@@ -48,6 +48,11 @@ export default (container) => {
       const { User, UserRole } = container.databaseService.models;
       const query = {
         where: criteria,
+        order: [
+          ['lastName', 'ASC'],
+          ['firstName', 'ASC'],
+          ['createdAt', 'DESC'],
+        ],
         include: [
           {
             model: UserRole,

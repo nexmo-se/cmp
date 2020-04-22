@@ -181,6 +181,11 @@ export default (container) => {
       } = container.databaseService.models;
       const query = {
         where: criteria,
+        order: [
+          ['name', 'ASC'],
+          ['applicationId', 'ASC'],
+          ['createdAt', 'DESC'],
+        ],
         include: [
           {
             model: CmpApiKey,
@@ -273,6 +278,11 @@ export default (container) => {
       } = container.databaseService.models;
       const query = {
         where: criteria,
+        order: [
+          ['name', 'ASC'],
+          ['applicationId', 'ASC'],
+          ['createdAt', 'DESC'],
+        ],
         include: [
           {
             model: CmpApiKey,
