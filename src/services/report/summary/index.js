@@ -38,9 +38,13 @@ export default (container) => {
       let sql = `
 select 
 ACampaigns.id,
-ACampaigns.name, 
-CmpRecordMessages.status, 
-count(*) statusCount
+ACampaigns.name,
+case 
+  when CmpRecordMessages.status is null 
+    then CmpRecords.status 
+    else CmpRecordMessages.status
+end as status,
+count(*) as statusCount
 from CmpRecords 
 left join CmpRecordMessages 
 on CmpRecordMessages.cmpRecordId = CmpRecords.id 
@@ -53,10 +57,13 @@ __OFFSET__
 ) as ACampaigns
 on ACampaigns.id = CmpRecords.cmpCampaignId
 where CmpRecords.deleted = 0 
-and CmpRecordMessages.deleted = 0 
+and (
+  CmpRecordMessages.deleted = 0
+  or CmpRecordMessages.deleted is null
+)
 __FROM_TO__
 and ACampaigns.deleted = 0
-group by ACampaigns.id, ACampaigns.name, CmpRecordMessages.status;
+group by ACampaigns.id, ACampaigns.name, status
       `.replace(/\n/g, ' ');
 
       if (cmpCampaignId && cmpCampaignId !== '') {
