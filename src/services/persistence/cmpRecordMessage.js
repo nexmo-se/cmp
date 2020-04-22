@@ -24,12 +24,14 @@ export default (container) => {
   const createRecordMessage = async (
     cmpRecordId,
     messageId,
+    price,
   ) => {
     try {
       const { CmpRecordMessage } = container.databaseService.accessors;
       const cmpRecordMessage = await CmpRecordMessage.createRecordMessage(
         cmpRecordId,
         messageId,
+        price,
       );
       return Promise.resolve(cmpRecordMessage);
     } catch (error) {

@@ -23,7 +23,7 @@ export default (container) => {
     }
   };
 
-  const updateRecordMessage = async (messageId, status) => {
+  const updateRecordMessage = async (messageId, status, price) => {
     try {
       const { useQueue } = container.config.webhook;
       const { CmpRecordMessage } = container.persistenceService;
@@ -32,11 +32,11 @@ export default (container) => {
 
       if (useQueue) {
         // Add to Queue
-        container.queueService.pushRecordMessageUpdate(messageId, status);
+        container.queueService.pushRecordMessageUpdate(messageId, status, price);
       } else {
         // Update Immediately
         const criteria = { messageId };
-        const changes = { status, statusTime: new Date() };
+        const changes = { status, statusTime: new Date(), price };
         const options = { noGet: true };
         await CmpRecordMessage.updateRecordMessages(criteria, changes, options);
       }
