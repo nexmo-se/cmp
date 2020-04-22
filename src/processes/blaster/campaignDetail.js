@@ -6,7 +6,7 @@ export default (container) => {
       const startTime = new Date().getTime();
 
       // Write Header
-      const header = [['id', 'recipient', 'channel', 'template', 'status', 'status time', 'submit time']];
+      const header = [['id', 'recipient', 'channel', 'template', 'status', 'status time', 'submit time', 'price']];
       const headerCsv = await container.csvService.toCsv(header);
       await container.fileService.writeContent(filePath, headerCsv);
 
@@ -32,6 +32,7 @@ export default (container) => {
         record.status,
         record.statusTime ? container.moment(record.statusTime).format(timePattern) : null,
         record.submitTime ? container.moment(record.submitTime).format(timePattern) : null,
+        record.price || 0,
       ]));
 
       const contentCsv = await container.csvService.toCsv(content);
