@@ -268,7 +268,11 @@ export default (container) => {
       );
 
       const messageIds = result.messages.map(message => message['message-id']);
-      return Promise.resolve(messageIds);
+      const prices = result.messages.map(message => message['message-price'] || 0);
+      return Promise.resolve({
+        messageIds,
+        prices,
+      });
     } catch (error) {
       return Promise.reject(error);
     }
@@ -295,7 +299,10 @@ export default (container) => {
       );
 
       const messageIds = [result.message_uuid];
-      return Promise.resolve(messageIds);
+      return Promise.resolve({
+        messageIds,
+        prices: [0],
+      });
     } catch (error) {
       return Promise.reject(error);
     }
@@ -344,7 +351,10 @@ export default (container) => {
       }
 
       const messageIds = [result.message_uuid];
-      return Promise.resolve(messageIds);
+      return Promise.resolve({
+        messageIds,
+        prices: [0],
+      });
     } catch (error) {
       return Promise.reject(error);
     }
@@ -378,7 +388,10 @@ export default (container) => {
       );
 
       const messageIds = [result.message_uuid];
-      return Promise.resolve(messageIds);
+      return Promise.resolve({
+        messageIds,
+        prices: [0],
+      });
     } catch (error) {
       return Promise.reject(error);
     }
@@ -411,7 +424,11 @@ export default (container) => {
 
       // await updateRecordSendTime(record);
       // await createRecordMessages(record, result);
-      return Promise.resolve({ cmpRecordId: record.id, messageIds: result });
+      return Promise.resolve({
+        cmpRecordId: record.id,
+        messageIds: result.messageIds,
+        prices: result.prices,
+      });
     } catch (error) {
       if (error.response != null) {
         L.error(error.message);
@@ -422,7 +439,11 @@ export default (container) => {
       } else {
         L.error(error.message, error);
       }
-      return Promise.resolve({ cmpRecordId: record.id });
+      return Promise.resolve({
+        cmpRecordId: record.id,
+        messageIds: [],
+        prices: [],
+      });
     }
   };
 
@@ -457,6 +478,7 @@ export default (container) => {
       }
       await updateRecordSendTimeBulk(sentRecords);
       await updateRecordErrorBulk(errorRecords);
+
       await createRecordMessagesBulk(results);
       const postEndTime = new Date().getTime();
       const postDuration = [postEndTime] - postStartTime;
