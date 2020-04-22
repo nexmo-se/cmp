@@ -177,9 +177,10 @@ export default (container) => {
       const creatableRecordMessages = [];
       for (let i = 0; i < records.length; i += 1) {
         const record = records[i];
-        const { cmpRecordId, messageIds = [] } = record;
+        const { cmpRecordId, messageIds = [], prices = [] } = record;
         for (let j = 0; j < messageIds.length; j += 1) {
           const messageId = messageIds[j];
+          const price = prices.length > j ? prices[j] : 0;
           if (messageId != null) {
             creatableRecordMessages.push({
               id: container.uuid(),
@@ -187,6 +188,7 @@ export default (container) => {
               messageId,
               status: 'requested',
               statusTime: new Date(),
+              price,
               deleted: false,
             });
           }
@@ -207,6 +209,7 @@ export default (container) => {
   const createRecordMessage = async (
     cmpRecordId,
     messageId,
+    price = 0,
   ) => {
     try {
       const { CmpRecordMessage } = container.databaseService.models;
@@ -216,6 +219,7 @@ export default (container) => {
         messageId,
         status: 'requested',
         statusTime: new Date(),
+        price,
         deleted: false,
       });
 
