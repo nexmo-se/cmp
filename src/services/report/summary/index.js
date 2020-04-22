@@ -44,7 +44,8 @@ case
     then CmpRecords.status 
     else CmpRecordMessages.status
 end as status,
-count(*) as statusCount
+count(*) as statusCount,
+sum(CmpRecordMessages.price) as price
 from CmpRecords 
 left join CmpRecordMessages 
 on CmpRecordMessages.cmpRecordId = CmpRecords.id 
@@ -113,16 +114,18 @@ group by ACampaigns.id, ACampaigns.name, status
       for (let i = 0; i < items.length; i += 1) {
         const item = items[i];
         const {
-          id, name, status, statusCount,
+          id, name, status, statusCount, price,
         } = item;
         if (summary[id] == null) {
           summary[id] = {
             id,
             name,
             summary: {},
+            price: 0,
           };
         }
         summary[id].summary[status] = statusCount;
+        summary[id].price += price;
       }
 
       const summaryList = Object.keys(summary).map((key) => {
