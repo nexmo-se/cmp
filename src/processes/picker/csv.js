@@ -174,7 +174,7 @@ export default (container) => {
         record.recipient,
         record.cmpCampaignId,
         record.cmpTemplateId,
-        record.cmpMediaId,
+        record.cmpMediaId || '\\N',
         record.activeStartHour,
         record.activeStartMinute,
         record.activeEndHour,
@@ -229,14 +229,14 @@ export default (container) => {
       const startTime = new Date().getTime();
       const csvArray = mediaList.map(mediaItem => ([
         mediaItem.id,
-        mediaItem.mediaType || '',
-        mediaItem.cmpMediaTextId || '',
-        mediaItem.cmpMediaImageId || '',
-        mediaItem.cmpMediaAudioId || '',
-        mediaItem.cmpMediaVideoId || '',
-        mediaItem.cmpMediaFileId || '',
-        mediaItem.cmpMediaLocationId || '',
-        mediaItem.cmpMediaViberTemplateId || '',
+        mediaItem.mediaType || '\\N',
+        mediaItem.cmpMediaTextId || '\\N',
+        mediaItem.cmpMediaImageId || '\\N',
+        mediaItem.cmpMediaAudioId || '\\N',
+        mediaItem.cmpMediaVideoId || '\\N',
+        mediaItem.cmpMediaFileId || '\\N',
+        mediaItem.cmpMediaLocationId || '\\N',
+        mediaItem.cmpMediaViberTemplateId || '\\N',
         0, // deleted
         container.moment().format(timePattern).toUpperCase(), // createdAt
         container.moment().format(timePattern).toUpperCase(), // updatedAt
