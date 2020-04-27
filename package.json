@@ -23,6 +23,7 @@
     "debug": "nodemon --inspect --exec babel-node src",
     "initDb": "sequelize-cli init",
     "migrate": "sequelize-cli db:migrate",
+    "undomigrate": "sequelize-cli db:migrate:undo",
     "seed": "sequelize-cli db:seed:all",
     "build": "npm run clean && babel src -D -d build",
     "test": "mocha \"./{,!(node_modules)/**/}*.test.js\" --require babel-polyfill --require esm",
