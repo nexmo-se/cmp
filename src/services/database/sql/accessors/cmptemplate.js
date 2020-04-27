@@ -73,6 +73,10 @@ export default (container) => {
       } = container.databaseService.models;
       const query = {
         where: criteria,
+        order: [
+          ['name', 'ASC'],
+          ['createdAt', 'DESC'],
+        ],
         include: [
           {
             model: CmpChannel,

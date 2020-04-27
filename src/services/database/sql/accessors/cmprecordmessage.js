@@ -43,6 +43,9 @@ export default (container) => {
       } = container.databaseService.models;
       const query = {
         where: criteria,
+        order: [
+          ['createdAt', 'DESC'],
+        ],
       };
 
       // Check Deleted
@@ -177,17 +180,21 @@ export default (container) => {
       const creatableRecordMessages = [];
       for (let i = 0; i < records.length; i += 1) {
         const record = records[i];
-        const { cmpRecordId, messageIds = [] } = record;
+        const { cmpRecordId, messageIds = [], prices = [] } = record;
         for (let j = 0; j < messageIds.length; j += 1) {
           const messageId = messageIds[j];
-          creatableRecordMessages.push({
-            id: container.uuid(),
-            cmpRecordId,
-            messageId,
-            status: 'requested',
-            statusTime: new Date(),
-            deleted: false,
-          });
+          const price = prices.length > j ? prices[j] : 0;
+          if (messageId != null) {
+            creatableRecordMessages.push({
+              id: container.uuid(),
+              cmpRecordId,
+              messageId,
+              status: 'requested',
+              statusTime: new Date(),
+              price,
+              deleted: false,
+            });
+          }
         }
       }
 
@@ -205,6 +212,7 @@ export default (container) => {
   const createRecordMessage = async (
     cmpRecordId,
     messageId,
+    price = 0,
   ) => {
     try {
       const { CmpRecordMessage } = container.databaseService.models;
@@ -214,6 +222,7 @@ export default (container) => {
         messageId,
         status: 'requested',
         statusTime: new Date(),
+        price,
         deleted: false,
       });
 

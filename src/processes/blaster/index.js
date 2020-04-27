@@ -81,6 +81,34 @@ export default (container) => {
     }
   };
 
+  const updateRecordErrorBulk = async (records) => {
+    try {
+      if (records.length === 0) {
+        return Promise.resolve();
+      }
+
+      const { CmpRecord } = container.persistenceService;
+      const criteria = {
+        id: records.map(record => record.id),
+        status: ['queuing', 'pending'],
+      };
+      const changes = {
+        status: 'error',
+        statusTime: new Date(),
+        sendTime: new Date(),
+      };
+
+      const startTime = new Date().getTime();
+      const updatedRecord = await CmpRecord.updateRecords(criteria, changes, true, false, {});
+      const endTime = new Date().getTime();
+      const duration = endTime - startTime;
+      L.debug(`Time Taken (Update Record Error Time Bulk: ${duration}ms`);
+      return Promise.resolve(updatedRecord);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecordMessagesBulk = async (records) => {
     try {
       if (records.length === 0) {
@@ -240,7 +268,11 @@ export default (container) => {
       );
 
       const messageIds = result.messages.map(message => message['message-id']);
-      return Promise.resolve(messageIds);
+      const prices = result.messages.map(message => message['message-price'] || 0);
+      return Promise.resolve({
+        messageIds,
+        prices,
+      });
     } catch (error) {
       return Promise.reject(error);
     }
@@ -248,6 +280,7 @@ export default (container) => {
 
   const blastWhatsapp = async (record, axios) => {
     try {
+      const { clientRefPrefix } = container.config.blaster;
       const {
         recipient, cmpTemplate, cmpParameters, cmpMedia,
       } = record;
@@ -261,12 +294,15 @@ export default (container) => {
         .map(cmpParameter => cmpParameter.parameter);
       const result = await container.nexmoService.whatsapp.sendTemplate(
         senderId, recipient, whatsappTemplateNamespace, whatsappTemplateName,
-        type || 'text', cmpMedia, parameters, `rec_${record.id}`,
+        type || 'text', cmpMedia, parameters, `${clientRefPrefix}${record.id}`,
         applicationId, privateKey, axios,
       );
 
       const messageIds = [result.message_uuid];
-      return Promise.resolve(messageIds);
+      return Promise.resolve({
+        messageIds,
+        prices: [0],
+      });
     } catch (error) {
       return Promise.reject(error);
     }
@@ -274,6 +310,7 @@ export default (container) => {
 
   const blastViber = async (record, axios) => {
     try {
+      const { clientRefPrefix } = container.config.blaster;
       const {
         recipient, cmpTemplate, cmpParameters, cmpMedia,
       } = record;
@@ -293,7 +330,7 @@ export default (container) => {
       if (type == null || type === 'text') {
         L.trace('Sending Viber Text');
         result = await container.nexmoService.viber.sendText(
-          senderId, recipient, text, `rec_${record.id}`,
+          senderId, recipient, text, `${clientRefPrefix}${record.id}`,
           category, viberTtl,
           applicationId, privateKey, axios,
         );
@@ -301,7 +338,7 @@ export default (container) => {
         L.trace('Sending Viber Image');
         const { url } = cmpMedia.cmpMediaImage;
         result = await container.nexmoService.viber.sendImage(
-          senderId, recipient, url, `rec_${record.id}`,
+          senderId, recipient, url, `${clientRefPrefix}${record.id}`,
           category, viberTtl,
           applicationId, privateKey, axios,
         );
@@ -311,13 +348,16 @@ export default (container) => {
         result = await container.nexmoService.viber.sendTemplate(
           senderId, recipient,
           text, url, caption, actionUrl,
-          `rec_${record.id}`, category, viberTtl,
+          `${clientRefPrefix}${record.id}`, category, viberTtl,
           applicationId, privateKey, axios,
         );
       }
 
       const messageIds = [result.message_uuid];
-      return Promise.resolve(messageIds);
+      return Promise.resolve({
+        messageIds,
+        prices: [0],
+      });
     } catch (error) {
       return Promise.reject(error);
     }
@@ -325,6 +365,7 @@ export default (container) => {
 
   const blastFacebook = async (record, axios) => {
     try {
+      const { clientRefPrefix } = container.config.blaster;
       const {
         recipient, cmpTemplate, cmpParameters, cmpMedia,
       } = record;
@@ -345,13 +386,16 @@ export default (container) => {
       }
 
       const result = await container.nexmoService.facebook.sendMedia(
-        senderId, recipient, type, media, `rec_${record.id}`,
+        senderId, recipient, type, media, `${clientRefPrefix}${record.id}`,
         category, facebookTag,
         applicationId, privateKey, axios,
       );
 
       const messageIds = [result.message_uuid];
-      return Promise.resolve(messageIds);
+      return Promise.resolve({
+        messageIds,
+        prices: [0],
+      });
     } catch (error) {
       return Promise.reject(error);
     }
@@ -384,7 +428,11 @@ export default (container) => {
 
       // await updateRecordSendTime(record);
       // await createRecordMessages(record, result);
-      return Promise.resolve({ cmpRecordId: record.id, messageIds: result });
+      return Promise.resolve({
+        cmpRecordId: record.id,
+        messageIds: result.messageIds,
+        prices: result.prices,
+      });
     } catch (error) {
       if (error.response != null) {
         L.error(error.message);
@@ -395,7 +443,11 @@ export default (container) => {
       } else {
         L.error(error.message, error);
       }
-      return Promise.reject(error);
+      return Promise.resolve({
+        cmpRecordId: record.id,
+        messageIds: [],
+        prices: [],
+      });
     }
   };
 
@@ -412,7 +464,25 @@ export default (container) => {
       L.debug(`Time Taken (Blast Records): ${duration}ms`);
 
       const postStartTime = new Date().getTime();
-      await updateRecordSendTimeBulk(records);
+
+      const sentRecords = [];
+      const errorRecords = [];
+      for (let i = 0; i < results.length; i += 1) {
+        const record = records[i];
+        const result = results[i];
+        if (result.messageIds == null) {
+          errorRecords.push(record);
+        } else if (result.messageIds.length <= 0) {
+          errorRecords.push(record);
+        } else if (result.messageIds[0] == null) {
+          errorRecords.push(record);
+        } else {
+          sentRecords.push(record);
+        }
+      }
+      await updateRecordSendTimeBulk(sentRecords);
+      await updateRecordErrorBulk(errorRecords);
+
       await createRecordMessagesBulk(results);
       const postEndTime = new Date().getTime();
       const postDuration = [postEndTime] - postStartTime;

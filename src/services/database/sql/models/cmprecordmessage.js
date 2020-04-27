@@ -22,6 +22,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       default: DataTypes.NOW,
     },
+    price: {
+      type: DataTypes.DECIMAL(12, 8),
+      allowNull: false,
+      default: 0,
+    },
     deleted: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

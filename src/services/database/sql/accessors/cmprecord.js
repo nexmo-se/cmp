@@ -230,6 +230,10 @@ export default (container) => {
       } = container.databaseService.models;
       const query = {
         where: criteria,
+        order: [
+          ['recipient', 'ASC'],
+          ['createdAt', 'DESC'],
+        ],
         include: [
           {
             model: CmpCampaign,

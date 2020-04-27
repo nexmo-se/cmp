@@ -2,20 +2,27 @@ export default (container) => {
   const { L } = container.defaultLogger('Queue Service');
 
   const queue = {
-    recordMessageUpdates: {},
+    recordMessageStatusUpdates: {},
+    recordMessagePriceUpdates: {},
     mapiStatusAudits: [],
     smsStatusAudits: [],
   };
 
   const StatusHierarchy = {
+    error: -1,
+    unknown: -1,
     draft: 0,
     pending: 1,
     queuing: 2,
     requested: 3,
     submitted: 4,
+    accepted: 4,
+    buffered: 4,
     delivered: 5,
     rejected: 5,
+    failed: 5,
     undeliverable: 5,
+    expired: 5,
     read: 6,
   };
 
@@ -41,8 +48,11 @@ export default (container) => {
     const { queueDelay } = container.config.webhook;
     L.trace('Initialize Queue Service');
 
-    L.trace('Scheduling Record Message Updating');
-    setTimeout(saveRecordMessageUpdates, queueDelay * 1000);
+    L.trace('Scheduling Record Message Status Updating');
+    setTimeout(saveRecordMessageStatusUpdates, queueDelay * 1000);
+
+    L.trace('Scheduling Record Message Price Updating');
+    setTimeout(saveRecordMessagePriceUpdates, queueDelay * 1000);
 
     L.trace('Scheduling MAPI Status Audit Saving');
     setTimeout(saveMapiStatusAudit, queueDelay * 1000);
@@ -85,13 +95,115 @@ export default (container) => {
     return map;
   };
 
-  const saveRecordMessageUpdates = async () => {
+  const saveRecordMessagePriceUpdates = async () => {
     try {
       const { CmpRecordMessage } = container.persistenceService;
       const { queueDelay } = container.config.webhook;
 
-      const updates = queue.recordMessageUpdates;
-      queue.recordMessageUpdates = {};
+      const updates = queue.recordMessagePriceUpdates;
+      queue.recordMessagePriceUpdates = {};
+
+      const priceBuckets = {};
+      const messageIds = Object.keys(updates);
+
+      // Make sure all message ids are available
+      const recordMessageIdMap = await getRecordMessageIdMap(messageIds);
+      for (let i = 0; i < messageIds.length; i += 1) {
+        const messageId = messageIds[i];
+        if (recordMessageIdMap[messageId] == null) {
+          // Not yet created, back into queue
+          const price = updates[messageId];
+          if (price != null) {
+            queue.recordMessagePriceUpdates[messageId] = price;
+          }
+
+          delete updates[messageId];
+        }
+      }
+
+      if (messageIds.length > 0) {
+        const mapStartTime = new Date().getTime();
+        const totalStartTime = new Date().getTime();
+
+        for (let i = 0; i < messageIds.length; i += 1) {
+          const messageId = messageIds[i];
+          const price = updates[messageId];
+          if (priceBuckets[price] == null) {
+            priceBuckets[price] = [];
+          }
+
+          priceBuckets[price].push(messageId);
+        }
+
+        const mapEndTime = new Date().getTime();
+        L.debug(`Time Taken (Map Record Message Price): ${mapEndTime - mapStartTime}ms`);
+
+        const prices = Object.keys(priceBuckets);
+        if (prices.length > 0) {
+          L.trace('Saving Record Message Price Updates');
+          const updateStartTime = new Date().getTime();
+
+          const promises = prices
+            .filter(price => price != null)
+            .map(async (price) => {
+              try {
+                const priceStartTime = new Date().getTime();
+
+                // Check whether need to update
+                const messageIdsMap = priceBuckets[price] || [];
+                if (messageIdsMap == null || messageIdsMap.length === 0) {
+                  const priceEndTime = new Date().getTime();
+                  L.trace(`Nothing to update for price: ${price}`);
+                  L.debug(`Time Taken (Single Record Message Price Update)[${price}]: ${priceEndTime - priceStartTime}ms`);
+                  return Promise.resolve();
+                }
+
+                // Update Record Message
+                const criteria = {
+                  messageId: messageIdsMap,
+                };
+                const changes = { price };
+                const options = { noGet: true };
+                await CmpRecordMessage.updateRecordMessages(criteria, changes, options);
+
+                const priceEndTime = new Date().getTime();
+                L.trace(`Price Updated: ${price}`);
+                L.debug(`Time Taken (Single Record Message Price Update)[${price}]: ${priceEndTime - priceStartTime}ms`);
+
+                return Promise.resolve();
+              } catch (error) {
+                return Promise.reject(error);
+              }
+            });
+          await Promise.all(promises);
+
+
+          const updateEndTime = new Date().getTime();
+          L.debug(`Time Taken (All Record Message Price Update)[${updates.length}]: ${updateEndTime - updateStartTime}ms`);
+          L.trace(`${updates.length} Record Message Price Updates saved`);
+        }
+
+        const totalEndTime = new Date().getTime();
+        L.debug(`Time Taken (Total Record Message Price Save): ${totalEndTime - totalStartTime}ms`);
+      } else {
+        L.trace('Nothing to save for Record Message Price Updates');
+      }
+
+
+      setTimeout(saveRecordMessagePriceUpdates, queueDelay * 1000);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const saveRecordMessageStatusUpdates = async () => {
+    try {
+      const { CmpRecordMessage } = container.persistenceService;
+      const { queueDelay } = container.config.webhook;
+
+      const updates = queue.recordMessageStatusUpdates;
+      queue.recordMessageStatusUpdates = {};
 
       const statusBuckets = {};
       const messageIds = Object.keys(updates);
@@ -102,12 +214,12 @@ export default (container) => {
         const messageId = messageIds[i];
         if (recordMessageIdMap[messageId] == null) {
           // Not yet created, back into queue
-          const currentStatus = queue.recordMessageUpdates[messageId];
+          const currentStatus = queue.recordMessageStatusUpdates[messageId];
           const status = updates[messageId];
           if (currentStatus == null) {
-            queue.recordMessageUpdates[messageId] = status;
+            queue.recordMessageStatusUpdates[messageId] = status;
           } else if (StatusHierarchy[status] >= StatusHierarchy[currentStatus]) {
-            queue.recordMessageUpdates[messageId] = status;
+            queue.recordMessageStatusUpdates[messageId] = status;
           }
 
           delete updates[messageId];
@@ -134,7 +246,7 @@ export default (container) => {
 
         const statuses = Object.keys(statusBuckets);
         if (statuses.length > 0) {
-          L.trace('Saving Record Message Updates');
+          L.trace('Saving Record Message Status Updates');
           const updateStartTime = new Date().getTime();
 
           /* Actually Do Something */
@@ -182,17 +294,17 @@ export default (container) => {
 
           const updateEndTime = new Date().getTime();
           L.debug(`Time Taken (All Record Message Status Update)[${updates.length}]: ${updateEndTime - updateStartTime}ms`);
-          L.trace(`${updates.length} Record Message Updates saved`);
+          L.trace(`${updates.length} Record Message Status Updates saved`);
         }
 
         const totalEndTime = new Date().getTime();
-        L.debug(`Time Taken (Total Record Message Save): ${totalEndTime - totalStartTime}ms`);
+        L.debug(`Time Taken (Total Record Message Status Save): ${totalEndTime - totalStartTime}ms`);
       } else {
-        L.trace('Nothing to save for Record Message Updates');
+        L.trace('Nothing to save for Record Message Status Updates');
       }
 
 
-      setTimeout(saveRecordMessageUpdates, queueDelay * 1000);
+      setTimeout(saveRecordMessageStatusUpdates, queueDelay * 1000);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
@@ -303,12 +415,16 @@ export default (container) => {
     }
   };
 
-  const pushRecordMessageUpdate = (messageId, status) => {
-    const currentStatus = queue.recordMessageUpdates[messageId];
+  const pushRecordMessageUpdate = (messageId, status, price) => {
+    const currentStatus = queue.recordMessageStatusUpdates[messageId];
     if (currentStatus == null) {
-      queue.recordMessageUpdates[messageId] = status;
+      queue.recordMessageStatusUpdates[messageId] = status;
     } else if (StatusHierarchy[status] >= StatusHierarchy[currentStatus]) {
-      queue.recordMessageUpdates[messageId] = status;
+      queue.recordMessageStatusUpdates[messageId] = status;
+    }
+
+    if (price != null) {
+      queue.recordMessagePriceUpdates[messageId] = price;
     }
   };
 
