@@ -24,7 +24,7 @@ export default {
     parallelPick: (process.env.PICKER_PARALLEL_PICK || 'false').toLowerCase() === 'true',
   },
   blaster: {
-    rateLimiter: (process.env.RATE_LIMITER || 'axiosratelimiter').toLowerCase(),
+    rateLimiter: (process.env.RATE_LIMITER || 'bottleneck').toLowerCase(),
     secondsPerBatch: parseInt(process.env.SECONDS_PER_BATCH || '5', 10),
     recordsPerBatch: parseInt(process.env.RECORDS_PER_BATCH || '30', 10),
     useMockBlast: (process.env.USE_MOCK_BLAST || 'false').toLowerCase() === 'true',
@@ -38,12 +38,12 @@ export default {
     batchLimit: parseInt(process.env.REPORT_BATCH_LIMIT || '1000', 10),
   },
   webhook: {
-    useQueue: (process.env.USE_QUEUE || 'false').toLowerCase() === 'true',
-    queueDelay: parseInt(process.env.QUEUE_DELAY || '1', 10),
+    useQueue: (process.env.USE_QUEUE || 'true').toLowerCase() === 'true',
+    queueDelay: parseInt(process.env.QUEUE_DELAY || '5', 10),
   },
   audit: {
-    saveRecordAudits: (process.env.SAVE_RECORDS_AUDITS || 'false').toLowerCase() === 'true',
-    saveCampaignAudits: (process.env.SAVE_CAMPAIGNS_AUDITS || 'false').toLowerCase() === 'true',
+    saveRecordAudits: (process.env.SAVE_RECORDS_AUDITS || 'true').toLowerCase() === 'true',
+    saveCampaignAudits: (process.env.SAVE_CAMPAIGNS_AUDITS || 'true').toLowerCase() === 'true',
   },
   nexmo: {
     host: process.env.NEXMO_API,
