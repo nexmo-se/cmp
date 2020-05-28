@@ -252,29 +252,12 @@ export default (container) => {
   const runSingle = async () => {
     try {
       const { uploadPath } = container.config.csv;
-      const { parallelPick } = container.config.picker;
       const uploadDirectoryFileNames = container.fs.readdirSync(uploadPath);
       const csvFilter = name => name !== '' && name.toLowerCase().indexOf('.csv') === name.length - 4;
       const csvFiles = uploadDirectoryFileNames.filter(csvFilter);
 
       let numFilesPicked = 0;
-      if (parallelPick) {
-        // Parallel
-        const promises = csvFiles.map(async (csvFile) => {
-          try {
-            // Process
-            await processFileBatch(csvFile);
-
-            // Archive
-            await archiveFile(csvFile);
-            return Promise.resolve();
-          } catch (error) {
-            return Promise.reject(error);
-          }
-        });
-        const result = await Promise.all(promises);
-        numFilesPicked = result.length;
-      } else if (csvFiles.length > 0) {
+      if (csvFiles.length > 0) {
         // Single File
         const csvFile = csvFiles[0];
 
