@@ -92,7 +92,7 @@ export default (container) => {
     axios = container.axios,
   ) => {
     try {
-      if (mediaType === 'text') {
+      if (mediaType == null || mediaType === 'none') {
         L.trace('Using Message Template');
         return sendMessageTemplate(
           from, to, namespace, name, parameters,
@@ -196,8 +196,8 @@ export default (container) => {
   const getLocationParameter = location => ({
     type: 'location',
     location: {
-      longitude: location.longitude,
-      latitude: location.latitude,
+      longitude: parseFloat(`${location.longitude}`),
+      latitude: parseFloat(`${location.latitude}`),
       name: convertToUtf8(location.name),
       address: convertToUtf8(location.address),
     },

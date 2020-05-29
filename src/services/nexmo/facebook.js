@@ -54,8 +54,8 @@ export default (container) => {
   });
 
   const getMediaContentBody = (mediaType, media) => {
-    let mediaContentBody = { type: 'text', text: media };
-    if (mediaType === 'text') {
+    let mediaContentBody = { type: 'none', text: media };
+    if (mediaType == null || mediaType === 'none') {
       L.trace('FB Template Text');
       mediaContentBody = getTextMediaContentBody(media);
     } else if (mediaType === 'image') {

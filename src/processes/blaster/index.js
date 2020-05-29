@@ -263,7 +263,7 @@ export default (container) => {
       const text = container.templateService.getText(body, parameters);
 
       const result = await container.nexmoService.sms.sendText(
-        recipient, text, 'text', senderId, apiKey, apiSecret,
+        recipient, text, 'none', senderId, apiKey, apiSecret,
         smsUseSignature, signatureSecret, signatureMethod, axios,
       );
 
@@ -294,7 +294,7 @@ export default (container) => {
         .map(cmpParameter => cmpParameter.parameter);
       const result = await container.nexmoService.whatsapp.sendTemplate(
         senderId, recipient, whatsappTemplateNamespace, whatsappTemplateName,
-        type || 'text', cmpMedia, parameters, `${clientRefPrefix}${record.id}`,
+        type || 'none', cmpMedia, parameters, `${clientRefPrefix}${record.id}`,
         applicationId, privateKey, axios,
       );
 
@@ -327,7 +327,7 @@ export default (container) => {
       const text = container.templateService.getText(body, parameters);
 
       let result;
-      if (type == null || type === 'text') {
+      if (type == null || type === 'none') {
         L.trace('Sending Viber Text');
         result = await container.nexmoService.viber.sendText(
           senderId, recipient, text, `${clientRefPrefix}${record.id}`,
@@ -377,7 +377,7 @@ export default (container) => {
       const { applicationId, privateKey } = cmpApplication || {};
 
       let media = cmpMedia;
-      if (type === 'text') {
+      if (type === 'none') {
         L.trace('Sending Facebook Text');
         const parameters = cmpParameters
           .sort((a, b) => a.order - b.order)
