@@ -60,7 +60,7 @@ const container = {};
 
 // Configs
 container.config = config;
-container.config.hostUrl = `${container.config.accessHost}:${container.config.accessPort}`;
+container.config.hostUrl = `${container.config.accessHost}:${container.config.accessPort}/`;
 
 // External
 container.fs = fs;
