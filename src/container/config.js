@@ -3,7 +3,8 @@ export default {
   port: process.env.PORT || 8080,
   ip: process.env.IP || '0.0.0.0',
   host: process.env.HOST || 'http://localhost',
-  customPort: (process.env.CUSTOM_PORT || 'false').toLowerCase() === 'true',
+  accessHost: process.env.ACCESS_HOST || 'http://localhost',
+  accessPort: process.env.ACCESS_PORT || 8080,
   requestMaxSize: process.env.REQUEST_MAX_SIZE || '150mb',
   csv: {
     skipCount: parseInt(process.env.CSV_SKIP_COUNT || '3', 10),
