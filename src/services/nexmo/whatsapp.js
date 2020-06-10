@@ -145,7 +145,7 @@ export default (container) => {
           },
           whatsapp: {
             policy: 'deterministic',
-            locale: 'en_GB',
+            locale: 'en',
           },
         },
         client_ref: clientRef,
@@ -168,13 +168,6 @@ export default (container) => {
     type: 'image',
     image: {
       link: image.url,
-    },
-  });
-
-  const getAudioParameter = audio => ({
-    type: 'audio',
-    audio: {
-      link: audio.url,
     },
   });
 
@@ -211,9 +204,6 @@ export default (container) => {
     } else if (mediaType === 'image') {
       L.trace('MTM Image');
       parameter = getImageParameter(media.cmpMediaImage);
-    } else if (mediaType === 'audio') {
-      L.trace('MTM Audio');
-      parameter = getAudioParameter(media.cmpMediaAudio);
     } else if (mediaType === 'video') {
       L.trace('MTM Video');
       parameter = getVideoParameter(media.cmpMediaVideo);
@@ -267,7 +257,7 @@ export default (container) => {
                 name,
                 language: {
                   policy: 'deterministic',
-                  code: 'en_GB',
+                  code: 'en',
                 },
                 components: [
                   {

@@ -81,7 +81,7 @@ export default {
         .min(1)
         .valid(
           'none', // no media (body text only)
-          'audio', // facebook, whatsapp
+          'audio', // facebook
           'file', // facebook, whatsapp
           'image', // facebook, whatsapp, viber
           'location', // whatsapp
@@ -96,7 +96,7 @@ export default {
             'recipient',
             'text', // text
             'url', // audio, file, image, viber_template, video
-            'caption', // file, image, viber_template, video
+            'caption', // image, viber_template, video
             'fileName', // file,
             'latitude', // location
             'longitude', // location
