@@ -71,10 +71,6 @@ export default (container) => {
     try {
       const loadingStart = new Date().getTime();
 
-      await dataLoadCsvType(CsvTypes.record, TableNames.record);
-      await dataLoadCsvType(CsvTypes.parameter, TableNames.parameter);
-      await dataLoadCsvType(CsvTypes.media, TableNames.media);
-
       await dataLoadCsvType(CsvTypes.mediaAudio, TableNames.mediaAudio);
       await dataLoadCsvType(CsvTypes.mediaFile, TableNames.mediaFile);
       await dataLoadCsvType(CsvTypes.mediaImage, TableNames.mediaImage);
@@ -82,6 +78,10 @@ export default (container) => {
       await dataLoadCsvType(CsvTypes.mediaText, TableNames.mediaText);
       await dataLoadCsvType(CsvTypes.mediaViberTemplate, TableNames.mediaViberTemplate);
       await dataLoadCsvType(CsvTypes.mediaVideo, TableNames.mediaVideo);
+
+      await dataLoadCsvType(CsvTypes.media, TableNames.media);
+      await dataLoadCsvType(CsvTypes.record, TableNames.record);
+      await dataLoadCsvType(CsvTypes.parameter, TableNames.parameter);
 
       const loadingEnd = new Date().getTime();
       L.debug(`Time Taken (DataLoading Total): ${loadingEnd - loadingStart}ms`);
