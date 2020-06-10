@@ -173,7 +173,7 @@ export default (container) => {
             custom: {
               '#txt': convertToUtf8(text),
               '#img': imageUrl,
-              '#caption': convertToUtf8(text),
+              '#caption': convertToUtf8(caption),
               '#action': actionUrl,
             },
           },
