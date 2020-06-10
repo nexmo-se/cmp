@@ -96,7 +96,7 @@ export default {
             'recipient',
             'text', // text
             'url', // audio, file, image, viber_template, video
-            'caption', // image, viber_template, video
+            'caption', // viber_template
             'fileName', // file,
             'latitude', // location
             'longitude', // location
