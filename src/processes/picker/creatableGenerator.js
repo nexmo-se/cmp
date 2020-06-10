@@ -40,7 +40,9 @@ export default (container) => {
     const creatableParameters = [];
 
     for (let i = 0; i < cmpParameters.length; i += 1) {
+      const id = container.uuid();
       const creatableParameter = {
+        id,
         cmpRecordId,
         parameter: cmpParameters[i],
         order: i,
