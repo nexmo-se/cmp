@@ -159,9 +159,14 @@ export default (container) => {
     }
   };
 
-  const getTextParameter = text => ({
+  const getBodyParameter = text => ({
     type: 'text',
     text: convertToUtf8(text),
+  });
+
+  const getTextParameter = text => ({
+    type: 'text',
+    text: convertToUtf8(text.text),
   });
 
   const getImageParameter = image => ({
@@ -266,7 +271,7 @@ export default (container) => {
                   },
                   {
                     type: 'body',
-                    parameters: parameters.map(parameter => getTextParameter(parameter)),
+                    parameters: parameters.map(parameter => getBodyParameter(parameter)),
                   },
                 ],
               },
