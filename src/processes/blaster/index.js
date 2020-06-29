@@ -440,6 +440,9 @@ export default (container) => {
           L.error('Too many request (429) detected, put back into queue');
           return blastRecord(record);
         }
+      } else if (error.message === 'socket hang up') {
+        L.error('Socket Hang Up detected, put back into queue');
+        return blastRecord(record);
       } else {
         L.error(error.message, error);
       }
