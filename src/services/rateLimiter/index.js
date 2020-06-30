@@ -7,6 +7,23 @@ export default (container) => {
   const axiosMap = {};
   const trackerMap = {};
 
+  const getMinTime = (tps) => {
+    const { rateLimiterMode } = container.config.blaster;
+
+    let minTime;
+    if (rateLimiterMode === 'ceiling') {
+      minTime = Math.ceil(1000 / tps);
+    } else if (rateLimiterMode === 'floor') {
+      minTime = Math.floor(1000 / tps);
+    } else if (rateLimiterMode === 'decimal') {
+      minTime = 1000 / tps;
+    } else {
+      minTime = Math.ceil(1000 / tps);
+    }
+
+    return minTime;
+  };
+
   const getTrackTime = () => {
     const currentTime = new Date();
     const year = currentTime.getFullYear();
@@ -105,7 +122,7 @@ export default (container) => {
     const config = { maxRequests: tps, perMilliseconds: 1000 };
     L.debug('Creating new Bottleneck instance (Request)', config);
 
-    const minTime = Math.ceil(1000 / tps);
+    const minTime = getMinTime(tps);
     const bottleneckInstance = new container.Bottleneck({ minTime, trackDoneStatus: true });
     return {
       get: () => bottleneckInstance.schedule(
@@ -164,7 +181,7 @@ export default (container) => {
     const config = { maxRequests: tps, perMilliseconds: 1000 };
     L.debug('Creating new Bottleneck instance (Axios)', config);
 
-    const minTime = Math.ceil(1000 / tps);
+    const minTime = getMinTime(tps);
     const bottleneckInstance = new container.Bottleneck({ minTime, trackDoneStatus: true });
 
     const originalAxiosInstance = container.axios.create({

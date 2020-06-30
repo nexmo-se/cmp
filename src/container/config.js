@@ -25,6 +25,7 @@ export default {
   },
   blaster: {
     rateLimiter: (process.env.RATE_LIMITER || 'bottleneck').toLowerCase(),
+    rateLimiterMode: (process.env.RATE_LIMITER_MODE || 'decimal').toLowerCase(),
     secondsPerBatch: parseInt(process.env.SECONDS_PER_BATCH || '5', 10),
     recordsPerBatch: parseInt(process.env.RECORDS_PER_BATCH || '30', 10),
     useMockBlast: (process.env.USE_MOCK_BLAST || 'false').toLowerCase() === 'true',
