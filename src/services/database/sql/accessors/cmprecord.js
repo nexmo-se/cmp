@@ -1208,9 +1208,17 @@ export default (container) => {
         query.where.activeOnWeekends = true;
       }
 
+      const startTime1 = new Date().getTime();
       const rawCmpRecords = await CmpRecord.findAll(query);
+      const endTime1 = new Date().getTime();
+      L.debug(`Time Taken (Select Active Records): ${endTime1 - startTime1}ms`);
+
+      const startTime2 = new Date().getTime();
       const cmpRecords = rawCmpRecords
         .map(cmpRecord => mapCmpRecord(cmpRecord, excludeSecret));
+      const endTime2 = new Date().getTime();
+      L.debug(`Time Taken (Map Active Records): ${endTime2 - startTime2}ms`);
+
       return Promise.resolve(cmpRecords);
     } catch (error) {
       if (error.name === 'SequelizeConnectionAcquireTimeoutError') {

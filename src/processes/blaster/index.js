@@ -3,7 +3,82 @@ import CampaignDetailReporter from './campaignDetail';
 export default (container) => {
   const { L } = container.defaultLogger('Blaster Process');
 
+  const campaignCache = {};
+
   const campaignDetailReporter = CampaignDetailReporter(container);
+
+  const getCampaigns = async (cmpCampaignIds) => {
+    try {
+      const campaigns = [];
+      const missingCampaignIds = [];
+
+      // Get From Cache
+      const startTime1 = new Date().getTime();
+      for (let i = 0; i < cmpCampaignIds.length; i += 1) {
+        const cmpCampaignId = cmpCampaignIds[i];
+
+        const campaign = campaignCache[cmpCampaignId];
+        if (campaign == null) {
+          missingCampaignIds.push(cmpCampaignId);
+        } else {
+          campaigns.push(campaign);
+        }
+      }
+      const endTime1 = new Date().getTime();
+      L.debug(`Time Taken (Find Campaign Cache): ${endTime1 - startTime1}ms`);
+
+      if (missingCampaignIds.length > 0) {
+        // Get From Database
+        const startTime2 = new Date().getTime();
+        const { CmpCampaign } = container.persistenceService;
+        const criteria = { id: missingCampaignIds };
+        const dbCampaigns = await CmpCampaign.findCampaigns(criteria);
+        const endTime2 = new Date().getTime();
+        L.debug(`Time Taken (Find Campaign Database): ${endTime2 - startTime2}ms`);
+
+        // Merge
+        const startTime3 = new Date().getTime();
+        for (let i = 0; i < dbCampaigns.length; i += 1) {
+          const dbCampaign = dbCampaigns[i];
+          // Add to Return list
+          campaigns.push(dbCampaign);
+
+          // Add to Cache
+          campaignCache[dbCampaign.id] = dbCampaign;
+        }
+        const endTime3 = new Date().getTime();
+        L.debug(`Time Taken (Find Campaign Merge): ${endTime3 - startTime3}ms`);
+      }
+
+      return Promise.resolve(campaigns);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const updateCampaign = async (cmpCampaignId, changes) => {
+    try {
+      // Update to Database
+      const startTime1 = new Date().getTime();
+      const { CmpCampaign } = container.persistenceService;
+      const result = await CmpCampaign.updateCampaign(cmpCampaignId, changes);
+      const endTime1 = new Date().getTime();
+      L.debug(`Time Taken (Update Campaign Database): ${endTime1 - startTime1}ms`);
+
+      // Update to Cache
+      const startTime2 = new Date().getTime();
+      const campaign = campaignCache[cmpCampaignId];
+      if (campaign != null) {
+        campaignCache[cmpCampaignId] = Object.assign({}, campaign, changes);
+      }
+      const endTime2 = new Date().getTime();
+      L.debug(`Time Taken (Update Campaign Cache): ${endTime2 - startTime2}ms`);
+
+      return Promise.resolve(result);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
 
   const getRecords = async (recordSize) => {
     try {
@@ -158,9 +233,10 @@ export default (container) => {
         return Promise.resolve();
       }
 
-      const { CmpCampaign } = container.persistenceService;
-      const criteria = { id: cmpCampaignIds };
-      const cmpCampaigns = await CmpCampaign.findCampaigns(criteria);
+      // const { CmpCampaign } = container.persistenceService;
+      // const criteria = { id: cmpCampaignIds };
+      // const cmpCampaigns = await CmpCampaign.findCampaigns(criteria);
+      const cmpCampaigns = await getCampaigns(cmpCampaignIds);
 
       const promises = cmpCampaigns.map(
         cmpCampaign => updateCampaignStatus(cmpCampaign, isStart, isEnd),
@@ -175,7 +251,7 @@ export default (container) => {
   const updateCampaignStatus = async (campaign, isStart = true, isEnd = true) => {
     try {
       const { generateReport, reportDelay } = container.config.blaster;
-      const { CmpRecord, CmpCampaign } = container.persistenceService;
+      const { CmpRecord } = container.persistenceService;
       const cmpCampaignId = campaign.id;
       const currentTime = new Date();
 
@@ -218,7 +294,11 @@ export default (container) => {
             const fullPath = `${filePath}/${fileName}`;
             setTimeout(() => campaignDetailReporter.generateCampaign(cmpCampaignId, fullPath)
               .then(() => publishCampaignStatusAudit(campaign, 'completed'))
-              .then(() => CmpCampaign.updateCampaign(cmpCampaignId, {
+              // .then(() => CmpCampaign.updateCampaign(cmpCampaignId, {
+              //   status: 'completed',
+              //   statusTime: new Date(),
+              // })), reportDelay * 1000);
+              .then(() => updateCampaign(cmpCampaignId, {
                 status: 'completed',
                 statusTime: new Date(),
               })), reportDelay * 1000);
@@ -238,7 +318,8 @@ export default (container) => {
       }
 
       const startTime = new Date().getTime();
-      const result = await CmpCampaign.updateCampaign(cmpCampaignId, changes);
+      // const result = await CmpCampaign.updateCampaign(cmpCampaignId, changes);
+      const result = await updateCampaign(cmpCampaignId, changes);
       const endTime = new Date().getTime();
       const duration = endTime - startTime;
       L.debug(`Time Taken (Update Campaign Status): ${duration}ms`);
