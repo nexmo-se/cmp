@@ -85,6 +85,52 @@ The build production picker can be started by running `npm run picker`.
 #### Development
 The development version of the picker that uses `babel-node` can be started by running `npm run devPicker`.
 
+# Concepts
+In order to get a full understanding of the Campaign Management Portal, there are a few concepts that we need to explain and be clear of.
+
+### API Key and Application
+API Key refers to a record of Nexmo API Key added to the portal. A CMP API Key ID will be generated upon adding the Nexmo API Key. This ID will be used for referencing in other components such as Application and Channel.
+
+Application refers to a record of a Nexmo Application added to the portal. A CMP Application ID will be generated uponb adding the Nexmo Application. This ID will be used for referencing in other components such as Channel.
+
+Relationship
+
+1 API Key owns N Applications
+
+### Channel and Template (Parameter and Media)
+Channel refers to a record of a messaging channel (whatsapp, facebook, viber or sms) that is linked to an Application and/or API Key. Since there could be instances where multiple Nexmo API Key or multiple Nexmo Application are to be used in the same CMP instance, such as in the use case of having multiple Whatsapp Business Account with different LVNs.
+
+Template refers to a predetermined message body template with paramaters that can be filled with values. A sample of the template body is as follow:
+
+```
+Thank you for shopping with {{1}}. Your purchase is completed and will be delivered to you at {{2}}.
+```
+
+`{{1}}` and `{{2}}` can be replaced with a proper value customized to your messaging needs.
+
+On top of template body parameters, certain channels such as Whatsapp, Facebook and Viber are capable of sending media. The supported media are as follow
+
+- None - no header, just pure body text with parameter: `SMS`, `Whatsapp`, `Facebook`, `Viber`
+- Text - a line of text header (bold): `Whatsapp`
+- Image: `Whatsapp`, `Facebook`, `Viber`
+- Audio: `Whatsapp`, `Facebook`
+- Video: `Whatsapp`. `Facebook`
+- File: `Whatsapp`, `Facebook`
+- Location: `Whatsapp`
+- Viber Template: `Viber`
+
+##### Viber Template
+A viber template is a special type exclusive to the Viber platform. It consist of an image, body text and a button with action URL.
+
+The display text of the button is specified by the `caption` field. See [Media](src/router/cmpmedia) for more details. Upon clicking the button, Viber will launch the browser navigating to the `actionUrl` provided.
+
+### Campaign and Records
+Campaign refers to a record of a full message blasting campaign. A campaign will be using the same Channel and the same Template for all records in the campaign.
+
+The campaign can be configured to have active hours (e.g. 8am to 6pm) so as not to send messages after working hours. It is also capable of configuring whether to send during weekends.
+
+Record refers to a record of a to-be recipient within the campaign. While all records share the same template and channel, each record may have different parameter values and media values so as to have a personalized message and content to the recipient.
+
 # API Documentations
 [Authentication](src/router/auth)
 
