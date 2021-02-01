@@ -131,6 +131,19 @@ The campaign can be configured to have active hours (e.g. 8am to 6pm) so as not 
 
 Record refers to a record of a to-be recipient within the campaign. While all records share the same template and channel, each record may have different parameter values and media values so as to have a personalized message and content to the recipient.
 
+# Uploading Campaign Records using CSV
+Due to the complexity and range of features available for each of the messaging channels, the CSV format and structure will have to be different.
+
+For example, the CSV format for a template that contains an image will need to have the url to the image as compared to the CSV format for a plaintext template.
+
+Therefore, the uploading of CSV is split into two parts:
+1. Creating metadata for the CSV
+2. Uploading the actual CSV
+
+During the metadata creation process, the structure of the CSV is made known to the portal so that when it is trying to parse the actual CSV, the columns can be parsed and inserted to the right table in the database.
+
+See **Create CSV Metadata** of [Record](src/router/cmprecord) for more details.
+
 # API Documentations
 [Authentication](src/router/auth)
 
