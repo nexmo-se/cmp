@@ -84,3 +84,18 @@ The build production picker can be started by running `npm run picker`.
 
 #### Development
 The development version of the picker that uses `babel-node` can be started by running `npm run devPicker`.
+
+# API Documentations
+[Authentication](src/router/auth)
+[User](src/router/user)
+[Webhook](src/router/webhook)
+[API Key](src/router/cmpapikey)
+[Application](src/router/cmpapplication)
+[Campaign](src/router/cmpcampaign)
+[Channel](src/router/cmpchannel)
+[Template](src/router/cmptemplate)
+[Media](src/router/cmpmedia)
+[Parameter](src/router/cmpparameter)
+[Record](src/router/cmprecord)
+[Report](src/router/cmpreport)
+[Blaster](src/router/blaster)
