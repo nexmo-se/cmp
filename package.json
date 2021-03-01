@@ -47,7 +47,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
     "aws-sdk": "^2.531.0",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "axios-rate-limit": "^1.2.1",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.18.3",
