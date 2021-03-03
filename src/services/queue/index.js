@@ -104,7 +104,7 @@ export default (container) => {
       queue.recordMessagePriceUpdates = {};
 
       const priceBuckets = {};
-      const messageIds = Object.keys(updates);
+      let messageIds = Object.keys(updates);
 
       // Make sure all message ids are available
       const recordMessageIdMap = await getRecordMessageIdMap(messageIds);
@@ -121,6 +121,7 @@ export default (container) => {
         }
       }
 
+      messageIds = Object.keys(updates);
       if (messageIds.length > 0) {
         const mapStartTime = new Date().getTime();
         const totalStartTime = new Date().getTime();
@@ -144,7 +145,7 @@ export default (container) => {
           const updateStartTime = new Date().getTime();
 
           const promises = prices
-            .filter(price => price != null)
+            .filter(price => !!price && price !== 'undefined' && price !== 'null')
             .map(async (price) => {
               try {
                 const priceStartTime = new Date().getTime();
@@ -206,7 +207,7 @@ export default (container) => {
       queue.recordMessageStatusUpdates = {};
 
       const statusBuckets = {};
-      const messageIds = Object.keys(updates);
+      let messageIds = Object.keys(updates);
 
       // Make sure all message ids are available
       const recordMessageIdMap = await getRecordMessageIdMap(messageIds);
@@ -226,6 +227,7 @@ export default (container) => {
         }
       }
 
+      messageIds = Object.keys(updates);
       if (messageIds.length > 0) {
         const mapStartTime = new Date().getTime();
         const totalStartTime = new Date().getTime();
@@ -250,7 +252,9 @@ export default (container) => {
           const updateStartTime = new Date().getTime();
 
           /* Actually Do Something */
-          const promises = statuses.map(async (status) => {
+          const promises = statuses
+            .filter(status => !!status && status !== 'undefined' && status !== 'null')
+            .map(async (status) => {
             try {
               const statusStartTime = new Date().getTime();
 
