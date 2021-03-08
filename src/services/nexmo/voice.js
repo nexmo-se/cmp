@@ -1,12 +1,21 @@
-import windows1252 from 'windows-1252';
-import utf8 from 'utf8';
-
 export default (container) => {
   const { L } = container.defaultLogger('Nexmo Voice Service');
 
-  const generateTtsNccos = (text) => {
+  const generateTtsNccos = (text, language = 'en-US', style = 0) => ([
+    {
+      action: "talk",
+      text: text,
+      language,
+      style,
+    }
+  ]);
 
-  }
+  const generateStreamNccos = (url) => ([
+    {
+      action: "stream",
+      streamUrl: [url],
+    }
+  ]);
 
   const getUrl = () => {
     const { host, useMockVoice, mockVoiceUrl } = container.config.nexmo;
@@ -20,21 +29,63 @@ export default (container) => {
   };
 
   const sendTts = async (
-    to, text, type, senderId,
-    apiKey, apiSecret,
-    smsUseSignature, signatureSecret, signatureMethod,
-    axios = container.axios) => {
+    from, to,
+    text, language = 'en-US', style = 0
+    clientRef,
+    applicationId, privateKey,
+    axios = container.axios,
+  ) => {
+    const nccos = generateTtsNccos(text, language, style);
+    return sendNcco(
+      from, to, nccos, clientRef,
+      applicationId, privateKey, axios,
+    );
+  }
+
+  const sendStream = async (
+    from, to,
+    url,
+    clientRef,
+    applicationId, privateKey,
+    axios = container.axios,
+  ) => {
+    const nccos = generateStreamNccos(url);
+    return sendNcco(
+      from, to, nccos, clientRef,
+      applicationId, privateKey, axios,
+    );
+  }
+
+  const sendNcco = async (
+    from, to, nccos, clientRef,
+    applicationId, privateKey,
+    axios = container.axios,
+  ) => {
     try {
       const url = getUrl();
+      const jwt = await container.nexmoService.jwt.getSystemJwt(applicationId, privateKey);
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      };
       const body = {
-        api_key: apiKey,
-        from: senderId,
-        to,
-        text: sanitizedText,
-        type: sanitizedType,
+        to: [
+          {
+            type: 'phone',
+            number: to,
+          },
+        ],
+        from: {
+          type: 'phone',
+          number: from,
+        },
+        event_url: [`${container.config.hostUrl}webhook/vapi/event/${clientRef}`]
+        event_method: 'POST',
       };
 
-      const response = await axios.post(url, body);
+      const response = await axios.post(url, body, config);
       const { data } = response;
       return Promise.resolve(data);
     } catch (error) {
@@ -44,5 +95,8 @@ export default (container) => {
 
   return {
     sendTts,
+    sendStream,
+
+    sendNcco,
   };
 };
