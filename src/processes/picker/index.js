@@ -32,7 +32,16 @@ export default (container) => {
         }
       } else if (column === 'recipient') {
         record.recipient = data;
+      } else if (column.indexOf('voice_') === 0) {
+        // Voice
+        const trimmedColumn = column.slice('voice_'.length);
+        if (record.cmpVoice == null) {
+          record.cmpVoice = {};
+        }
+
+        record.cmpVoice[trimmedColumn] = data;
       } else {
+        // Media
         record.cmpMedia[column] = data;
       }
     }
