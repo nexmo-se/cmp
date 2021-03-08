@@ -107,7 +107,7 @@ export default (container) => {
       const ncco = [
         {
           action: 'text',
-          text: 'You have reached the NIDS Demo Answer. Have a nice day and goodbye.',
+          text: 'You have reached the C M P Answer Webhook. Have a nice day and goodbye.',
         },
       ];
       const endTime = new Date().getTime();
@@ -128,7 +128,7 @@ export default (container) => {
       const ncco = [
         {
           action: 'text',
-          text: 'You have reached the NIDS Demo Fallback Answer. Have a nice day and goodbye.',
+          text: 'You have reached the C M P Fallback Answer Webhook. Have a nice day and goodbye.',
         },
       ];
       const endTime = new Date().getTime();
@@ -149,7 +149,7 @@ export default (container) => {
       const ncco = [
         {
           action: 'text',
-          text: 'You have reached the NIDS Demo Event. Have a nice day and goodbye.',
+          text: 'You have reached the C M P Event Webhook. Have a nice day and goodbye.',
         },
       ];
       const endTime = new Date().getTime();
