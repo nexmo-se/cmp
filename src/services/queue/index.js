@@ -6,6 +6,7 @@ export default (container) => {
     recordMessagePriceUpdates: {},
     mapiStatusAudits: [],
     smsStatusAudits: [],
+    vapiEventAudits: [],
   };
 
   const StatusHierarchy = {
@@ -15,6 +16,8 @@ export default (container) => {
     pending: 1,
     queuing: 2,
     requested: 3,
+
+    // Mapi and SMS
     submitted: 4,
     accepted: 4,
     buffered: 4,
@@ -24,6 +27,24 @@ export default (container) => {
     undeliverable: 5,
     expired: 5,
     read: 6,
+
+    // Vapi
+    started: 4,
+    ringing: 5,
+    answered: 6,
+    human: 7,
+    machine: 7,
+    record: 8,
+    input: 8,
+    transfer: 8,
+    busy: 9,
+    cancelled: 9,
+    unanswered: 9,
+    disconnected: 9,
+    rejected: 9,
+    failed: 9,
+    timeout: 9,
+    completed: 10,
   };
 
   const getOverwritableStatuses = (status) => {
@@ -59,6 +80,9 @@ export default (container) => {
 
     L.trace('Scheduling SMS Status Audit Saving');
     setTimeout(saveSmsStatusAudit, queueDelay * 1000);
+
+    L.trace('Scheduling VAPI Event Audit Saving');
+    setTimeout(saveVapiEventAudit, queueDelay * 1000);
   };
 
   const getRecordMessageIdMap = async (messageIds) => {
@@ -419,6 +443,58 @@ export default (container) => {
     }
   };
 
+  const saveVapiEventAudit = async () => {
+    try {
+      const { CmpRecordMessageStatusAudit } = container.persistenceService;
+      const { queueDelay } = container.config.webhook;
+      const audits = queue.vapiEventAudits;
+      queue.vapiEventAudits = [];
+
+      if (audits.length > 0) {
+        L.trace('Saving VAPI Event Audits');
+        const startTime = new Date().getTime();
+
+        /* Actually Do Something */
+        const uuids = audits.map(audit => audit.uuid);
+        const recordMessageIdMap = await getRecordMessageIdMap(uuids);
+
+        // Inject Record Message ID
+        const injectStartTime = new Date().getTime();
+        const availableAudits = [];
+        for (let i = 0; i < audits.length; i += 1) {
+          const audit = audits[i];
+          const { uuid } = audit;
+          if (recordMessageIdMap[uuid] == null) {
+            // Record Message not available, back into queue
+            queue.vapiEventAudits.push(audits[i]);
+          } else {
+            audits[i].cmpRecordMessageId = recordMessageIdMap[uuid];
+            availableAudits.push(audits[i]);
+          }
+        }
+        const injectEndTime = new Date().getTime();
+        L.debug(`Time Taken (VAPI Record Message ID Inject): ${injectEndTime - injectStartTime}ms`);
+
+        // Bulk Insert
+        const createStartTime = new Date().getTime();
+        await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditVapiBatch(availableAudits);
+        const createEndTime = new Date().getTime();
+        L.debug(`Time Taken (VAPI Audit Create): ${createEndTime - createStartTime}ms`);
+        /* End of Do Something */
+
+        const endTime = new Date().getTime();
+        L.debug(`Time Taken (VAPI Event Audits Saving)[${availableAudits.length}]: ${endTime - startTime}ms`);
+        L.trace(`${availableAudits.length} VAPI Event Audits saved`);
+      } else {
+        L.trace('Nothing to save for VAPI Event Audits');
+      }
+      setTimeout(saveVapiEventAudit, queueDelay * 1000);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const pushRecordMessageUpdate = (messageId, status, price) => {
     const currentStatus = queue.recordMessageStatusUpdates[messageId];
     if (currentStatus == null) {
@@ -440,6 +516,10 @@ export default (container) => {
     queue.smsStatusAudits.push(data);
   };
 
+  const pushVapiEventAudit = (data) => {
+    queue.vapiEventAudits.push(data);
+  };
+
 
   return {
     initialize,
@@ -447,5 +527,6 @@ export default (container) => {
     pushRecordMessageUpdate,
     pushMapiStatusAudit,
     pushSmsStatusAudit,
+    pushVapiEventAudit,
   };
 };

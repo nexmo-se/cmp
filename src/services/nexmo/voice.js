@@ -30,7 +30,7 @@ export default (container) => {
 
   const sendTts = async (
     from, to,
-    text, language = 'en-US', style = 0
+    text, language = 'en-US', style = 0,
     clientRef,
     applicationId, privateKey,
     axios = container.axios,

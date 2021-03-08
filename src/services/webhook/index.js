@@ -1,3 +1,5 @@
+import { duration } from "moment";
+
 export default (container) => {
   const { L } = container.defaultLogger('Webhook Service');
 
@@ -172,9 +174,102 @@ export default (container) => {
     }
   };
 
+  const publishVapiEventAudit = async (data, clientRef) => {
+    try {
+      const { useQueue } = container.config.webhook;
+      const { saveRecordAudits } = container.config.audit;
+      const { CmpRecordMessageStatusAudit } = container.persistenceService;
+
+      if (!saveRecordAudits) {
+        return Promise.resolve();
+      }
+
+      const {
+        from, to,
+        uuid, conversation_uuid: conversationUuid,
+        status, direction, timestamp,
+        start_time: callStartTime, end_time: callEndTime,
+        duration, rate, price, network, detail,
+        dtmf, speech,
+      } = data;
+
+      // DTMF Input
+      const { digits: dtmfDigits, timed_out: dtmfTimedOut } = dtmf || {};
+      
+      // Speech Input
+      const { timeout_reason: speechTimeoutReason, error: speechError, results: speechResults } = speech || {};
+      const { text: speechText, confidence: speechConfidence } = speechResults || {};
+      const { reason: speechErrorReason } = speechError || {};
+
+      const startTime = new Date().getTime();
+
+      if (useQueue) {
+        // Add to Queue
+        const creatableData = {
+          from,
+          to,
+          uuid,
+          conversationUuid,
+          status,
+          direction,
+          timestamp,
+          startTime: callStartTime,
+          endTime: callEndTime,
+          duration,
+          rate,
+          price,
+          network,
+          detail,
+          dtmfDigits,
+          dtmfTimedOut,
+          speechText,
+          speechConfidence,
+          speechTimeoutReason,
+          speechErrorReason,
+          clientRef,
+        };
+        container.queueService.pushVapiEventAudit(creatableData);
+      } else {
+        // Insert Immediately
+        const recordMessage = await getRecordMessage(uuid);
+        await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditVapi(
+          recordMessage.id,
+          from,
+          to,
+          uuid,
+          conversationUuid,
+          status,
+          direction,
+          timestamp,
+          startTime: callStartTime,
+          endTime: callEndTime,
+          duration,
+          rate,
+          price,
+          network,
+          detail,
+          dtmfDigits,
+          dtmfTimedOut,
+          speechText,
+          speechConfidence,
+          speechTimeoutReason,
+          speechErrorReason,
+          clientRef,
+        );
+      }
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Handle Publish Vapi Event Audit): ${endTime - startTime}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   return {
     updateRecordMessage,
+
     publishMapiStatusAudit,
     publishSmsStatusAudit,
+    publishVapiEventAudit,
   };
 };

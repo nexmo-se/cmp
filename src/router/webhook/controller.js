@@ -160,6 +160,27 @@ export default (container) => {
     }
   };
 
+  const vapiEventDynamic = async (req, res, next) => {
+    try {
+      L.debug('VAPI Event Dynamic');
+      L.trace(req.params);
+      L.trace(req.body);
+
+      const startTime = new Date().getTime();
+
+      const { clientRef } = req.params;
+      const { uuid, status, price } = req.body;
+      await container.webhookService.updateRecordMessage(uuid, status, price);
+      await container.webhookService.publishVapiEventAudit(req.body, clientRef);
+
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (VAPI Event Dynamic Webhook): ${endTime - startTime}ms`);
+      res.json([]);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   const mapiInbound = async (req, res, next) => {
     try {
       L.debug('MAPI Inbound');
@@ -219,6 +240,7 @@ export default (container) => {
     vapiAnswer,
     vapiFallbackAnswer,
     vapiEvent,
+    vapiEventDynamic,
 
     mapiInbound,
     mapiStatus,

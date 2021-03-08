@@ -37,6 +37,12 @@ export default {
     body: {},
   },
 
+  vapiEventDynamic: {
+    query: {},
+    params: {},
+    body: {},
+  },
+
   mapiInbound: {
     query: {},
     params: {},

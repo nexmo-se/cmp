@@ -51,6 +51,11 @@ export default (container) => {
     validate(validator.vapiEvent),
     controller.vapiEvent,
   );
+  router.post(
+    '/vapi/event/:clientRef',
+    validate(validator.vapiEventDynamic),
+    controller.vapiEventDynamic,
+  );
 
   // MAPI
   router.post(

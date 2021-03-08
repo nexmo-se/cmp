@@ -9,6 +9,8 @@ export default (container) => {
       mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditSms;
     } else if (mappedRmsAudit.mediaType === 'mapi') {
       mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditMapi;
+    } else if (mappedRmsAudit.mediaType === 'vapi') {
+      mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditVapi;
     }
 
     mappedRmsAudit.typeId = mappedRmsAuditData.id;
@@ -62,6 +64,7 @@ export default (container) => {
           messageType: 'sms',
           cmpRecordMessageStatusAuditSmsId: smsAuditId,
           cmpRecordMessageStatusAuditMapiId: null,
+          cmpRecordMessageStatusAuditVapiId: null,
         });
       }
 
@@ -109,6 +112,7 @@ export default (container) => {
           'sms',
           cmpRecordMessageStatusAuditSmsId,
           null,
+          null,
         );
 
       return Promise.resolve();
@@ -153,6 +157,7 @@ export default (container) => {
           messageType: 'mapi',
           cmpRecordMessageStatusAuditSmsId: null,
           cmpRecordMessageStatusAuditMapiId: mapiAuditId,
+          cmpRecordMessageStatusAuditVapiId: null,
         });
       }
 
@@ -204,6 +209,116 @@ export default (container) => {
           'mapi',
           null,
           cmpRecordMessageStatusAuditMapiId,
+          null,
+        );
+      const mappedCmpRecordMessageStatusAudit = mapRecordMessageStatusAudit(
+        cmpRecordMessageStatusAudit,
+      );
+
+      return Promise.resolve(mappedCmpRecordMessageStatusAudit);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createRecordMessageStatusAuditVapiBatch = async (audits) => {
+    try {
+      const {
+        CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditVapi,
+      } = container.databaseService.accessors;
+
+      const commonAudits = [];
+      const vapiAudits = [];
+
+      for (let i = 0; i < audits.length; i += 1) {
+        const audit = audits[i];
+        const vapiAuditId = container.uuid();
+        vapiAudits.push({
+          id: vapiAuditId,
+          from: audit.from,
+          to: audit.to,
+          uuid: audit.uuid,
+          conversationUuid: audit.conversationUuid,
+          status: audit.status,
+          direction: audit.direction,
+          timestamp: audit.timestamp,
+          startTime: audit.startTime,
+          endTime: audit.endTime,
+          duration: audit.duration,
+          rate: audit.rate,
+          price: audit.price,
+          network: audit.network,
+          detail: audit.detail,
+          dtmfDigits: audit.dtmfDigits,
+          dtmfTimedOut: audit.dtmfTimedOut,
+          speechText: audit.speechText,
+          speechConfidence: audit.speechConfidence,
+          speechTimeoutReason: audit.speechTimeoutReason,
+          speechErrorReason: audit.speechErrorReason,
+          clientRef: audit.clientRef,
+        });
+
+        commonAudits.push({
+          id: container.uuid(),
+          cmpRecordMessageId: audit.cmpRecordMessageId,
+          messageType: 'vapi',
+          cmpRecordMessageStatusAuditSmsId: null,
+          cmpRecordMessageStatusAuditMapiId: null,
+          cmpRecordMessageStatusAuditVapiId: vapiAuditId,
+        });
+      }
+
+      // Insert SMS Audits
+      await CmpRecordMessageStatusAuditVapi.createRecordMessageStatusAuditVapiBatch(vapiAudits);
+      await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditBatch(commonAudits);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createRecordMessageStatusAuditVapi = async (
+    cmpRecordMessageId,
+    from, to, uuid, conversationUuid,
+    status, direction, timestamp,
+    startTime, endTime,
+    duration, rate, price, network, detail,
+    dtmfDigits, dtmfTimedOut,
+    speechText, speechConfidence,
+    speechTimeoutReason, speechErrorReason,
+    clientRef,
+  ) => {
+    try {
+      L.trace(cmpRecordMessageId);
+      const {
+        CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditVapi,
+      } = container.databaseService.accessors;
+
+      // Create RecordMessageStatusAudit Text
+      const cmpRecordMessageStatusAuditVapiId = container.uuid();
+      await CmpRecordMessageStatusAuditVapi
+        .createRecordMessageStatusAuditVapi(
+          container.uuid(),
+          cmpRecordMessageStatusAuditVapiId,
+          from, to, uuid, conversationUuid,
+          status, direction, timestamp,
+          startTime, endTime,
+          duration, rate, price, network, detail,
+          dtmfDigits, dtmfTimedOut,
+          speechText, speechConfidence,
+          speechTimeoutReason, speechErrorReason,
+          clientRef,
+        );
+
+      // Create RecordMessageStatusAudit
+      const cmpRecordMessageStatusAudit = await CmpRecordMessageStatusAudit
+        .createRecordMessageStatusAudit(
+          container.uuid(),
+          cmpRecordMessageId,
+          'vapi',
+          null,
+          null,
+          cmpRecordMessageStatusAuditVapiId,
         );
       const mappedCmpRecordMessageStatusAudit = mapRecordMessageStatusAudit(
         cmpRecordMessageStatusAudit,
@@ -269,6 +384,9 @@ export default (container) => {
 
     createRecordMessageStatusAuditMapi,
     createRecordMessageStatusAuditMapiBatch,
+
+    createRecordMessageStatusAuditVapi,
+    createRecordMessageStatusAuditVapiBatch,
 
     readRecordMessageStatusAudit,
 
