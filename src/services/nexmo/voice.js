@@ -81,7 +81,7 @@ export default (container) => {
           type: 'phone',
           number: from,
         },
-        event_url: [`${container.config.hostUrl}webhook/vapi/event/${clientRef}`]
+        event_url: [`${container.config.hostUrl}webhook/vapi/event/${clientRef}`],
         event_method: 'POST',
       };
 
