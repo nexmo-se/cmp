@@ -22,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(45),
       allowNull: true,
     },
+    cmpRecordMessageStatusAuditVapiId: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
     deleted: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
@@ -35,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
     CmpRecordMessageStatusAudit.belongsTo(models.CmpRecordMessageStatusAuditSms, { foreignKey: 'cmpRecordMessageStatusAuditSmsId', as: 'cmpRecordMessageStatusAuditSms' });
     CmpRecordMessageStatusAudit.belongsTo(models.CmpRecordMessageStatusAuditMapi, { foreignKey: 'cmpRecordMessageStatusAuditMapiId', as: 'cmpRecordMessageStatusAuditMapi' });
+    CmpRecordMessageStatusAudit.belongsTo(models.CmpRecordMessageStatusAuditVapi, { foreignKey: 'cmpRecordMessageStatusAuditVapiId', as: 'cmpRecordMessageStatusAuditVapi' });
     CmpRecordMessageStatusAudit.belongsTo(models.CmpRecordMessage, { foreignKey: 'cmpRecordMessageId', as: 'cmpRecordMessage' });
   };
 
