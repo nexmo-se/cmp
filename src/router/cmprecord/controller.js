@@ -300,6 +300,24 @@ export default (container) => {
     }
   };
 
+  const createVoice = async (voice) => {
+    try {
+      const {
+        voiceType, language, style,
+        streamUrl, answerUrl,
+      } = voice;
+      const { CmpVoice } = container.persistenceService;
+
+      const cmpVoice = await CmpVoice.createVoice(
+        voiceType, language, style,
+        streamUrl, answerUrl,
+      );
+      return Promise.resolve(cmpVoice);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecord = async (record) => {
     try {
       const {
@@ -307,7 +325,9 @@ export default (container) => {
         cmpCampaignId,
         cmpTemplateId,
         cmpMediaId,
+        cmpVoiceId,
         cmpMedia,
+        cmpVoice,
         cmpParameters,
         activeStartHour,
         activeStartMinute,
@@ -325,6 +345,12 @@ export default (container) => {
         actualCmpMediaId = actualCmpMedia.id;
       }
 
+      let actualCmpVoiceId = cmpVoiceId;
+      if (actualCmpVoiceId == null && cmpVoice) {
+        const actualCmpVoice = await createVoice(cmpVoice);
+        actualCmpVoiceId = actualCmpVoice.id;
+      }
+
 
       const sanitizedStart = container.dateTimeService
         .getDateInUtc(activeStartHour, activeStartMinute, timezone);
@@ -336,6 +362,7 @@ export default (container) => {
         cmpCampaignId,
         cmpTemplateId,
         actualCmpMediaId,
+        actualCmpVoiceId,
         sanitizedStart.getUTCHours(),
         sanitizedStart.getUTCMinutes(),
         sanitizedEnd.getUTCHours(),

@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(45),
       allowNull: true,
     },
+    cmpVoiceId: {
+      type: DataTypes.STRING(45),
+      allowNull: true,
+    },
     activeStart: {
       type: DataTypes.INTEGER,
       allowNull: true,
@@ -79,6 +83,7 @@ module.exports = (sequelize, DataTypes) => {
   CmpRecord.associate = (models) => {
     // associations can be defined here
     CmpRecord.belongsTo(models.CmpMedia, { foreignKey: 'cmpMediaId', as: 'cmpMedia' });
+    CmpRecord.belongsTo(models.CmpVoice, { foreignKey: 'cmpVoiceId', as: 'cmpVoice' });
     CmpRecord.belongsTo(models.CmpTemplate, { foreignKey: 'cmpTemplateId', as: 'cmpTemplate' });
     CmpRecord.hasMany(models.CmpParameter, { foreignKey: 'cmpRecordId', as: 'cmpParameters' });
     CmpRecord.belongsTo(models.CmpCampaign, { foreignKey: 'cmpCampaignId', as: 'cmpCampaign' });

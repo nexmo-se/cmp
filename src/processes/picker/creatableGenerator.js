@@ -1,8 +1,8 @@
 export default (container) => {
-  const generateCreatableRecord = (cmpRecordId, cmpMediaId, record) => {
+  const generateCreatableRecord = (cmpRecordId, cmpMediaId, cmpVoiceId, record) => {
     const {
       recipient,
-      cmpCampaignId, cmpTemplateId, cmpMedia,
+      cmpCampaignId, cmpTemplateId, cmpMedia, cmpVoice,
       activeStartHour, activeStartMinute,
       activeEndHour, activeEndMinute,
       activeOnWeekends, timezone,
@@ -30,6 +30,9 @@ export default (container) => {
     if (cmpMedia) {
       creatableRecord.cmpMediaId = cmpMediaId;
     }
+    if (cmpVoice) {
+      creatableRecord.cmpVoiceId = cmpVoiceId;
+    }
 
     return creatableRecord;
   };
@@ -52,6 +55,25 @@ export default (container) => {
     }
 
     return creatableParameters;
+  };
+
+  const generateCreatableVoice = (cmpVoiceId, record) => {
+    const { cmpVoice } = record;
+
+    if (cmpVoice) {
+      const creatableVoice = {
+        id: cmpVoiceId,
+        voiceType: cmpVoice.voiceType,
+        language: cmpVoice.language,
+        style: cmpVoice.style,
+        streamUrl: cmpVoice.streamUrl,
+        answerUrl: cmpVoice.answerUrl,
+      };
+
+      return creatableVoice;
+    }
+
+    return null;
   };
 
   const generateCreatableMedia = (cmpMediaId, record) => {
@@ -184,6 +206,7 @@ export default (container) => {
   return {
     generateCreatableRecord,
     generateCreatableParameters,
+    generateCreatableVoice,
     generateCreatableMedia,
 
     generateCreatableMediaRaw,

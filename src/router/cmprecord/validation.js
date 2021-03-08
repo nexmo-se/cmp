@@ -9,6 +9,7 @@ export default {
       cmpCampaignId: Joi.string(),
       cmpTemplateId: Joi.string(),
       cmpMediaId: Joi.string(),
+      cmpVoiceId: Joi.string(),
       activeStartHour: Joi.number().integer(),
       activeStartMinute: Joi.number().integer(),
       activeEndHour: Joi.number().integer(),
@@ -38,6 +39,10 @@ export default {
       ),
       cmpMediaId: Joi.alternatives().try(
         Joi.string(),
+        Joi.array().items(Joi.string()),
+      ),
+      cmpVoiceId: Joi.alternatives().try(
+        Joi.sting(),
         Joi.array().items(Joi.string()),
       ),
       activeStartHour: Joi.number().integer(),
@@ -137,6 +142,14 @@ export default {
         address: Joi.string(),
         actionUrl: Joi.string(),
       }),
+      cmpVoiceId: Joi.string(),
+      cmpVoice: Joi.object({
+        voiceType: Joi.string().min(1).required(),
+        language: Joi.string(),
+        style: Joi.string(),
+        streamUrl: Joi.string(),
+        answerUrl: Joi.string(),
+      }),
       cmpParameters: Joi.array().items(Joi.string().min(1)),
       activeStartHour: Joi.number().integer()
         .min(0)
@@ -177,6 +190,14 @@ export default {
         name: Joi.string(),
         address: Joi.string(),
         actionUrl: Joi.string(),
+      }),
+      cmpVoiceId: Joi.string(),
+      cmpVoice: Joi.object({
+        voiceType: Joi.string().min(1).required(),
+        language: Joi.string(),
+        style: Joi.string(),
+        streamUrl: Joi.string(),
+        answerUrl: Joi.string(),
       }),
       cmpParameters: Joi.array().items(Joi.string().min(1)),
       activeStartHour: Joi.number().integer()

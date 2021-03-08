@@ -10,6 +10,7 @@ export default (container) => {
   const CsvTypes = {
     record: 'records',
     parameter: 'parameters',
+    voice: 'voices',
     media: 'media',
 
     mediaAudio: 'mediaAudio',
@@ -24,6 +25,7 @@ export default (container) => {
   const TableNames = {
     record: 'CmpRecords',
     parameter: 'CmpParameters',
+    voice: 'CmpVoices',
     media: 'CmpMedia',
 
     mediaAudio: 'CmpMediaAudios',
@@ -80,6 +82,7 @@ export default (container) => {
       await dataLoadCsvType(CsvTypes.mediaVideo, TableNames.mediaVideo);
 
       await dataLoadCsvType(CsvTypes.media, TableNames.media);
+      await dataLoadCsvType(CsvTypes.voice, TableNames.voice);
       await dataLoadCsvType(CsvTypes.record, TableNames.record);
       await dataLoadCsvType(CsvTypes.parameter, TableNames.parameter);
 
@@ -96,6 +99,7 @@ export default (container) => {
     const creatableLists = {
       records: [],
       parameters: [],
+      voices: [],
       media: [],
 
       mediaAudio: [],
@@ -112,15 +116,24 @@ export default (container) => {
 
       const cmpRecordId = container.uuid();
       const cmpMediaId = container.uuid();
+      const cmpVoiceId = container.uuid();
       const cmpMediaTypeId = container.uuid();
 
-      const creatableRecord = generator.generateCreatableRecord(cmpRecordId, cmpMediaId, record);
+      const creatableRecord = generator.generateCreatableRecord(cmpRecordId, cmpMediaId, cmpVoiceId, record);
       creatableLists.records.push(creatableRecord);
 
       const creatableParameterList = generator.generateCreatableParameters(cmpRecordId, record);
       for (let j = 0; j < creatableParameterList.length; j += 1) {
         const creatableParameter = creatableParameterList[j];
         creatableLists.parameters.push(creatableParameter);
+      }
+
+      const { cmpVoice } = record;
+      if (cmpVoice != null) {
+        const {
+
+        } = cmpVoice;
+        const creatableVoice = generator.generateCreatableVoice(cmpVoiceId, record)
       }
 
       const { cmpMedia } = record;
@@ -189,6 +202,7 @@ export default (container) => {
         container.moment().format(timePattern).toUpperCase(),
         (record.activeStartHour * 60) + record.activeStartMinute,
         (record.activeEndHour * 60) + record.activeEndMinute,
+        record.cmpVideoId || '\\N',
       ]));
       const recordsCsvString = await container.csvService.toCsv(recordsCsvArray);
       const csvPath = getCsvPath(CsvTypes.record);
@@ -218,6 +232,31 @@ export default (container) => {
       await container.fileService.writeContent(csvPath, parametersCsvString);
       const createParameterEnd = new Date().getTime();
       L.debug(`Time Taken (Create Dataload CSV Parameters): ${createParameterEnd - createParameterStart}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const generateVoiceCsv = async (voiceList) => {
+    try {
+      const startTime = new Date().getTime();
+      const csvArray = voiceList.map(voiceItem => ([
+        voiceItem.id,
+        voiceItem.voiceType || '\\N',
+        voiceItem.language || '\\N',
+        voiceItem.style || '\\N',
+        voiceItem.streamUrl || '\\N',
+        voiceItem.answerUrl || '\\N',
+        0, // deleted
+        container.moment().format(timePattern).toUpperCase(), // createdAt
+        container.moment().format(timePattern).toUpperCase(), // updatedAt
+      ]));
+      const csvString = await container.csvService.toCsv(csvArray);
+      const csvPath = getCsvPath(CsvTypes.voice);
+      await container.fileService.writeContent(csvPath, csvString);
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Create Dataload CSV Voice): ${endTime - startTime}ms`);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
@@ -414,6 +453,7 @@ export default (container) => {
 
       await generateRecordCsv(creatableLists.records);
       await generateParameterCsv(creatableLists.parameters);
+      await generateVoiceCsv(creatableLists.voices);
       await generateMediaCsv(creatableLists.media);
 
       await generateMediaAudioCsv(creatableLists.mediaAudio);

@@ -6,7 +6,7 @@ export default (container) => {
   ) => {
     try {
       const {
-        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpRecordMessage,
+        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpVoice, CmpRecordMessage,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
         CmpMediaText, CmpMediaImage, CmpMediaAudio, CmpMediaVideo,
         CmpMediaFile, CmpMediaLocation, CmpMediaViberTemplate,
@@ -142,6 +142,15 @@ export default (container) => {
             required: false,
           },
           {
+            model: CmpVoice,
+            as: 'cmpVoice',
+            foreignKey: 'cmpVoiceId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
             model: CmpParameter,
             as: 'cmpParameters',
             foreignKey: 'cmpParameterId',
@@ -221,7 +230,7 @@ export default (container) => {
   ) => {
     try {
       const {
-        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpRecordMessage,
+        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpVoice, CmpRecordMessage,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
         CmpMediaText, CmpMediaImage, CmpMediaAudio, CmpMediaVideo,
         CmpMediaFile, CmpMediaLocation, CmpMediaViberTemplate,
@@ -362,6 +371,15 @@ export default (container) => {
             model: CmpParameter,
             as: 'cmpParameters',
             foreignKey: 'cmpParameterId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpVoice,
+            as: 'cmpVoice',
+            foreignKey: 'cmpVoiceId',
             where: {
               deleted: false,
             },
@@ -593,6 +611,16 @@ export default (container) => {
     return mappedCmpTemplate;
   };
 
+  const mapCmpVoice = (cmpVoice, excludeSecret = true) => {
+    const mappedCmpVoice = cmpVoice.dataValues;
+
+    delete mappedCmpVoice.deleted;
+    delete mappedCmpVoice.createdAt;
+    delete mappedCmpVoice.updatedAt;
+
+    return mappedCmpVoice;
+  };
+
   const mapCmpCampaign = (cmpCampaign) => {
     const mappedCmpCampaign = cmpCampaign.dataValues;
 
@@ -781,6 +809,9 @@ export default (container) => {
     if (mappedCmpRecord.cmpMedia) {
       mappedCmpRecord.cmpMedia = mapCmpMedia(mappedCmpRecord.cmpMedia);
     }
+    if (mappedCmpRecord.cmpVoice) {
+      mappedCmpRecord.cmpVoice = mapCmpVoice(mappedCmpRecord.cmpVoice);
+    }
     if (mappedCmpRecord.cmpTemplate) {
       mappedCmpRecord.cmpTemplate = mapCmpTemplate(mappedCmpRecord.cmpTemplate, excludeSecret);
     }
@@ -818,6 +849,7 @@ export default (container) => {
           cmpCampaignId,
           cmpTemplateId,
           cmpMediaId,
+          cmpVoiceId,
           activeStartHour,
           activeStartMinute,
           activeEndHour,
@@ -835,6 +867,7 @@ export default (container) => {
           cmpCampaignId,
           cmpTemplateId,
           cmpMediaId,
+          cmpVoiceId,
           activeStart,
           activeStartHour,
           activeStartMinute,
@@ -866,6 +899,7 @@ export default (container) => {
     cmpCampaignId,
     cmpTemplateId,
     cmpMediaId,
+    cmpVoiceId,
     activeStartHour,
     activeStartMinute,
     activeEndHour,
@@ -885,6 +919,7 @@ export default (container) => {
         cmpCampaignId,
         cmpTemplateId,
         cmpMediaId,
+        cmpVoiceId,
         activeStart,
         activeStartHour,
         activeStartMinute,
@@ -907,6 +942,7 @@ export default (container) => {
           cmpCampaignId,
           cmpTemplateId,
           cmpMediaId,
+          cmpVoiceId,
           activeStartHour,
           activeStartMinute,
           activeEndHour,
@@ -1004,7 +1040,7 @@ export default (container) => {
   ) => {
     try {
       const {
-        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia,
+        CmpRecord, CmpCampaign, CmpTemplate, CmpMedia, CmpVoice,
         CmpParameter, CmpChannel, CmpApplication, CmpApiKey,
         CmpMediaText, CmpMediaImage, CmpMediaAudio, CmpMediaVideo,
         CmpMediaFile, CmpMediaLocation, CmpMediaViberTemplate,
@@ -1195,6 +1231,15 @@ export default (container) => {
             model: CmpParameter,
             as: 'cmpParameters',
             foreignKey: 'cmpParameterId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpVoice,
+            as: 'cmpVoice',
+            foreignKey: 'cmpVoiceId',
             where: {
               deleted: false,
             },

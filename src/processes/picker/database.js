@@ -9,15 +9,17 @@ export default (container) => {
     const creatableRecords = [];
     const creatableParameters = [];
     const creatableMediaList = [];
+    const creatableVoiceList = [];
 
     for (let i = 0; i < records.length; i += 1) {
       const record = records[i];
 
       const cmpRecordId = container.uuid();
       const cmpMediaId = container.uuid();
+      const cmpVoiceId = container.uuid();
 
       // Record
-      const creatableRecord = generator.generateCreatableRecord(cmpRecordId, cmpMediaId, record);
+      const creatableRecord = generator.generateCreatableRecord(cmpRecordId, cmpMediaId, cmpVoiceId, record);
       creatableRecords.push(creatableRecord);
 
       // Parameters
@@ -25,6 +27,12 @@ export default (container) => {
       for (let j = 0; j < creatableParameterList.length; j += 1) {
         const creatableParameter = creatableParameterList[j];
         creatableParameters.push(creatableParameter);
+      }
+
+      // Voice
+      const creatableVoice = generator.generateCreatableVoice(cmpVoiceId, record);
+      if (creatableVoice != null) {
+        creatableVoiceList.push(creatableVoice);
       }
 
       // Media
@@ -38,6 +46,7 @@ export default (container) => {
       records: creatableRecords,
       parameters: creatableParameters,
       media: creatableMediaList,
+      voice: creatableVoiceList,
     };
   };
 
@@ -86,10 +95,26 @@ export default (container) => {
     }
   };
 
+  const insertVoice = async (creatableVoiceList) => {
+    try {
+      const { CmpVoice } = container.persistenceService;
+
+      const createVoiceStart = new Date().getTime();
+      await CmpVoice.createVoiceBatch(creatableVoiceList);
+      const createVoiceEnd = new Date().getTime();
+      L.debug(`Time Taken (Create Voice): ${createVoiceEnd - createVoiceStart}ms`);
+
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const createRecordsDatabase = async (records) => {
     try {
       const creatableLists = createCreatableLists(records);
 
+      await insertVoice(creatableLists.voice);
       await insertMedia(creatableLists.media);
       await insertParameters(creatableLists.parameters);
       await insertRecords(creatableLists.records);
