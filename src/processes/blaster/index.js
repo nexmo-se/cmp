@@ -482,6 +482,46 @@ export default (container) => {
     }
   };
 
+  const blastVoice = async (record, axios) => {
+    try {
+      const { clientRefPrefix } = container.config.blaster;
+      const { recipient, cmpTemplate, cmpParameters, cmpVoice, } = record;
+      const { body, cmpChannel, } = cmpTemplate;
+      const { senderId, cmpApplication } = cmpChannel;
+      const { applicationId, privateKey } = cmpApplication || {};
+      const { voiceType, language, style, streamUrl, answerUrl } = cmpVoice || {};
+
+
+      let result;
+      if (voiceType === 'tts') {
+        const parameters = cmpParameters
+          .sort((a, b) => a.order - b.order)
+          .map(cmpParameter => cmpParameter.parameter);
+        const text = container.templateService.getText(body, parameters);
+
+        result = await container.nexmoService.voice.sendTts(
+          senderId, recipient, text, language, style, `${clientRefPrefix}${record.id}`,
+          applicationId, privateKey, axios,
+        );
+      } else if (voiceType === 'stream') {
+        result = await container.nexmoService.voice.sendStream(
+          senderId, recipient, streamUrl, `${clientRefPrefix}${record.id}`,
+          applicationId, privateKey, axios,
+        );
+      } else if (voiceType === 'answer') {
+        return Promise.reject(new Error('Answer URL not supported yet'));
+      }
+
+      const messageIds = [result.uuid];
+      return Promise.resolve({
+        messageIds,
+        prices: [0],
+      });
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
 
   const blastRecord = async (record) => {
     try {
@@ -504,6 +544,8 @@ export default (container) => {
         result = await blastFacebook(record, axios);
       } else if (channel === 'viber') {
         result = await blastViber(record, axios);
+      } else if (channel === 'voice') {
+        result = await blastVoice(record, axios);
       }
       L.trace(`Blast Result - ${record.id}`, result);
 
