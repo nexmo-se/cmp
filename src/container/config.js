@@ -52,11 +52,13 @@ export default {
     mockSmsUrl: process.env.MOCK_SMS_URL,
     mockWhatsappUrl: process.env.MOCK_WHATSAPP_URL,
     mockViberUrl: process.env.MOCK_VIBER_URL,
+    mockVoiceUrl: process.env.MOCK_VOICE_URL,
     useWhatsappSandbox: (process.env.USE_SANDBOX_WHATSAPP || 'false').toLowerCase() === 'true',
     useViberSandbox: (process.env.USE_SANDBOX_VIBER || 'false').toLowerCase() === 'true',
     useMockSms: (process.env.USE_MOCK_SMS || 'false').toLowerCase() === 'true',
     useMockWhatsapp: (process.env.USE_MOCK_WHATSAPP || 'false').toLowerCase() === 'true',
     useMockViber: (process.env.USE_MOCK_VIBER || 'false').toLowerCase() === 'true',
+    useMockVoice: (process.env.USE_MOCK_VOICE || 'false').toLowerCase() === 'true',
   },
   database: {
     name: process.env.DATABASE_NAME || '',
