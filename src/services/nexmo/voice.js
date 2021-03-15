@@ -83,6 +83,7 @@ export default (container) => {
         },
         event_url: [`${container.config.hostUrl}webhook/vapi/event/${clientRef}`],
         event_method: 'POST',
+        ncco: nccos,
       };
 
       const response = await axios.post(url, body, config);
