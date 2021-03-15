@@ -46,6 +46,7 @@ export default (container) => {
       }
     }
 
+    // L.debug(record);
     return record;
   };
 
@@ -74,6 +75,8 @@ export default (container) => {
           cmpTemplateId,
           cmpMediaId: null,
           cmpMedia: record.cmpMedia,
+          cmpVoiceId: null,
+          cmpVoice: record.cmpVoice,
           cmpParameters: record.cmpParameters,
           activeStartHour,
           activeStartMinute,

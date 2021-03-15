@@ -109,6 +109,11 @@ export default {
             'address', // location
             'actionUrl', // viber_template
             'parameter', // body text parameter (multiple)
+            'voice_voiceType',
+            'voice_language',
+            'voice_style',
+            'voice_streamUrl',
+            'voice_answerUrl',
           ),
         )
         .default([]),

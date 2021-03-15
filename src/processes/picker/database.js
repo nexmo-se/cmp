@@ -116,8 +116,8 @@ export default (container) => {
 
       await insertVoice(creatableLists.voice);
       await insertMedia(creatableLists.media);
-      await insertParameters(creatableLists.parameters);
       await insertRecords(creatableLists.records);
+      await insertParameters(creatableLists.parameters);
 
       return Promise.resolve();
     } catch (error) {

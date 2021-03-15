@@ -12,6 +12,7 @@ import CmpCampaignStatusAudit from './cmpcampaignstatusaudit';
 import CmpRecordMessage from './cmprecordmessage';
 import CmpRecordMessageStatusAudit from './cmprecordmessagestatusaudit';
 import CmpReport from './cmpreport';
+import CmpVoice from './cmpvoice';
 
 import CmpMediaText from './cmpmediatext';
 import CmpMediaImage from './cmpmediaimage';
@@ -44,6 +45,7 @@ export default container => ({
   CmpRecordMessage: CmpRecordMessage(container),
   CmpRecordMessageStatusAudit: CmpRecordMessageStatusAudit(container),
   CmpReport: CmpReport(container),
+  CmpVoice: CmpVoice(container),
 
   CmpMediaText: CmpMediaText(container),
   CmpMediaImage: CmpMediaImage(container),
