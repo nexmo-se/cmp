@@ -42,7 +42,7 @@ export default {
         Joi.array().items(Joi.string()),
       ),
       cmpVoiceId: Joi.alternatives().try(
-        Joi.sting(),
+        Joi.string(),
         Joi.array().items(Joi.string()),
       ),
       activeStartHour: Joi.number().integer(),
