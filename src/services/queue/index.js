@@ -37,14 +37,14 @@ export default (container) => {
     record: 8,
     input: 8,
     transfer: 8,
-    busy: 9,
-    cancelled: 9,
-    unanswered: 9,
-    disconnected: 9,
-    rejected: 9,
-    failed: 9,
-    timeout: 9,
-    completed: 10,
+    completed: 9,
+    busy: 10,
+    cancelled: 10,
+    unanswered: 10,
+    disconnected: 10,
+    rejected: 10,
+    failed: 10,
+    timeout: 10,
   };
 
   const getOverwritableStatuses = (status) => {
