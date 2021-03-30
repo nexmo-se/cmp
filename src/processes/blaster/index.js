@@ -493,7 +493,7 @@ export default (container) => {
 
 
       let result;
-      if (voiceType === 'tts') {
+      if (voiceType && voiceType.toLowerCase() === 'tts') {
         const parameters = cmpParameters
           .sort((a, b) => a.order - b.order)
           .map(cmpParameter => cmpParameter.parameter);
@@ -503,13 +503,15 @@ export default (container) => {
           senderId, recipient, text, language, style, `${clientRefPrefix}${record.id}`,
           applicationId, privateKey, axios,
         );
-      } else if (voiceType === 'stream') {
+      } else if (voiceType && voiceType.toLowerCase() === 'stream') {
         result = await container.nexmoService.voice.sendStream(
           senderId, recipient, streamUrl, `${clientRefPrefix}${record.id}`,
           applicationId, privateKey, axios,
         );
-      } else if (voiceType === 'answer') {
+      } else if (voiceType && voiceType.toLowerCase() === 'answer') {
         return Promise.reject(new Error('Answer URL not supported yet'));
+      } else {
+        return Promise.reject(new Error(`Unsupported Voice Type: ${voiceType}`));
       }
 
       const messageIds = [result.uuid];
