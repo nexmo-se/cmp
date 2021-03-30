@@ -575,6 +575,7 @@ export default (container) => {
         cmpRecordId: record.id,
         messageIds: [],
         prices: [],
+        error,
       });
     }
   };
