@@ -524,6 +524,31 @@ export default (container) => {
     }
   };
 
+  const blastNumberInsight = async (record, axios) => {
+    try {
+      const { recipient, cmpTemplate, cmpCampaign } = record;
+      const { niCnam = false } = cmpCampaign;
+      const { body, cmpChannel } = cmpTemplate;
+      const { cmpApiKey } = cmpChannel;
+      const { apiKey, apiSecret } = cmpApiKey;
+
+      const result = await container.nexmoService.numberInsight.sendAdvanced(
+        apiKey, apiSecret, recipient, niCnam, axios
+      );
+
+      if (result.status === 1) {
+        throw new Error('ni_busy');
+      }
+
+      return Promise.resolve({
+        messageIds: [result.request_id],
+        prices: [result.request_price || 0],
+      });
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
 
   const blastRecord = async (record) => {
     try {
@@ -548,6 +573,8 @@ export default (container) => {
         result = await blastViber(record, axios);
       } else if (channel === 'voice') {
         result = await blastVoice(record, axios);
+      } else if (channel === 'number_insight') {
+        result = await blastNumberInsight(record, axios);
       }
       L.trace(`Blast Result - ${record.id}`, result);
 
@@ -567,6 +594,9 @@ export default (container) => {
         }
       } else if (error.message === 'socket hang up') {
         L.error('Socket Hang Up detected, put back into queue');
+        return blastRecord(record);
+      } else if (error.message === 'ni_busy') {
+        L.error('Busy detected for Number Insight, put back into queue');
         return blastRecord(record);
       } else {
         L.error(error.message, error);

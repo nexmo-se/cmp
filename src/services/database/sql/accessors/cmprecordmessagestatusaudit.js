@@ -8,6 +8,7 @@ export default (container) => {
         CmpRecordMessageStatusAuditMapi,
         CmpRecordMessageStatusAuditSms,
         CmpRecordMessageStatusAuditVapi,
+        CmpRecordMessageStatusAuditNi,
       } = container.databaseService.models;
       const query = {
         where: {
@@ -36,6 +37,15 @@ export default (container) => {
             model: CmpRecordMessageStatusAuditVapi,
             as: 'cmpRecordMessageStatusAuditVapi',
             foreignKey: 'cmpRecordMessageStatusAuditVapiId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpRecordMessageStatusAuditNi,
+            as: 'cmpRecordMessageStatusAuditNi',
+            foreignKey: 'cmpRecordMessageStatusAuditNiId',
             where: {
               deleted: false,
             },
@@ -74,6 +84,7 @@ export default (container) => {
         CmpRecordMessageStatusAuditMapi,
         CmpRecordMessageStatusAuditSms,
         CmpRecordMessageStatusAuditVapi,
+        CmpRecordMessageStatusAuditNi,
       } = container.databaseService.models;
       const query = {
         where: criteria,
@@ -103,6 +114,15 @@ export default (container) => {
             model: CmpRecordMessageStatusAuditVapi,
             as: 'cmpRecordMessageStatusAuditVapi',
             foreignKey: 'cmpRecordMessageStatusAuditVapiId',
+            where: {
+              deleted: false,
+            },
+            required: false,
+          },
+          {
+            model: CmpRecordMessageStatusAuditNi,
+            as: 'cmpRecordMessageStatusAuditNi',
+            foreignKey: 'cmpRecordMessageStatusAuditNiId',
             where: {
               deleted: false,
             },
@@ -250,6 +270,16 @@ export default (container) => {
     return mappedCmpRecordMessageStatusAuditVapi;
   };
 
+  const mapCmpRecordMessageStatusAuditNi = (cmpRecordMessageStatusAuditNi) => {
+    const mappedCmpRecordMessageStatusAuditNi = cmpRecordMessageStatusAuditNi.dataValues;
+
+    delete mappedCmpRecordMessageStatusAuditNi.deleted;
+    delete mappedCmpRecordMessageStatusAuditNi.createdAt;
+    delete mappedCmpRecordMessageStatusAuditNi.updatedAt;
+
+    return mappedCmpRecordMessageStatusAuditNi;
+  };
+
   const mapCmpRecordMessageStatusAudit = (cmpRMSAudit) => {
     const mappedCmpRMSAudit = cmpRMSAudit.dataValues;
 
@@ -266,6 +296,11 @@ export default (container) => {
     if (mappedCmpRMSAudit.cmpRecordMessageStatusAuditVapi) {
       mappedCmpRMSAudit.cmpRecordMessageStatusAuditVapi = mapCmpRecordMessageStatusAuditVapi(
         mappedCmpRMSAudit.cmpRecordMessageStatusAuditVapi,
+      );
+    }
+    if (mappedCmpRMSAudit.cmpRecordMessageStatusAuditNi) {
+      mappedCmpRMSAudit.cmpRecordMessageStatusAuditNi = mapCmpRecordMessageStatusAuditNi(
+        mappedCmpRMSAudit.cmpRecordMessageStatusAuditNi,
       );
     }
     delete mappedCmpRMSAudit.deleted;
@@ -294,6 +329,7 @@ export default (container) => {
         cmpRecordMessageStatusAuditSmsId: audit.cmpRecordMessageStatusAuditSmsId,
         cmpRecordMessageStatusAuditMapiId: audit.cmpRecordMessageStatusAuditMapiId,
         cmpRecordMessageStatusAuditVapiId: audit.cmpRecordMessageStatusAuditVapiId,
+        cmpRecordMessageStatusAuditNiId: audit.cmpRecordMessageStatusAuditNiId,
         deleted: false,
       }));
 
@@ -314,6 +350,7 @@ export default (container) => {
     cmpRecordMessageStatusAuditSmsId,
     cmpRecordMessageStatusAuditMapiId,
     cmpRecordMessageStatusAuditVapiId,
+    cmpRecordMessageStatusAuditNiId,
   ) => {
     try {
       const { CmpRecordMessageStatusAudit } = container.databaseService.models;
@@ -324,6 +361,7 @@ export default (container) => {
         cmpRecordMessageStatusAuditSmsId,
         cmpRecordMessageStatusAuditMapiId,
         cmpRecordMessageStatusAuditVapiId,
+        cmpRecordMessageStatusAuditNiId,
         deleted: false,
       });
 
@@ -337,6 +375,7 @@ export default (container) => {
           cmpRecordMessageStatusAuditSmsId,
           cmpRecordMessageStatusAuditMapiId,
           cmpRecordMessageStatusAuditVapiId,
+          cmpRecordMessageStatusAuditNiId,
         );
       }
       return Promise.reject(error);

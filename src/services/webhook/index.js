@@ -265,11 +265,154 @@ export default (container) => {
     }
   };
 
+  const publishNiCallbackAudit = async (data) => {
+    try {
+      const { useQueue } = container.config.webhook;
+      const { saveRecordAudits } = container.config.audit;
+      const { CmpRecordMessageStatusAudit } = container.persistenceService;
+
+      if (!saveRecordAudits) {
+        return Promise.resolve();
+      }
+
+      const {
+        status, status_message: statusMessage, requestId,
+        international_format_number: internationalFormatNumber, national_format_number: nationalFormatNumber,
+        country_code: countryCode, country_code_iso3: countryCodeIso3, country_name: countryName, country_prefix: countryPrefix,
+        request_price: requestPrice, refund_price: refundPrice, remaining_balance: remainingBalance,
+        current_carrier: currentCarrier, original_carrier: originalCarrier,
+        ported, roaming, caller_identity: callerIdentity,
+        lookup_outcome: lookupOutcome, lookup_outcome_message: lookupOutcomeMessage,
+        valid_number: validNumber, reachable,
+      } = data;
+
+      // Current Carrier
+      const {
+        network_code: currentCarrierNetworkCode,
+        name: currentCarrierName,
+        country: currentCarrierCountry,
+        network_type: currentCarrierNetworkType,
+      } = currentCarrier || {};
+
+      // Original Carrier
+      const {
+        network_code: originalCarrierNetworkCode,
+        name: originalCarrierName,
+        country: originalCarrierCountry,
+        network_type: originalCarrierNetworkType,
+      } = originalCarrier || {};
+
+      // Roaming
+      const {
+        status: roamingStatus,
+        roaming_country_code: roamingCountryCode,
+        roaming_network_code: roamingNetworkCode,
+        roaming_network_name: roamingNetworkName,
+      } = roaming || {};
+
+      // caller Identity
+      const {
+        caller_type: callerType,
+        caller_name: callerName,
+        first_name: callerFirstName,
+        last_name: callerLastName,
+      } = callerIdentity || {};
+
+
+      const startTime = new Date().getTime();
+
+      if (useQueue) {
+        // Add to Queue
+        const creatableData = {
+          status,
+          statusMessage,
+          requestId,
+          internationalFormatNumber,
+          nationalFormatNumber,
+          countryCode,
+          countryCodeIso3,
+          countryName,
+          countryPrefix,
+          requestPrice,
+          refundPrice,
+          remainingBalance,
+          currentCarrierNetworkCode,
+          currentCarrierName,
+          currentCarrierCountry,
+          currentCarrierNetworkType,
+          originalCarrierNetworkCode,
+          originalCarrierName,
+          originalCarrierCountry,
+          originalCarrierNetworkType,
+          ported,
+          roamingStatus,
+          roamingCountryCode,
+          roamingNetworkCode,
+          roamingNetworkName,
+          callerType,
+          callerName,
+          callerFirstName,
+          callerLastName,
+          lookupOutcome,
+          lookupOutcomeMessage,
+          validNumber,
+          reachable,
+        };
+        container.queueService.pushNiEventAudit(creatableData);
+      } else {
+        // Insert Immediately
+        const recordMessage = await getRecordMessage(requestId);
+        await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditNi(
+          recordMessage.id,
+          status,
+          statusMessage,
+          requestId,
+          internationalFormatNumber,
+          nationalFormatNumber,
+          countryCode,
+          countryCodeIso3,
+          countryName,
+          countryPrefix,
+          requestPrice,
+          refundPrice,
+          remainingBalance,
+          currentCarrierNetworkCode,
+          currentCarrierName,
+          currentCarrierCountry,
+          currentCarrierNetworkType,
+          originalCarrierNetworkCode,
+          originalCarrierName,
+          originalCarrierCountry,
+          originalCarrierNetworkType,
+          ported,
+          roamingStatus,
+          roamingCountryCode,
+          roamingNetworkCode,
+          roamingNetworkName,
+          callerType,
+          callerName,
+          callerFirstName,
+          callerLastName,
+          lookupOutcome,
+          lookupOutcomeMessage,
+          validNumber,
+          reachable,
+        );
+      }
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Handle Publish NI Event Audit): ${endTime - startTime}ms`);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   return {
     updateRecordMessage,
 
     publishMapiStatusAudit,
     publishSmsStatusAudit,
     publishVapiEventAudit,
+    publishNiCallbackAudit,
   };
 };

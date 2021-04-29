@@ -42,6 +42,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(100),
       allowNull: true,
     },
+    niCnam: {
+      type: DataTypes.BOOLEAN,
+      allowNull: true,
+    },
     actualStartDate: {
       type: DataTypes.DATE,
       allowNull: true,

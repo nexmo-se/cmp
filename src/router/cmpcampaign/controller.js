@@ -163,6 +163,7 @@ export default (container) => {
         activeEndMinute,
         activeOnWeekends,
         timezone,
+        niCnam,
       } = req.body;
       const { CmpCampaign } = container.persistenceService;
 
@@ -179,6 +180,7 @@ export default (container) => {
         sanitizedEnd.getUTCMinutes(),
         activeOnWeekends,
         container.dateTimeService.tzUTC,
+        niCnam,
       );
       res.status(200).json(cmpCampaign);
     } catch (error) {
@@ -244,6 +246,7 @@ export default (container) => {
         actualDuration,
         status,
         statusTime,
+        niCnam,
       } = req.body;
 
       const changes = {};
@@ -279,6 +282,10 @@ export default (container) => {
 
       if (statusTime) {
         changes.statusTime = statusTime;
+      }
+
+      if (niCnam != null) {
+        changes.niCnam = niCnam;
       }
 
       const { CmpCampaign } = container.persistenceService;

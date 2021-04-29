@@ -60,4 +60,10 @@ export default {
     params: {},
     body: {},
   },
+
+  niCallback: {
+    query: {},
+    params: {},
+    body: {},
+  },
 };

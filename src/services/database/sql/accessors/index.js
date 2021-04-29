@@ -25,6 +25,7 @@ import CmpMediaViberTemplate from './cmpmediavibertemplate';
 import CmpRecordMessageStatusAuditMapi from './cmprecordmessagestatusauditmapi';
 import CmpRecordMessageStatusAuditSms from './cmprecordmessagestatusauditsms';
 import CmpRecordMessageStatusAuditVapi from './cmprecordmessagestatusauditvapi';
+import CmpRecordMessageStatusAuditNi from './cmprecordmessagestatusauditni';
 
 import CmpReportOverallSummary from './cmpreportoverallsummary';
 import CmpReportCampaignSummary from './cmpreportcampaignsummary';
@@ -58,6 +59,7 @@ export default container => ({
   CmpRecordMessageStatusAuditMapi: CmpRecordMessageStatusAuditMapi(container),
   CmpRecordMessageStatusAuditSms: CmpRecordMessageStatusAuditSms(container),
   CmpRecordMessageStatusAuditVapi: CmpRecordMessageStatusAuditVapi(container),
+  CmpRecordMessageStatusAuditNi: CmpRecordMessageStatusAuditNi(container),
 
   CmpReportOverallSummary: CmpReportOverallSummary(container),
   CmpReportCampaignSummary: CmpReportCampaignSummary(container),

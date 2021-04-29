@@ -231,6 +231,27 @@ export default (container) => {
     }
   };
 
+  const niCallback = async (req, res, next) => {
+    try {
+      L.debug('Number Insight Callback');
+      L.trace(req.params);
+      L.trace(req.body);
+
+      const startTime = new Date().getTime();
+
+      const { status_message: status, request_id: messageId, request_price: price } = req.body;
+
+      await container.webhookService.updateRecordMessage(messageId, status, price);
+      await container.webhookService.publishNiCallbackAudit(req.body);
+
+      const endTime = new Date().getTime();
+      L.debug(`Time Taken (Number Insight Callback Webhook): ${endTime - startTime}ms`);
+      res.status(container.httpStatus.OK).send('ok');
+    } catch (error) {
+      next(error);
+    }
+  };
+
   return {
     register,
 
@@ -246,5 +267,7 @@ export default (container) => {
     mapiStatus,
 
     rtcEvent,
+
+    niCallback,
   };
 };

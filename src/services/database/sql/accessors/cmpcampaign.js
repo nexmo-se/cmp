@@ -224,6 +224,7 @@ export default (container) => {
     activeEndMinute,
     activeOnWeekends,
     timezone,
+    niCnam,
   ) => {
     try {
       const { CmpCampaign } = container.databaseService.models;
@@ -238,6 +239,7 @@ export default (container) => {
         activeEndMinute,
         activeOnWeekends,
         timezone,
+        niCnam,
         status: 'draft',
         statusTime: new Date(),
         deleted: false,
@@ -257,6 +259,7 @@ export default (container) => {
           activeEndMinute,
           activeOnWeekends,
           timezone,
+          niCnam,
         );
       }
       return Promise.reject(error);

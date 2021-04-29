@@ -69,6 +69,7 @@ export default {
         .required(),
       activeOnWeekends: Joi.boolean().required(),
       timezone: Joi.string().required(),
+      niCnam: Joi.boolean().optional(),
     },
   },
   readCampaign: {
@@ -98,6 +99,7 @@ export default {
       actualDuration: Joi.number(),
       status: Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed'),
       statusTime: Joi.date(),
+      niCnam: Joi.boolean().optional(),
     },
   },
   deleteCampaign: {

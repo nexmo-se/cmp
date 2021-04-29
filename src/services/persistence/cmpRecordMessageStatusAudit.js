@@ -7,10 +7,12 @@ export default (container) => {
     let mappedRmsAuditData = {};
     if (mappedRmsAudit.messageType === 'sms') {
       mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditSms;
-    } else if (mappedRmsAudit.mediaType === 'mapi') {
+    } else if (mappedRmsAudit.messageType === 'mapi') {
       mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditMapi;
-    } else if (mappedRmsAudit.mediaType === 'vapi') {
+    } else if (mappedRmsAudit.messageType === 'vapi') {
       mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditVapi;
+    } else if (mappedRmsAudit.messageType === 'ni') {
+      mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditNi;
     }
 
     mappedRmsAudit.typeId = mappedRmsAuditData.id;
@@ -65,6 +67,7 @@ export default (container) => {
           cmpRecordMessageStatusAuditSmsId: smsAuditId,
           cmpRecordMessageStatusAuditMapiId: null,
           cmpRecordMessageStatusAuditVapiId: null,
+          cmpRecordMessageStatusAuditNiId: null,
         });
       }
 
@@ -113,6 +116,7 @@ export default (container) => {
           cmpRecordMessageStatusAuditSmsId,
           null,
           null,
+          null,
         );
 
       return Promise.resolve();
@@ -158,6 +162,7 @@ export default (container) => {
           cmpRecordMessageStatusAuditSmsId: null,
           cmpRecordMessageStatusAuditMapiId: mapiAuditId,
           cmpRecordMessageStatusAuditVapiId: null,
+          cmpRecordMessageStatusAuditNiId: null,
         });
       }
 
@@ -209,6 +214,7 @@ export default (container) => {
           'mapi',
           null,
           cmpRecordMessageStatusAuditMapiId,
+          null,
           null,
         );
       const mappedCmpRecordMessageStatusAudit = mapRecordMessageStatusAudit(
@@ -265,6 +271,7 @@ export default (container) => {
           cmpRecordMessageStatusAuditSmsId: null,
           cmpRecordMessageStatusAuditMapiId: null,
           cmpRecordMessageStatusAuditVapiId: vapiAuditId,
+          cmpRecordMessageStatusAuditNiId: null,
         });
       }
 
@@ -319,6 +326,180 @@ export default (container) => {
           null,
           null,
           cmpRecordMessageStatusAuditVapiId,
+          null,
+        );
+      const mappedCmpRecordMessageStatusAudit = mapRecordMessageStatusAudit(
+        cmpRecordMessageStatusAudit,
+      );
+
+      return Promise.resolve(mappedCmpRecordMessageStatusAudit);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createRecordMessageStatusAuditNiBatch = async (audits) => {
+    try {
+      const {
+        CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditNi,
+      } = container.databaseService.accessors;
+
+      const commonAudits = [];
+      const niAudits = [];
+
+      for (let i = 0; i < audits.length; i += 1) {
+        const audit = audits[i];
+        const niAuditId = container.uuid();
+        niAudits.push({
+          id: niAuditId,
+          status: audit.status,
+          statusMessage: audit.statusMessage,
+          requestId: audit.requestId,
+          internationalFormatNumber: audit.internationalFormatNumber,
+          nationalFormatNumber: audit.nationalFormatNumber,
+          countryCode: audit.countryCode,
+          countryCodeIso3: audit.countryCodeIso3,
+          countryName: audit.countryName,
+          countryPrefix: audit.countryPrefix,
+          requestPrice: audit.requestPrice,
+          refundPrice: audit.refundPrice,
+          remainingBalance: audit.remainingBalance,
+          currentCarrierNetworkCode: audit.currentCarrierNetworkCode,
+          currentCarrierName: audit.currentCarrierName,
+          currentCarrierCountry: audit.currentCarrierCountry,
+          currentCarrierNetworkType: audit.currentCarrierNetworkType,
+          originalCarrierNetworkCode: audit.originalCarrierNetworkCode,
+          originalCarrierName: audit.originalCarrierName,
+          originalCarrierCountry: audit.originalCarrierCountry,
+          originalCarrierNetworkType: audit.originalCarrierNetworkType,
+          ported: audit.ported,
+          roamingStatus: audit.roamingStatus,
+          roamingCountryCode: audit.roamingCountryCode,
+          roamingNetworkCode: audit.roamingNetworkCode,
+          roamingNetworkName: audit.roamingNetworkName,
+          callerType: audit.callerType,
+          callerName: audit.callerName,
+          callerFirstName: audit.callerFirstName,
+          callerLastName: audit.callerLastName,
+          lookupOutcome: audit.lookupOutcome,
+          lookupOutcomeMessage: audit.lookupOutcomeMessage,
+          validNumber: audit.validNumber,
+          reachable: audit.reachable,
+        });
+
+        commonAudits.push({
+          id: container.uuid(),
+          cmpRecordMessageId: audit.cmpRecordMessageId,
+          messageType: 'ni',
+          cmpRecordMessageStatusAuditSmsId: null,
+          cmpRecordMessageStatusAuditMapiId: null,
+          cmpRecordMessageStatusAuditVapiId: null,
+          cmpRecordMessageStatusAuditNiId: niAuditId,
+        });
+      }
+
+      // Insert SMS Audits
+      await CmpRecordMessageStatusAuditNi.createRecordMessageStatusAuditNiBatch(niAudits);
+      await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditBatch(commonAudits);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  const createRecordMessageStatusAuditNi = async (
+    cmpRecordMessageId,
+    status,
+    statusMessage,
+    requestId,
+    internationalFormatNumber,
+    nationalFormatNumber,
+    countryCode,
+    countryCodeIso3,
+    countryName,
+    countryPrefix,
+    requestPrice,
+    refundPrice,
+    remainingBalance,
+    currentCarrierNetworkCode,
+    currentCarrierName,
+    currentCarrierCountry,
+    currentCarrierNetworkType,
+    originalCarrierNetworkCode,
+    originalCarrierName,
+    originalCarrierCountry,
+    originalCarrierNetworkType,
+    ported,
+    roamingStatus,
+    roamingCountryCode,
+    roamingNetworkCode,
+    roamingNetworkName,
+    callerType,
+    callerName,
+    callerFirstName,
+    callerLastName,
+    lookupOutcome,
+    lookupOutcomeMessage,
+    validNumber,
+    reachable,
+  ) => {
+    try {
+      L.trace(cmpRecordMessageId);
+      const {
+        CmpRecordMessageStatusAudit, CmpRecordMessageStatusAuditNi,
+      } = container.databaseService.accessors;
+
+      // Create RecordMessageStatusAudit Text
+      const cmpRecordMessageStatusAuditNiId = container.uuid();
+      await CmpRecordMessageStatusAuditNi
+        .createRecordMessageStatusAuditNi(
+          container.uuid(),
+          cmpRecordMessageStatusAuditNiId,
+          status,
+          statusMessage,
+          requestId,
+          internationalFormatNumber,
+          nationalFormatNumber,
+          countryCode,
+          countryCodeIso3,
+          countryName,
+          countryPrefix,
+          requestPrice,
+          refundPrice,
+          remainingBalance,
+          currentCarrierNetworkCode,
+          currentCarrierName,
+          currentCarrierCountry,
+          currentCarrierNetworkType,
+          originalCarrierNetworkCode,
+          originalCarrierName,
+          originalCarrierCountry,
+          originalCarrierNetworkType,
+          ported,
+          roamingStatus,
+          roamingCountryCode,
+          roamingNetworkCode,
+          roamingNetworkName,
+          callerType,
+          callerName,
+          callerFirstName,
+          callerLastName,
+          lookupOutcome,
+          lookupOutcomeMessage,
+          validNumber,
+          reachable,
+        );
+
+      // Create RecordMessageStatusAudit
+      const cmpRecordMessageStatusAudit = await CmpRecordMessageStatusAudit
+        .createRecordMessageStatusAudit(
+          container.uuid(),
+          cmpRecordMessageId,
+          'ni',
+          null,
+          null,
+          null,
+          cmpRecordMessageStatusAuditNiId,
         );
       const mappedCmpRecordMessageStatusAudit = mapRecordMessageStatusAudit(
         cmpRecordMessageStatusAudit,
@@ -387,6 +568,9 @@ export default (container) => {
 
     createRecordMessageStatusAuditVapi,
     createRecordMessageStatusAuditVapiBatch,
+
+    createRecordMessageStatusAuditNi,
+    createRecordMessageStatusAuditNiBatch,
 
     readRecordMessageStatusAudit,
 

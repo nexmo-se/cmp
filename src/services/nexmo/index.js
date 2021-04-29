@@ -5,6 +5,7 @@ import Whatsapp from './whatsapp';
 import Viber from './viber';
 import Facebook from './facebook';
 import Voice from './voice';
+import NumberInsight from './numberInsight';
 
 export default container => ({
   jwt: Jwt(container),
@@ -14,4 +15,5 @@ export default container => ({
   viber: Viber(container),
   facebook: Facebook(container),
   voice: Voice(container),
+  numberInsight: NumberInsight(container),
 });

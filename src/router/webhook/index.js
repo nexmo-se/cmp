@@ -76,5 +76,12 @@ export default (container) => {
     controller.rtcEvent,
   );
 
+  // Number Insight
+  router.post(
+    '/ni/callback',
+    validate(validator.niCallback),
+    controller.niCallback,
+  );
+
   return router;
 };

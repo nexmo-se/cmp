@@ -41,6 +41,7 @@ export default (container) => {
     activeEndMinute,
     activeOnWeekends,
     timezone,
+    niCnam,
   ) => {
     try {
       const { CmpCampaign } = container.databaseService.accessors;
@@ -54,6 +55,7 @@ export default (container) => {
         activeEndMinute,
         activeOnWeekends,
         timezone,
+        niCnam,
       );
       return Promise.resolve(cmpCampaign);
     } catch (error) {

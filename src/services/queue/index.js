@@ -7,6 +7,7 @@ export default (container) => {
     mapiStatusAudits: [],
     smsStatusAudits: [],
     vapiEventAudits: [],
+    niEventAudits: [],
   };
 
   const StatusHierarchy = {
@@ -45,13 +46,29 @@ export default (container) => {
     rejected: 10,
     failed: 10,
     timeout: 10,
+
+    // Ni
+    "0": 4,
+    "1": 4,
+    "3": 4,
+    "4": 4,
+    "5": 4,
+    "6": 4,
+    "7": 4,
+    "8": 4,
+    "9": 4,
+    "19": 4,
+    "43": 4,
+    "44": 4,
+    "45": 4,
+    "999": 4,
   };
 
   const getOverwritableStatuses = (status) => {
     const keys = Object.keys(StatusHierarchy);
     const overwritableStatuses = [];
 
-    const hierarchy = StatusHierarchy[status] || 0;
+    const hierarchy = StatusHierarchy[`${status}`] || 0;
 
     for (let i = 0; i < keys.length; i += 1) {
       const key = keys[i];
@@ -83,6 +100,9 @@ export default (container) => {
 
     L.trace('Scheduling VAPI Event Audit Saving');
     setTimeout(saveVapiEventAudit, queueDelay * 1000);
+
+    L.trace('Scheduling NI Event Audit Saving');
+    setTimeout(saveNiEventAudit, queueDelay * 1000);
   };
 
   const getRecordMessageIdMap = async (messageIds) => {
@@ -243,7 +263,7 @@ export default (container) => {
           const status = updates[messageId];
           if (currentStatus == null) {
             queue.recordMessageStatusUpdates[messageId] = status;
-          } else if (StatusHierarchy[status] >= StatusHierarchy[currentStatus]) {
+          } else if (StatusHierarchy[`${status}`] >= StatusHierarchy[`${currentStatus}`]) {
             queue.recordMessageStatusUpdates[messageId] = status;
           }
 
@@ -495,6 +515,58 @@ export default (container) => {
     }
   };
 
+  const saveNiEventAudit = async () => {
+    try {
+      const { CmpRecordMessageStatusAudit } = container.persistenceService;
+      const { queueDelay } = container.config.webhook;
+      const audits = queue.niEventAudits;
+      queue.niEventAudits = [];
+
+      if (audits.length > 0) {
+        L.trace('Saving NI Event Audits');
+        const startTime = new Date().getTime();
+
+        /* Actually Do Something */
+        const uuids = audits.map(audit => audit.requestId);
+        const recordMessageIdMap = await getRecordMessageIdMap(uuids);
+
+        // Inject Record Message ID
+        const injectStartTime = new Date().getTime();
+        const availableAudits = [];
+        for (let i = 0; i < audits.length; i += 1) {
+          const audit = audits[i];
+          const { requestId } = audit;
+          if (recordMessageIdMap[requestId] == null) {
+            // Record Message not available, back into queue
+            queue.niEventAudits.push(audits[i]);
+          } else {
+            audits[i].cmpRecordMessageId = recordMessageIdMap[requestId];
+            availableAudits.push(audits[i]);
+          }
+        }
+        const injectEndTime = new Date().getTime();
+        L.debug(`Time Taken (NI Record Message ID Inject): ${injectEndTime - injectStartTime}ms`);
+
+        // Bulk Insert
+        const createStartTime = new Date().getTime();
+        await CmpRecordMessageStatusAudit.createRecordMessageStatusAuditNiBatch(availableAudits);
+        const createEndTime = new Date().getTime();
+        L.debug(`Time Taken (NI Audit Create): ${createEndTime - createStartTime}ms`);
+        /* End of Do Something */
+
+        const endTime = new Date().getTime();
+        L.debug(`Time Taken (NI Event Audits Saving)[${availableAudits.length}]: ${endTime - startTime}ms`);
+        L.trace(`${availableAudits.length} NI Event Audits saved`);
+      } else {
+        L.trace('Nothing to save for NI Event Audits');
+      }
+      setTimeout(saveNiEventAudit, queueDelay * 1000);
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
   const pushRecordMessageUpdate = (messageId, status, price) => {
     const currentStatus = queue.recordMessageStatusUpdates[messageId];
     if (currentStatus == null) {
@@ -520,6 +592,10 @@ export default (container) => {
     queue.vapiEventAudits.push(data);
   };
 
+  const pushNiEventAudit = (data) => {
+    queue.niEventAudits.push(data);
+  };
+
 
   return {
     initialize,
@@ -528,5 +604,6 @@ export default (container) => {
     pushMapiStatusAudit,
     pushSmsStatusAudit,
     pushVapiEventAudit,
+    pushNiEventAudit,
   };
 };
