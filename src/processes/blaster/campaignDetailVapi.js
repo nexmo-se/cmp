@@ -6,7 +6,30 @@ export default (container) => {
       const startTime = new Date().getTime();
 
       // Write Header
-      const header = [['id', 'recipient', 'channel', 'template', 'status', 'status time', 'submit time', 'price']];
+      const header = [[
+        'id',
+        'recipient',
+        'channel',
+        'template',
+        'status',
+
+        'status time',
+        'submit time',
+
+        'from',
+        'uuid',
+        'conversationUuid',
+        'direction',
+        'timestamp',
+        'startTime',
+        'endTime',
+        'duration',
+        'rate',
+        'price',
+        'network',
+        'detail',
+        'clientRef',
+      ]];
       const headerCsv = await container.csvService.toCsv(header);
       await container.fileService.writeContent(filePath, headerCsv);
 
@@ -24,16 +47,46 @@ export default (container) => {
 
       // Write Content
       const timePattern = 'YYYY/MM/DD HH:mm:ss';
-      const content = records.map(record => ([
-        record.id,
-        record.recipient,
-        (record.cmpChannel || {}).channel,
-        (record.cmpTemplate || {}).name,
-        record.status,
-        record.statusTime ? container.moment(record.statusTime).format(timePattern) : null,
-        record.submitTime ? container.moment(record.submitTime).format(timePattern) : null,
-        record.price || 0,
-      ]));
+      const content = records.map(record => {
+        // Get Status Audit
+        const { cmpRecordMessages } = record;
+        const { cmpRecordMessageStatusAudits = [] } = cmpRecordMessages || {};
+
+        // Use Completed Status
+        let statusAudit = {};
+        for (let i = 0; i < cmpRecordMessageStatusAudits.length; i += 1) {
+          const cmpRecordMessageStatusAudit = cmpRecordMessageStatusAudits[i];
+          if (cmpRecordMessageStatusAudit.status === 'completed') {
+            statusAudit = cmpRecordMessageStatusAudit;
+          }
+        }
+
+        // Return proper array
+        return [
+          record.id,
+          record.recipient,
+          (record.cmpChannel || {}).channel,
+          (record.cmpTemplate || {}).name,
+          record.status,
+
+          record.statusTime ? container.moment(record.statusTime).format(timePattern) : null,
+          record.submitTime ? container.moment(record.submitTime).format(timePattern) : null,
+
+          (statusAudit || {}).from,
+          (statusAudit || {}).uuid,
+          (statusAudit || {}).conversationUuid,
+          (statusAudit || {}).direction,
+          (statusAudit || {}).timestamp,
+          (statusAudit || {}).startTime,
+          (statusAudit || {}).endTime,
+          (statusAudit || {}).duration,
+          (statusAudit || {}).rate,
+          (statusAudit || {}).price,
+          (statusAudit || {}).network,
+          (statusAudit || {}).detail,
+          (statusAudit || {}).clientRef,
+        ];
+      });
 
       const contentCsv = await container.csvService.toCsv(content);
       await container.fileService.writeContent(filePath, contentCsv);

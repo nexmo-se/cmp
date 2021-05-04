@@ -9,6 +9,10 @@ export default (container) => {
       mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditSms;
     } else if (mappedRmsAudit.messageType === 'mapi') {
       mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditMapi;
+    } else if (mappedRmsAudit.messageType === 'vapi') {
+      mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditVapi;
+    } else if (mappedRmsAudit.messageType === 'ni') {
+      mappedRmsAuditData = mappedRmsAudit.cmpRecordMessageStatusAuditNi;
     }
 
     mappedRmsAudit.typeId = mappedRmsAuditData.id;
