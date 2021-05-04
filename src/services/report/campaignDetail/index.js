@@ -22,8 +22,10 @@ export default (container) => {
       },
     };
 
+
     if (cmpRecord.cmpRecordMessages && cmpRecord.cmpRecordMessages.length > 0) {
       const cmpRecordMessage = cmpRecord.cmpRecordMessages[0];
+      mappedCmpRecord.cmpRecordMessages = cmpRecord.cmpRecordMessages[0];
       mappedCmpRecord.price = cmpRecord.cmpRecordMessages
         .reduce((prev, curr) => prev + curr.price, 0);
       mappedCmpRecord.status = cmpRecordMessage.status;
