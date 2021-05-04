@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       default: 'No Name',
     },
+    campaignType: {
+      type: DataTypes.STRING(100),
+      allowNull: true,
+    },
     campaignStartDate: {
       type: DataTypes.DATE,
       allowNull: false,

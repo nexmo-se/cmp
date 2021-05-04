@@ -240,6 +240,7 @@ export default (container) => {
         activeOnWeekends,
         timezone,
         niCnam,
+        campaignType: null,
         status: 'draft',
         statusTime: new Date(),
         deleted: false,

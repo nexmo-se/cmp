@@ -227,19 +227,27 @@ export default (container) => {
     }
   };
 
-  const updateCampaignStatuses = async (cmpCampaignIds, isStart = true, isEnd = true) => {
+  const updateCampaignStatuses = async (campaigns, isStart = true, isEnd = true) => {
     try {
-      if (cmpCampaignIds.length === 0) {
+      if (campaigns.length === 0) {
         return Promise.resolve();
       }
 
       // const { CmpCampaign } = container.persistenceService;
       // const criteria = { id: cmpCampaignIds };
       // const cmpCampaigns = await CmpCampaign.findCampaigns(criteria);
+
+      const campaignTypes = {};
+      for (let i = 0; i < campaigns.length; i += 1) {
+        const { id, campaignType } = campaigns[i];
+        campaignTypes[id] = campaignType;
+      }
+
+      const cmpCampaignIds = campaigns.map(campaign => campaign.id);
       const cmpCampaigns = await getCampaigns(cmpCampaignIds);
 
       const promises = cmpCampaigns.map(
-        cmpCampaign => updateCampaignStatus(cmpCampaign, isStart, isEnd),
+        cmpCampaign => updateCampaignStatus(cmpCampaign, isStart, isEnd, campaignTypes[cmpCampaign.id]),
       );
       const results = await Promise.all(promises);
       return Promise.resolve(results);
@@ -248,14 +256,14 @@ export default (container) => {
     }
   };
 
-  const updateCampaignStatus = async (campaign, isStart = true, isEnd = true) => {
+  const updateCampaignStatus = async (campaign, isStart = true, isEnd = true, campaignType) => {
     try {
       const { generateReport, reportDelay } = container.config.blaster;
       const { CmpRecord } = container.persistenceService;
       const cmpCampaignId = campaign.id;
       const currentTime = new Date();
 
-      const changes = {};
+      const changes = { campaignType };
       if (isStart && campaign.status === 'pending') {
         // Start, first record
         changes.status = 'started';
@@ -660,12 +668,18 @@ export default (container) => {
 
     for (let i = 0; i < records.length; i += 1) {
       const record = records[i];
-      const { cmpCampaignId } = record;
-      campaignsMap[cmpCampaignId] = true;
+      const { cmpCampaignId, cmpTemplate } = record;
+      const { cmpChannel } = cmpTemplate || {};
+      const { channel } = cmpChannel || {};
+      
+      campaignsMap[cmpCampaignId] = channel;
     }
 
-    const campaigns = Object.keys(campaignsMap);
-    return campaigns;
+    const campaignIds = Object.keys(campaignsMap);
+    return campaignIds.map(campaignId => ({
+      id: campaignId,
+      campaignType: campaignsMap[campaignId],
+    }));
   };
 
   const runSingle = async (records) => {

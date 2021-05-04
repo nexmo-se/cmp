@@ -1,65 +1,23 @@
+import SmsDetails from './campaignDetailSms';
+import MapiDetails from './campaignDetailMapi';
+import VapiDetails from './campaignDetailVapi';
+import NiDetails from './campaignDetailNi';
+
 export default (container) => {
   const { L } = container.defaultLogger('Report Process - Campaign Detail');
 
-  const appendHeader = async (filePath) => {
+  const smsDetails = SmsDetails(container);
+  const mapiDetails = MapiDetails(container);
+  const vapiDetails = VapiDetails(container);
+  const niDetails = NiDetails(container);
+
+  const getCampaignType = async (cmpCampaignId) => {
     try {
-      const startTime = new Date().getTime();
-
-      // Write Header
-      const header = [['id', 'recipient', 'channel', 'template', 'status', 'status time', 'submit time', 'price']];
-      const headerCsv = await container.csvService.toCsv(header);
-      await container.fileService.writeContent(filePath, headerCsv);
-
-      const endTime = new Date().getTime();
-      L.debug(`Time Taken (Append Header): ${endTime - startTime}`);
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const appendContent = async (filePath, records) => {
-    try {
-      const startTime = new Date().getTime();
-
-      // Write Content
-      const timePattern = 'YYYY/MM/DD HH:mm:ss';
-      const content = records.map(record => ([
-        record.id,
-        record.recipient,
-        (record.cmpChannel || {}).channel,
-        (record.cmpTemplate || {}).name,
-        record.status,
-        record.statusTime ? container.moment(record.statusTime).format(timePattern) : null,
-        record.submitTime ? container.moment(record.submitTime).format(timePattern) : null,
-        record.price || 0,
-      ]));
-
-      const contentCsv = await container.csvService.toCsv(content);
-      await container.fileService.writeContent(filePath, contentCsv);
-
-      const endTime = new Date().getTime();
-      L.debug(`Time Taken (Append Content) [${records.length}]: ${endTime - startTime}`);
-      return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const generateCampaignNextBatch = async (cmpCampaignId, filePath, limit, offset) => {
-    try {
-      const { campaignDetail: campaignDetailService } = container.reportService;
-      const paginatedResults = await campaignDetailService
-        .getCampaignDetails(cmpCampaignId, limit, offset);
-
-      const { results } = paginatedResults;
-
-      await appendContent(filePath, results);
-
-      if (results.length <= 0) {
-        return Promise.resolve();
-      }
-      return generateCampaignNextBatch(cmpCampaignId, filePath, limit, offset + results.length);
+      // TODO: Check Campaign Type
+      const { CmpCampaign } = container.persistenceService;
+      const campaign = await CmpCampaign.readCampaign(cmpCampaignId);
+      const { campaignType } = campaign;
+      return Promise.resolve(campaignType);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -67,10 +25,27 @@ export default (container) => {
 
   const generateCampaign = async (cmpCampaignId, filePath) => {
     try {
-      const { batchLimit } = container.config.report;
-      await appendHeader(filePath);
-      await generateCampaignNextBatch(cmpCampaignId, filePath, batchLimit, 0);
-      return Promise.resolve();
+      // Get Campaign Type
+      const campaignType = await getCampaignType(cmpCampaignId);
+
+      // Generate Based on Type
+      if (campaignType === 'sms') {
+        L.debug('Generating SMS Report');
+        return smsDetails.generateCampaign(cmpCampaignId, filePath);
+      } else if (campaignType === 'viber' || campaignType === 'whatsapp' || campaignType === 'facebook') {
+        L.debug('Generating MAPI Report');
+        return mapiDetails.generateCampaign(cmpCampaignId, filePath);
+      } else if (campaignType === 'voice') {
+        L.debug('Generating VAPI Report');
+        return vapiDetails.generateCampaign(cmpCampaignId, filePath);
+      } else if (campaignType === 'number_insight') {
+        L.debug('Generating NI Report');
+        return niDetails.generateCampaign(cmpCampaignId, filePath);
+      } else {
+        // Generic, fallback to SMS
+        L.debug('Unknown Campaign Type, fallback to Generating SMS Report');
+        return smsDetails.generateCampaign(cmpCampaignId, filePath);
+      }
     } catch (error) {
       return Promise.reject(error);
     }
