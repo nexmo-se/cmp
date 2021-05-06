@@ -1,6 +1,12 @@
 # xCMP
 Campaign Management Portal
 
+# Server Requirements
+The installation for CMP has been tested on `Ubuntu 16.04 LTS` with `MySQL 5.7` installed on. Here are the list
+- Ubuntu 16.04 LTS
+- MySQL 5.7
+- NodeJS 14.x
+
 # Installation
 Install required softwares: `nodejs`, `npm`, `git`
 
