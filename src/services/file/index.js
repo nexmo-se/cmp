@@ -51,11 +51,7 @@ export default (container) => {
 
   const writeBuffer = async (path, buffer, overwrite = false) => {
     try {
-      const options = {};
-      if (!overwrite) {
-        options.flag = 'a';
-      }
-
+      const options = { flag: overwrite ? 'w' : 'a' };
       container.fs.writeFileSync(path, buffer, options);
       return Promise.resolve();
     } catch (error) {
