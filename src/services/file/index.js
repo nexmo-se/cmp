@@ -52,7 +52,7 @@ export default (container) => {
   const writeBuffer = async (path, buffer, overwrite = false) => {
     try {
       const options = {};
-      if (overwrite) {
+      if (!overwrite) {
         options.flag = 'a';
       }
 
