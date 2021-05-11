@@ -39,19 +39,24 @@ export default (container) => {
     return reader;
   };
 
-  const writeContent = async (path, content) => {
+  const writeContent = async (path, content, overwrite = false) => {
     try {
       const buffer = Buffer.from(content, 'utf8');
-      await writeBuffer(path, buffer);
+      await writeBuffer(path, buffer, overwrite);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const writeBuffer = async (path, buffer) => {
+  const writeBuffer = async (path, buffer, overwrite = false) => {
     try {
-      container.fs.writeFileSync(path, buffer, { flag: 'a' });
+      const options = {};
+      if (overwrite) {
+        options.flag = 'a';
+      }
+
+      container.fs.writeFileSync(path, buffer, options);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);

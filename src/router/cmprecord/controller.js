@@ -486,7 +486,7 @@ export default (container) => {
       const filePath = `${uploadPath}/${fileName}`;
       const jsonBody = JSON.stringify(metadata);
 
-      await container.fileService.writeContent(filePath, jsonBody);
+      await container.fileService.writeContent(filePath, jsonBody, true);
       res.json({ status: 'ok' });
     } catch (error) {
       next(error);
