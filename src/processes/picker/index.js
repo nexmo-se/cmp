@@ -204,12 +204,38 @@ export default (container) => {
       return Promise.reject(error);
     }
   };
+  
+  const updateCampaignStatusToFailed = async (cmpCampaignId) => {
+    try {
+      const { CmpCampaign, CmpCampaignStatusAudit } = container.persistenceService;
 
-  const processFileBatch = async (fileName) => {
+      const status = 'failed';
+      const statusTime = new Date();
+
+      // Update Campaign Status
+      const startTime1 = new Date().getTime();
+      const changes = { status, statusTime };
+      const result = await CmpCampaign.updateCampaign(cmpCampaignId, changes);
+      const endTime1 = new Date().getTime();
+      L.debug(`Time Taken (Update Campaign Status): ${endTime1 - startTime1}ms`);
+
+      // Create Campaign Status Audit
+      const startTime2 = new Date().getTime();
+      await CmpCampaignStatusAudit.createCampaignStatusAudit(cmpCampaignId, status, statusTime);
+      const endTime2 = new Date().getTime();
+      L.debug(`Time Taken (Create Campaign Status Audit): ${endTime2 - startTime2}ms`);
+
+      return Promise.resolve(true);
+    } catch (error) {
+      L.error(error);
+      return Promise.resolve(false);
+    }
+  }
+
+  const processFileBatch = async (fileName, metadata) => {
     try {
       const { skipCount, batchSize } = container.config.csv;
       const processStart = new Date().getTime();
-      const metadata = extractMetadataFromFileName(fileName);
       const { cmpCampaignId, cmpTemplateId } = metadata;
       const { CmpCampaign } = container.persistenceService;
       const campaign = await CmpCampaign.readCampaign(cmpCampaignId);
@@ -227,6 +253,15 @@ export default (container) => {
       L.debug(`Time Taken (Process File): ${processEnd - processStart}ms`);
       return Promise.resolve();
     } catch (error) {
+      // Update campaign as rejected
+      const { cmpCampaignId } = metadata;
+      const updated = await updateCampaignStatusToFailed(cmpCampaignId);
+      if (updated) {
+        L.info(`Updated Campaign ${cmpCampaignId} status to Failed`);
+      } else {
+        L.error(`Failed to update Campaign ${cmpCampaignId} status to Failed`);
+      }
+
       return Promise.reject(error);
     }
   };
@@ -245,21 +280,45 @@ export default (container) => {
     return metadata;
   };
 
-  const archiveFile = async (fileName) => {
+  const archiveFile = async (fileName, failed = false) => {
     try {
       const { uploadPath, archivePath } = container.config.csv;
       const oldPath = `${uploadPath}/${fileName}`;
-      const newPath = `${archivePath}/${fileName}`;
+      const newPath = `${archivePath}/${fileName}${rejected ? '.failed' : ''}`;
 
       const archiveStart = new Date().getTime();
       container.fs.renameSync(oldPath, newPath);
       const archiveEnd = new Date().getTime();
-      L.debug(`Time Taken (Archive): ${archiveEnd - archiveStart}ms`);
+      L.debug(`Time Taken (Archive)${rejected ? ' [failed]' : '[processed]'}: ${archiveEnd - archiveStart}ms`);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(error);
     }
   };
+
+  const runFile = async (csvFile) => {
+    try {
+      // Extract File Name Metadata
+      const metadata = extractMetadataFromFileName(csvFile);
+
+      // Process
+      await processFileBatch(csvFile, metadata);
+
+      // Archive (Processed)
+      await archiveFile(csvFile, false);
+
+      L.info(`1 file processed`);
+      return Promise.resolve(true);
+    } catch (error) {
+      L.error(error);
+
+      // Archive (Failed)
+      await archiveFile(csvFile, true);
+
+      L.info(`1 file failed`);
+      return Promise.resolve(false);
+    }
+  }
 
   const runSingle = async () => {
     try {
@@ -268,25 +327,15 @@ export default (container) => {
       const csvFilter = name => name !== '' && name.toLowerCase().indexOf('.csv') === name.length - 4;
       const csvFiles = uploadDirectoryFileNames.filter(csvFilter);
 
-      let numFilesPicked = 0;
       if (csvFiles.length > 0) {
         // Single File
         const csvFile = csvFiles[0];
-
-        // Process
-        await processFileBatch(csvFile);
-
-        // Archive
-        await archiveFile(csvFile);
-
-        // Update Count
-        numFilesPicked = 1;
+        await runFile(csvFile);
       }
 
-      L.info(`${numFilesPicked} files processed`);
       return Promise.resolve();
     } catch (error) {
-      return Promise.reject(error);
+      return Promise.resolve();
     }
   };
 

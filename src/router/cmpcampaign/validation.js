@@ -14,7 +14,7 @@ export default {
       activeEndMinute: Joi.number().integer().min(0).max(59),
       activeOnWeekends: Joi.boolean(),
       timezone: Joi.string(),
-      status: Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed'),
+      status: Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed', 'failed'),
     },
     params: {},
     body: {},
@@ -33,7 +33,7 @@ export default {
       campaignEndDate: Joi.date(),
       status: Joi.alternatives().try(
         Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed'),
-        Joi.array().items(Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed')),
+        Joi.array().items(Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed', 'failed')),
       ),
       activeStartHour: Joi.number().integer().min(0).max(23),
       activeStartMinute: Joi.number().integer().min(0).max(59),
@@ -97,7 +97,7 @@ export default {
       actualStartDate: Joi.date(),
       actualEndDate: Joi.date().min(Joi.ref('actualStartDate')),
       actualDuration: Joi.number(),
-      status: Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed'),
+      status: Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed', 'failed'),
       statusTime: Joi.date(),
       niCnam: Joi.boolean().optional(),
     },
@@ -115,7 +115,7 @@ export default {
       cmpCampaignId: Joi.string().min(1).required(),
     },
     body: {
-      status: Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed'),
+      status: Joi.string().valid('pending', 'draft', 'started', 'paused', 'completed', 'failed'),
     },
   },
 };
