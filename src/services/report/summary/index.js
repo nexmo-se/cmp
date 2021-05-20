@@ -125,7 +125,7 @@ group by ACampaigns.id, ACampaigns.name, status
           };
         }
         summary[id].summary[status] = statusCount;
-        summary[id].price += price;
+        summary[id].price = parseFloat(summary[id].price) + parseFloat(price);
       }
 
       const summaryList = Object.keys(summary).map((key) => {

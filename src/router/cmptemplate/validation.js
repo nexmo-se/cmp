@@ -76,7 +76,7 @@ export default {
       facebookTag: Joi.string(),
       category: Joi.string(),
       mediaType: Joi.string().min(1).required(),
-      body: Joi.string(),
+      body: Joi.string().allow(null, '').optional(),
     },
   },
   readTemplate: {

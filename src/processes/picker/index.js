@@ -280,7 +280,7 @@ export default (container) => {
     return metadata;
   };
 
-  const archiveFile = async (fileName, failed = false) => {
+  const archiveFile = async (fileName, rejected = false) => {
     try {
       const { uploadPath, archivePath } = container.config.csv;
       const oldPath = `${uploadPath}/${fileName}`;

@@ -57,7 +57,7 @@ export default {
     body: {
       name: Joi.string().min(1).required(),
       channel: Joi.string().min(1).required(),
-      senderId: Joi.string().min(1).required(),
+      senderId: Joi.string().allow(null, '').optional(),
       tps: Joi.number().integer().required(),
       cmpApiKeyId: Joi.string().min(1).required(),
       cmpApplicationId: Joi.string(),

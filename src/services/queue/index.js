@@ -48,20 +48,13 @@ export default (container) => {
     timeout: 10,
 
     // Ni
-    "0": 4,
-    "1": 4,
-    "3": 4,
-    "4": 4,
-    "5": 4,
-    "6": 4,
-    "7": 4,
-    "8": 4,
-    "9": 4,
-    "19": 4,
-    "43": 4,
-    "44": 4,
-    "45": 4,
-    "999": 4,
+    "Success": 4,
+    "Busy": 4,
+    "Invalid": 4,
+    "Invalid credentials": 4,
+    "Internal Error": 4,
+    "Partner quota exceeded": 4,
+    "Facility Not Allowed": 4,
   };
 
   const getOverwritableStatuses = (status) => {

@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     senderId: {
       type: DataTypes.STRING(45),
-      allowNull: false,
+      allowNull: true,
     },
     tps: {
       type: DataTypes.INTEGER,

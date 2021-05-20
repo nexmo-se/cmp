@@ -276,7 +276,7 @@ export default (container) => {
       }
 
       const {
-        status, status_message: statusMessage, requestId,
+        status, status_message: statusMessage, request_id: requestId,
         international_format_number: internationalFormatNumber, national_format_number: nationalFormatNumber,
         country_code: countryCode, country_code_iso3: countryCodeIso3, country_name: countryName, country_prefix: countryPrefix,
         request_price: requestPrice, refund_price: refundPrice, remaining_balance: remainingBalance,

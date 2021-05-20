@@ -49,8 +49,8 @@ export default (container) => {
       const timePattern = 'YYYY/MM/DD HH:mm:ss';
       const content = records.map(record => {
         // Get Status Audit
-        const { cmpRecordMessages = [] } = record;
-        const { cmpRecordMessageStatusAudits = [] } = cmpRecordMessages.length > 0 ? cmpRecordMessages[0] : {};
+        const { cmpRecordMessages = {} } = record;
+        const { cmpRecordMessageStatusAudits = [] } = cmpRecordMessages;
 
         // Use Completed Status
         let statusAudit = {};

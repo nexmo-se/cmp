@@ -65,8 +65,8 @@ export default (container) => {
       const timePattern = 'YYYY/MM/DD HH:mm:ss';
       const content = records.map(record => {
         // TODO: Get Status Audit
-        const { cmpRecordMessages = [] } = record;
-        const { cmpRecordMessageStatusAudits = [] } = cmpRecordMessages.length > 0 ? cmpRecordMessages[0] : {};
+        const { cmpRecordMessages = {} } = record;
+        const { cmpRecordMessageStatusAudits = [] } = cmpRecordMessages;
         const statusAudit = cmpRecordMessageStatusAudits.length > 0 ? cmpRecordMessageStatusAudits[0] : {};
 
         // Return proper array
@@ -74,7 +74,7 @@ export default (container) => {
           record.id,
           record.recipient,
           (record.cmpChannel || {}).channel,
-          record.status,
+          (statusAudit || {}).status == null ? record.status : (statusAudit || {}).status,
           (statusAudit || {}).statusMessage,
 
           record.statusTime ? container.moment(record.statusTime).format(timePattern) : null,

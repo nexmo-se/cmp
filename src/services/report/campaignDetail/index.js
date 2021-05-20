@@ -27,7 +27,7 @@ export default (container) => {
       const cmpRecordMessage = cmpRecord.cmpRecordMessages[0];
       mappedCmpRecord.cmpRecordMessages = cmpRecord.cmpRecordMessages[0];
       mappedCmpRecord.price = cmpRecord.cmpRecordMessages
-        .reduce((prev, curr) => prev + curr.price, 0);
+        .reduce((prev, curr) => parseFloat(prev) + parseFloat(curr.price), 0);
       mappedCmpRecord.status = cmpRecordMessage.status;
       mappedCmpRecord.statusTime = cmpRecordMessage.statusTime;
     } else {
