@@ -1,5 +1,5 @@
 {
-  "name": "xcmp",
+  "name": "cmp",
   "version": "0.0.1",
   "description": "Campaign Management Portal",
   "main": "index.js",
@@ -13,30 +13,24 @@
     "blast": "NODE_ENV=production node build/blastIndex.js",
     "picker": "NODE_ENV=production node build/pickerIndex.js",
     "report": "NODE_ENV=production node build/reportIndex.js",
+
     "dev": "NODE_ENV=development nodemon --exec babel-node src",
     "devWeb": "NODE_ENV=development babel-node src",
     "devBlast": "NODE_ENV=development babel-node src/blastIndex.js",
     "devTrigger": "NODE_ENV=development babel-node src/runIndex.js",
     "devPicker": "NODE_ENV=development babel-node src/pickerIndex.js",
     "devReport": "NODE_ENV=development babel-node src/reportIndex.js",
+
     "clean": "rm -rf build",
+    "build": "npm run clean && babel src -D -d build",
     "debug": "nodemon --inspect --exec babel-node src",
+
     "initDb": "sequelize-cli init",
     "migrate": "sequelize-cli db:migrate",
     "undomigrate": "sequelize-cli db:migrate:undo",
     "seed": "sequelize-cli db:seed:all",
-    "build": "npm run clean && babel src -D -d build",
-    "test": "mocha \"./{,!(node_modules)/**/}*.test.js\" --require babel-polyfill --require esm",
-    "bundleServer": "nexe build/index.js -o \"xcmp/server\" -r \"build/**/*\" --verbose",
-    "bundleBlaster": "nexe build/blastIndex.js -o \"xcmp/blaster\" -r \"build/**/*\" --verbose",
-    "bundle": "npm run bundleServer && npm run bundleBlaster",
-    "copyPackageJson": "cp package.json xcmp/package.json",
-    "copyEnvExample": "cp .env.example xcmp/.env.example",
-    "copyReadme": "cp README-dist.md xcmp/README.md",
-    "copyEssentialFiles": "npm run copyPackageJson && npm run copyEnvExample && npm run copyReadme",
-    "zip": "zip -r -X xcmp.zip xcmp",
-    "distributeClean": "rm -rf xcmp && rm -rf xcmp.zip",
-    "distribute": "npm test && npm run distributeClean && npm run build && npm run bundle && npm run copyEssentialFiles && npm run zip"
+
+    "test": "mocha \"./{,!(node_modules)/**/}*.test.js\" --require babel-polyfill --require esm"
   },
   "author": "Yee Hui Poh <yhpoh91@gmail.com>",
   "license": "ISC",
