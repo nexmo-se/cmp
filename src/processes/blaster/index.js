@@ -1,3 +1,8 @@
+/**
+ * Blaster Process
+ * Get records from database and send
+ */
+
 import CampaignDetailReporter from './campaignDetail';
 
 export default (container) => {
@@ -682,6 +687,7 @@ export default (container) => {
     }));
   };
 
+  // Single loop workings
   const runSingle = async (records) => {
     try {
       if (records.length === 0) {
@@ -726,6 +732,7 @@ export default (container) => {
     }
   };
 
+  // This will run in a loop
   const runIndefinitely = async (blastTime, blastsMade) => {
     try {
       const startTime = new Date().getTime();
@@ -764,7 +771,7 @@ export default (container) => {
       const totalBlastsMade = blastsMade + newBlast;
 
       const nextBlastTime = blastsStart + (secondsPerBatch * 1000);
-      return runIndefinitely(nextBlastTime, totalBlastsMade);
+      return runIndefinitely(nextBlastTime, totalBlastsMade); // Run next loop
     } catch (error) {
       return Promise.reject(error);
     }

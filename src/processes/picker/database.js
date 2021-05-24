@@ -1,3 +1,7 @@
+/**
+ * Bulk Insert into Database with SQL
+ */
+
 import CreatableGenerator from './creatableGenerator';
 
 export default (container) => {

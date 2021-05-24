@@ -1,3 +1,7 @@
+/**
+ * Generate Simple Objects that can be saved into the database directly
+ */
+
 export default (container) => {
   const generateCreatableRecord = (cmpRecordId, cmpMediaId, cmpVoiceId, record) => {
     const {

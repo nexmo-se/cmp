@@ -1,3 +1,8 @@
+/**
+ * Reporter Process
+ * Get report request from database and generate reports
+ */
+
 import SummaryReporter from './summary';
 import CampaignDetailReporter from './campaignDetail';
 
@@ -20,6 +25,7 @@ export default (container) => {
 
   const wait = duration => new Promise(resolve => setTimeout(resolve, duration));
 
+  // Single loop workings
   const runSingle = async () => {
     try {
       const { CmpReport } = container.persistenceService;
@@ -63,6 +69,7 @@ export default (container) => {
     }
   };
 
+  // This will run in a loop
   const runIndefinitely = async (reportTime) => {
     try {
       // Wait
@@ -83,7 +90,7 @@ export default (container) => {
       L.debug(`Time Taken (Iteration): ${endTime - startTime}ms`);
 
       const nextReportTime = endTime + (container.config.report.delay * 1000);
-      return runIndefinitely(nextReportTime);
+      return runIndefinitely(nextReportTime); // Run next loop
     } catch (error) {
       return Promise.reject(error);
     }

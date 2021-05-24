@@ -1,3 +1,7 @@
+/**
+ * Report After the Blast
+ */
+
 import SmsDetails from './campaignDetailSms';
 import MapiDetails from './campaignDetailMapi';
 import VapiDetails from './campaignDetailVapi';
@@ -11,6 +15,7 @@ export default (container) => {
   const vapiDetails = VapiDetails(container);
   const niDetails = NiDetails(container);
 
+  // Get the type of campaign, so that a different report can be generated
   const getCampaignType = async (cmpCampaignId) => {
     try {
       // TODO: Check Campaign Type
@@ -23,6 +28,7 @@ export default (container) => {
     }
   };
 
+  // Generate different report based on campaign types
   const generateCampaign = async (cmpCampaignId, filePath) => {
     try {
       // Get Campaign Type

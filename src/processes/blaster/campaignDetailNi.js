@@ -1,3 +1,7 @@
+/**
+ * Generate Number Insight Report
+ */
+
 export default (container) => {
   const { L } = container.defaultLogger('Report Process - Campaign Detail NI');
 

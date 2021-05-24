@@ -1,3 +1,7 @@
+/**
+ * Generate Summary Report
+ */
+
 export default (container) => {
   const { L } = container.defaultLogger('Report Process - Summary');
 

@@ -1,3 +1,8 @@
+/**
+ * Picker Process
+ * Pick records from CSV and insert them to database either with SQL Bulk Insert or CSV DataLoad
+ */
+
 import DatabaseInserter from './database';
 import CsvInserter from './csv';
 
@@ -320,6 +325,7 @@ export default (container) => {
     }
   }
 
+  // Single loop workings
   const runSingle = async () => {
     try {
       const { uploadPath } = container.config.csv;
@@ -339,6 +345,7 @@ export default (container) => {
     }
   };
 
+  // This will run in a loop
   const runIndefinitely = async (pickTime) => {
     try {
       // Wait
@@ -359,7 +366,7 @@ export default (container) => {
       L.debug(`Time Taken (Iteration): ${endTime - startTime}ms`);
 
       const nextPickTime = endTime + (container.config.picker.delay * 1000);
-      return runIndefinitely(nextPickTime);
+      return runIndefinitely(nextPickTime); // Run next loop
     } catch (error) {
       return Promise.reject(error);
     }
