@@ -1,3 +1,8 @@
+/**
+ * Entry point for the Picker process
+ * Reads and Parses the Metadata and CSV files uploaded and insert them into the database
+ */
+
 require('@babel/polyfill');
 require('dotenv').config();
 

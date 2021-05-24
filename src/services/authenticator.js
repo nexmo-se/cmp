@@ -1,3 +1,8 @@
+/**
+ * Authentication Service
+ * To check whether the user is logged in, throw Unauthorized 401 if not having valid JWT token
+ */
+
 export default (container) => {
   const checkAuthenticationBasic = async (authValue, req) => {
     try {

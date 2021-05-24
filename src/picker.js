@@ -1,3 +1,7 @@
+/**
+ * Actual Entry point for Picker
+ */
+
 import container from './container';
 
 const { L } = container.defaultLogger('Picker App');
@@ -12,7 +16,7 @@ const checkLogLevels = () => {
 const start = async () => {
   try {
     checkLogLevels();
-    await container.pickerProcess.run();
+    await container.pickerProcess.run(); // in src/processes
     return Promise.resolve();
   } catch (error) {
     container.logger.error(error.message, error);

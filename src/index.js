@@ -1,3 +1,8 @@
+/**
+ * Entry point for the Web Process
+ * API Endpoints and Webhook Endpoints
+ */
+
 require('@babel/polyfill');
 require('dotenv').config();
 

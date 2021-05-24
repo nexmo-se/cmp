@@ -1,3 +1,7 @@
+/**
+ * Actual Entry point for Blaster
+ */
+
 import container from './container';
 
 const { L } = container.defaultLogger('Blaster App');
@@ -12,7 +16,7 @@ const checkLogLevels = () => {
 const start = async () => {
   try {
     checkLogLevels();
-    await container.blasterProcess.run();
+    await container.blasterProcess.run(); // in src/processes
     return Promise.resolve();
   } catch (error) {
     container.logger.error(error.message, error);

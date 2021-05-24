@@ -58,10 +58,10 @@ export default (container) => {
         return;
       }
 
-      for (let i = 0; i < controllerConfigs.length; i += 1) {
+      for (let i = 0; i < controllerConfigs.length; i += 1) { // the config order is important, first one to match will be used
         const controllerConfig = controllerConfigs[i];
         L.trace('Checking Controller Config', controllerConfig);
-        const { roles, controller } = controllerConfig;
+        const { roles, controller } = controllerConfig; // Each controller may allow a different set of roles
         const userHasAllRoles = hasAllRoles(roles, userRoles);
 
         if (userHasAllRoles) {

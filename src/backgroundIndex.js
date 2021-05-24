@@ -1,3 +1,7 @@
+/**
+ * This is just a dummy script for quick test on things, not really used
+ */
+
 require('@babel/polyfill');
 require('dotenv').config();
 

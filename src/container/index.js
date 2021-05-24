@@ -1,3 +1,7 @@
+/**
+ * Dependency Injection Container/ServiceLocator
+ */
+
 import fs from 'fs';
 import readline from 'readline';
 import NReadLines from 'n-readlines';

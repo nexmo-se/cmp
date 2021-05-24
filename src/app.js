@@ -1,3 +1,7 @@
+/**
+ * Actual entry point for Web
+ */
+
 import cors from 'cors';
 import express from 'express';
 import bodyParser from 'body-parser';
@@ -36,7 +40,7 @@ app.use(compression({ level: 9 }));
 
 app.use(log4js.connectLogger(L, { level: log4js.levels.INFO }));
 
-app.use('/', Router(container));
+app.use('/', Router(container)); // src/router
 app.use(errorHandler.handleError);
 
 // Initialize Webhook Queue

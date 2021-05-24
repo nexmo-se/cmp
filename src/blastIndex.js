@@ -1,3 +1,8 @@
+/**
+ * Entry point for the Blaster process
+ * Reads campaigns and records from the database, and blast them out in a rate-limited approach
+ */
+
 require('@babel/polyfill');
 require('dotenv').config();
 

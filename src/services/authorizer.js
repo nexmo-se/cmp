@@ -1,3 +1,8 @@
+/**
+ * Authorization Service
+ * To check whether the user is having the role required, throw Forbidden 403 if user does not have the role
+ */
+
 export default (container) => {
   const authorize = allowedRoles => async (req, res, next) => {
     try {

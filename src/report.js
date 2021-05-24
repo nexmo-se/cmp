@@ -1,3 +1,7 @@
+/**
+ * Actual Entry point for Reporter
+ */
+
 import container from './container';
 
 const { L } = container.defaultLogger('Report App');
@@ -12,7 +16,7 @@ const checkLogLevels = () => {
 const start = async () => {
   try {
     checkLogLevels();
-    await container.reportProcess.run();
+    await container.reportProcess.run(); // in src/processes
     return Promise.resolve();
   } catch (error) {
     container.logger.error(error.message, error);

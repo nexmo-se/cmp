@@ -1,3 +1,8 @@
+/**
+ * Entry point for the Reporter process
+ * Used for checking and generating reports that are manually requested from the frontend
+ */
+
 require('@babel/polyfill');
 require('dotenv').config();
 
