@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Record Message Status Audits (Number Insights)
+ * Create, Read, Update, Delete and List Record Message Status Audits (Number Insights)
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp RMS Audit Number Insight Model Accessor');
 
   const getById = async (cmpRecordMessageStatusAuditNiId, excludeDeleted = true) => {

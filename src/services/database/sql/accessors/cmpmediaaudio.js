@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Media (Audio)
+ * Create, Read, Update, Delete and List Audio Media
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Media Audio Model Accessor');
 
   const getById = async (cmpMediaAudioId, excludeDeleted = true) => {

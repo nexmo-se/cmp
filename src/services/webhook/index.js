@@ -1,4 +1,7 @@
-import { duration } from "moment";
+/**
+ * Webhook Service
+ * Handle webhook requests
+ */
 
 export default (container) => {
   const { L } = container.defaultLogger('Webhook Service');
@@ -408,11 +411,11 @@ export default (container) => {
   };
 
   return {
-    updateRecordMessage,
+    updateRecordMessage, // Update Updated RecordMessage with new status
 
-    publishMapiStatusAudit,
-    publishSmsStatusAudit,
-    publishVapiEventAudit,
-    publishNiCallbackAudit,
+    publishMapiStatusAudit, // Save new Messages API Status Webhook data
+    publishSmsStatusAudit, // Save new SMS API Status Webhook data
+    publishVapiEventAudit, // Save new Voice API Event Webhook data
+    publishNiCallbackAudit, /// Save Number Insight API result Webhook data
   };
 };

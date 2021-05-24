@@ -1,3 +1,7 @@
+/**
+ * Number Insight
+ */
+
 export default (container) => {
   const { L } = container.defaultLogger('Nexmo Number Insight Service');
 
@@ -38,6 +42,6 @@ export default (container) => {
   };
 
   return {
-    sendAdvanced,
+    sendAdvanced, // Send Advanced Number Insight request
   };
 };

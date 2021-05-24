@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Media (Image)
+ * Create, Read, Update, Delete and List Image Media
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Media Image Model Accessor');
 
   const getById = async (cmpMediaImageId, excludeDeleted = true) => {

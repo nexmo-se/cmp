@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Channels
+ * Create, Read, Update, Delete and List Channels
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Channel Model Accessor');
 
   const getByIdUser = async (cmpChannelId, userId, excludeSecret = true, excludeDeleted = true) => {

@@ -1,4 +1,10 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP Reports
+ * Create, Read, Update, Delete and List Reports
+ * This Report is actually a request to generate new custom report (not the automated one after blasting)
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Report Persistence Accessor');
 
   const ReportTypes = {

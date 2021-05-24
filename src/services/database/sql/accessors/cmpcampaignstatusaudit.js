@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Campaign Status Audits
+ * Create, Read, Update, Delete and List Campaign Status Audits
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Campaign Status Audit Model Accessor');
 
   const getById = async (cmpCampaignStatusAuditId, excludeDeleted = true) => {

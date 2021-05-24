@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP API Keys
+ * Create, Read, Update, Delete and List API Keys
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp ApiKey Model Accessor');
 
   const getByIdUser = async (cmpApiKeyId, userId, excludeSecret = true, excludeDeleted = true) => {

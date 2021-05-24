@@ -1,3 +1,8 @@
+/**
+ * Webhook Setup
+ * Setup webhook to Nexmo Application automatically
+ */
+
 export default (container) => {
   const getUrl = applicationId => `${container.config.nexmo.host}/v2/applications/${applicationId}`;
   const getSmsUrl = () => `${container.config.nexmo.restHost}/account/settings`;
@@ -35,6 +40,7 @@ export default (container) => {
     }
   };
 
+  // Setup SMS webhooks (API Key Level)
   const registerSms = async (
     apiKey, apiSecret, inboundRoute, deliveryRoute,
   ) => {
@@ -75,6 +81,7 @@ export default (container) => {
     }
   };
 
+  // Setup RTC webhooks (Application Level)
   const registerRtc = async (
     apiKey, apiSecret, applicationId, eventRoute,
   ) => {
@@ -108,6 +115,7 @@ export default (container) => {
     }
   };
 
+  // Setup Messages API (MAPI) webhooks (Application Level)
   const registerMapi = async (
     apiKey, apiSecret, applicationId, inboundRoute, statusRoute,
   ) => {
@@ -149,6 +157,7 @@ export default (container) => {
     }
   };
 
+  // Setup Voice API (VAPI) webhooks (Application Level)
   const registerVapi = async (
     apiKey, apiSecret, applicationId, eventRoute, answerRoute, fallbackAnswerRoute,
   ) => {
@@ -199,9 +208,9 @@ export default (container) => {
   };
 
   return {
-    registerSms,
-    registerRtc,
-    registerVapi,
-    registerMapi,
+    registerSms, // Setup SMS Webhook (API key level)
+    registerRtc, // Setup RTC Webhook (application level)
+    registerVapi, // Setup VAPI Webhook (application level)
+    registerMapi, // Setup MAPI Webhook (application level)
   };
 };

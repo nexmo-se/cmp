@@ -1,3 +1,8 @@
+/**
+ * Rate Limiter Service
+ * REST API call service with Rate Limiting queue
+ */
+
 import http from 'http';
 import https from 'https';
 import request from 'request';
@@ -24,6 +29,7 @@ export default (container) => {
     return minTime;
   };
 
+  // Get new tracker time
   const getTrackTime = () => {
     const currentTime = new Date();
     const year = currentTime.getFullYear();
@@ -36,6 +42,7 @@ export default (container) => {
     return trackTime;
   };
 
+  // Print TPS tracking log
   const trackTps = (key) => {
     if (trackerMap[key] == null) {
       L.trace('New TPS Tracker');
@@ -59,6 +66,7 @@ export default (container) => {
     }
   };
 
+  // Create Axios-based AxiosRateLimiter instance
   const createNewAxiosInstance = (key, tps) => {
     const httpAgent = new http.Agent({ keepAlive: true });
     const httpsAgent = new https.Agent({ keepAlive: true });
@@ -70,6 +78,7 @@ export default (container) => {
       httpsAgent,
     });
 
+    // Log before request sent
     originalAxiosInstance.interceptors.request.use((req) => {
       const currentTime = new Date();
       const year = currentTime.getFullYear();
@@ -89,6 +98,7 @@ export default (container) => {
       return req;
     });
 
+    // Log after response received
     originalAxiosInstance.interceptors.response.use((res) => {
       const currentTime = new Date();
       const year = currentTime.getFullYear();
@@ -116,6 +126,7 @@ export default (container) => {
     return rateLimitedAxiosInstance;
   };
 
+  // Create Request(library)-based Bottleneck instance
   const createNewBottleneckRequestInstance = (key, tps) => {
     const httpAgent = new http.Agent({ keepAlive: true });
     const httpsAgent = new https.Agent({ keepAlive: true });
@@ -175,6 +186,7 @@ export default (container) => {
     };
   };
 
+  // Create Axios-based Bottleneck instance
   const createNewBottleneckAxiosInstance = (key, tps) => {
     const httpAgent = new http.Agent({ keepAlive: true });
     const httpsAgent = new https.Agent({ keepAlive: true });
@@ -189,6 +201,7 @@ export default (container) => {
       httpsAgent,
     });
 
+    // Before request sent
     originalAxiosInstance.interceptors.request.use((req) => {
       const currentTime = new Date();
       const year = currentTime.getFullYear();
@@ -211,6 +224,7 @@ export default (container) => {
       return req;
     });
 
+    // After response received
     originalAxiosInstance.interceptors.response.use((res) => {
       const currentTime = new Date();
       const year = currentTime.getFullYear();
@@ -250,6 +264,7 @@ export default (container) => {
     };
   };
 
+  // Get or Create Axios Rate Limiter for channel
   const getAxiosRateLimiter = (id, channel, tps) => {
     const key = `${channel}-${id}`;
     if (axiosMap[key] == null) {
@@ -259,6 +274,7 @@ export default (container) => {
     return axiosMap[key];
   };
 
+  // Get or Create Axios Bottleneck for channel
   const getAxiosBottleneckAxios = (id, channel, tps) => {
     const key = `${channel}-${id}`;
     if (axiosMap[key] == null) {
@@ -268,6 +284,7 @@ export default (container) => {
     return axiosMap[key];
   };
 
+  // Get or Create Request Bottleneck for channel
   const getAxiosBottleneckRequest = (id, channel, tps) => {
     const key = `${channel}-${id}`;
     if (axiosMap[key] == null) {
@@ -277,6 +294,8 @@ export default (container) => {
     return axiosMap[key];
   };
 
+
+  // Get or create rate limited instance for channel
   const getAxios = (id, channel, tps) => {
     const { rateLimiter } = container.config.blaster;
     if (rateLimiter === 'bottleneck') {
@@ -300,6 +319,6 @@ export default (container) => {
   };
 
   return {
-    getAxios,
+    getAxios, // Get Axios-like instance with rate limiting
   };
 };

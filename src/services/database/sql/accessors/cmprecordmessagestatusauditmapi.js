@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Record Message Status Audits (Messages API)
+ * Create, Read, Update, Delete and List Record Message Status Audits (Messages API)
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp RMS Audit Mapi Model Accessor');
 
   const getById = async (cmpRecordMessageStatusAuditMapiId, excludeDeleted = true) => {

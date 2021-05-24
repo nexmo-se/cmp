@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP Record Parameters
+ * Create, Read, Update, Delete and List Record Parameters
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Parameter Persistence Accessor');
 
   const listParameters = async (options = {}) => {

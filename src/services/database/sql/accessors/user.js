@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Users
+ * Create, Read, Update, Delete and List Users
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('User Model Accessor');
 
   const getById = async (userId, excludePassword = true, excludeDeleted = true) => {

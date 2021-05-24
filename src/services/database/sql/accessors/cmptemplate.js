@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Templates
+ * Create, Read, Update, Delete and List Templates
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Template Model Accessor');
 
   const getById = async (cmpTemplateId, excludeSecret = true, excludeDeleted = true) => {

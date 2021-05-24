@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP Channels
+ * Create, Read, Update, Delete and List Channels
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Channel Persistence Accessor');
 
   const filterChannels = (userId, cmpChannels) => cmpChannels

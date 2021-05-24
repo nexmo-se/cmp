@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Applications
+ * Create, Read, Update, Delete and List Applications
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Application Model Accessor');
 
   const getByIdUser = async (

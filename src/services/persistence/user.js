@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP Users
+ * Create, Read, Update, Delete and List Users
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('User Persistence Accessor');
 
   const listUsers = async (excludePassword = true, options = {}) => {

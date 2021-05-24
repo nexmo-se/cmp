@@ -1,3 +1,8 @@
+/**
+ * Accessor Service
+ * Low level database access, with the use of models
+ */
+
 import User from './user';
 import UserRole from './userrole';
 import CmpApiKey from './cmpapikey';

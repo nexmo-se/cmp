@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Voices
+ * Create, Read, Update, Delete and List Voices
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Voice Model Accessor');
 
   const getById = async (cmpVoiceId, excludeDeleted = true) => {

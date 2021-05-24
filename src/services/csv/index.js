@@ -1,3 +1,8 @@
+/**
+ * CSV Service
+ * To Parse CSV to JSON and to Serialize JSON to CSV
+ */
+
 export default (container) => {
   const fromCsv = async (csvContent) => {
     try {
@@ -27,8 +32,8 @@ export default (container) => {
   };
 
   return {
-    fromCsv,
-    fromCsvSync,
-    toCsv,
+    fromCsv, // Convert CSV to JSON (Async version), requires await/then
+    fromCsvSync, // Convert CSV to JSON (Sync version), can use directly (PREFERRED)
+    toCsv, // Convert JSON to CSV
   };
 };

@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Reports
+ * Create, Read, Update, Delete and List Reports
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Report Model Accessor');
 
   const getById = async (cmpReportId, excludeDeleted = true) => {

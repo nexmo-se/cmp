@@ -1,3 +1,8 @@
+/**
+ * Base64 Service
+ * Encode and Decode between Plaintext and Base64 String
+ */
+
 export default () => {
   const encode = async (plaintext) => {
     try {
@@ -20,7 +25,7 @@ export default () => {
   };
 
   return {
-    encode,
-    decode,
+    encode, // Encode plaintext string to base64
+    decode, // Decode base64 string to plaintext
   };
 };

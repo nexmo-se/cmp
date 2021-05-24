@@ -1,3 +1,8 @@
+/**
+ * Viber
+ * Send Text and Media Viber Message
+ */
+
 import windows1252 from 'windows-1252';
 import utf8 from 'utf8';
 
@@ -21,6 +26,7 @@ export default (container) => {
     return url;
   };
 
+  // Convert encoding to UTF-8
   const convertToUtf8 = (text) => {
     if (text == null) {
       return null;
@@ -194,8 +200,8 @@ export default (container) => {
   };
 
   return {
-    sendText,
-    sendImage,
-    sendTemplate,
+    sendText, // Send Text-only Viber message
+    sendImage, // Send Image-only Viber message
+    sendTemplate, // Send Image + Text + Button Viber message
   };
 };

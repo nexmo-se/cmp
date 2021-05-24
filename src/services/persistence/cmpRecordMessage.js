@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP Record Messages
+ * Create, Read, Update, Delete and List Record Messages
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp RecordMessage Persistence Accessor');
 
   const listRecordMessages = async (options = {}) => {

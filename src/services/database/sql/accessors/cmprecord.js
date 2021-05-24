@@ -1,4 +1,10 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Records
+ * Create, Read, Update, Delete and List Records
+ * Get Active Records (waiting to be sent)
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Record Model Accessor');
 
   const getById = async (

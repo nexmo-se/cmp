@@ -1,3 +1,8 @@
+/**
+ * Whatsapp
+ * Send Text and Media Messages
+ */
+
 import windows1252 from 'windows-1252';
 import utf8 from 'utf8';
 
@@ -20,6 +25,7 @@ export default (container) => {
     return url;
   };
 
+  // Convert encoding to UTF-8
   const convertToUtf8 = (text) => {
     if (text == null) {
       return null;
@@ -110,6 +116,7 @@ export default (container) => {
     }
   };
 
+  // Send Text-only Message Template using "Template"
   const sendMessageTemplate = async (
     from, to, namespace, name, parameters, clientRef,
     applicationId, privateKey,
@@ -225,6 +232,7 @@ export default (container) => {
     return parameter;
   };
 
+  // Send Whatsapp Media Template using "Custom"
   const sendMediaTemplate = async (
     from, to, namespace, name,
     mediaType, media, parameters, clientRef,
@@ -290,7 +298,7 @@ export default (container) => {
   };
 
   return {
-    sendFreeForm,
-    sendTemplate,
+    sendFreeForm, // Send FreeForm Text (not very useful, requires 24H window open)
+    sendTemplate, // Send Message/Media Template
   };
 };

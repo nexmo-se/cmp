@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP Voices
+ * Create, Read, Delete and List Voices
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Voice Persistence Accessor');
 
   const listVoices = async (options = {}) => {

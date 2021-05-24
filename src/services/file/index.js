@@ -1,3 +1,8 @@
+/**
+ * File Service
+ * To Read data from File and to Write data to File
+ */
+
 export default (container) => {
   const readContent = async (path) => {
     try {
@@ -78,16 +83,16 @@ export default (container) => {
   };
 
   return {
-    readContent,
-    readBuffer,
-    readLineBuffer,
-    readLineContent,
-    readNLineBuffer,
+    readContent, // Read File As String
+    readBuffer, // Read File As Buffer
+    readLineBuffer, // Read Line (of a file) as Buffer
+    readLineContent, // Read Line (of a file) as String
+    readNLineBuffer, // Read Line (of a file) as Buffer using ReadNLine library
 
-    writeContent,
-    writeBuffer,
+    writeContent, // Write String to File
+    writeBuffer, // Write Buffer to File
 
-    renameFile,
-    deleteFile,
+    renameFile, // Rename File
+    deleteFile, // Delete File
   };
 };

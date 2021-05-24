@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+  Accessor Service for CMP Record Parameters
+ * Create, Read, Update, Delete and List Record Parameters
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Parameter Model Accessor');
 
   const getById = async (cmpParameterId, excludeDeleted = true) => {

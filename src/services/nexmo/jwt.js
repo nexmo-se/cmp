@@ -1,3 +1,8 @@
+/**
+ * JWT
+ * Generate JWT token for Nexmo Application
+ */
+
 export default (container) => {
   const acl = {
     paths: {
@@ -46,7 +51,7 @@ export default (container) => {
   };
 
   return {
-    getUserJwt,
-    getSystemJwt,
+    getUserJwt, // Not in use, only for In-App usage
+    getSystemJwt, // Server use, for API calls
   };
 };

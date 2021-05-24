@@ -1,3 +1,8 @@
+/**
+ * DateTime Service
+ * To do date manipulation, especially across timezones
+ */
+
 export default (container) => {
   const { L } = container.defaultLogger('DateTime Service');
   const tzUTC = 'Etc/UTC';
@@ -49,8 +54,8 @@ export default (container) => {
   };
 
   return {
-    getDateInUtc,
-    getCurrentTimeInUtc,
+    getDateInUtc, // Get Date Object of given time and timezone converted to UTC
+    getCurrentTimeInUtc, // Get curent time in UTC timezone
     tzUTC,
   };
 };

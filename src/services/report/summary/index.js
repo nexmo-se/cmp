@@ -1,3 +1,8 @@
+/**
+ * Summary Report Service
+ * Generate Overall/Campaign Summary Report
+ */
+
 export default (container) => {
   const { L } = container.defaultLogger('Report Service - Summary');
 
@@ -178,7 +183,7 @@ group by ACampaigns.id, ACampaigns.name, status
   };
 
   return {
-    getOverallSummary,
-    getCampaignSummary,
+    getOverallSummary, // Generate Overall Summary (all campaigns)
+    getCampaignSummary, // Generate Campaign Summary (single campaign)
   };
 };

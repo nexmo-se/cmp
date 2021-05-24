@@ -1,4 +1,9 @@
-import User from './user';
+/**
+ * Persistence Service
+ * A higher level service to manage the persistence of data into the database
+ */
+
+ import User from './user';
 import CmpApiKey from './cmpApiKey';
 import CmpApplication from './cmpApplication';
 import CmpChannel from './cmpChannel';

@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP Campaign Status Audits
+ * Create, Read, Delete and List Campaign Status Audits
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp RMS Audit Persistence Accessor');
 
   const listCampaignStatusAudits = async (options = {}) => {

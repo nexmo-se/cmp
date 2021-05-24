@@ -1,3 +1,8 @@
+/**
+ * JWT Service
+ * To Encode and Decode JWT Tokens
+ */
+
 export default (container) => {
   const encode = async (payload) => {
     try {
@@ -20,7 +25,7 @@ export default (container) => {
   };
 
   return {
-    encode,
-    decode,
+    encode, // Encode payload to JWT format
+    decode, // Verify and Decode JWT to payload
   };
 };

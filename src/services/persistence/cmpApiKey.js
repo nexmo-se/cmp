@@ -1,3 +1,8 @@
+/**
+ * Persistence Service for CMP API Keys
+ * Create, Read, Update, Delete and List API Keys
+ */
+
 export default (container) => {
   const { L } = container.defaultLogger('Cmp ApiKey Persistence Accessor');
 

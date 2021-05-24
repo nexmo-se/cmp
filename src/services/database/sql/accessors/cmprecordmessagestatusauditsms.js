@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Record Message Status Audits (SMS)
+ * Create, Read, Update, Delete and List Record Message Status Audits (SMS)
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp RMS Audit SMS Model Accessor');
 
   const getById = async (cmpRecordMessageStatusAuditSmsId, excludeDeleted = true) => {

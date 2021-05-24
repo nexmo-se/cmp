@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP Templates
+ * Create, Read, Update, Delete and List Templates
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Template Persistence Accessor');
 
   const listTemplates = async (excludeSecret = true, options = {}) => {

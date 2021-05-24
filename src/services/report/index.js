@@ -1,3 +1,8 @@
+/**
+ * Report Service
+ * Generates various reports
+ */
+
 import Summary from './summary';
 import CampaignDetail from './campaignDetail';
 

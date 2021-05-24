@@ -1,3 +1,8 @@
+/**
+ * Template Service
+ * Convert template with parameters into final text with parameters filled in
+ */
+
 export default () => {
   const getText = (templateBody, parameters) => {
     let contentBody = templateBody;
@@ -13,6 +18,6 @@ export default () => {
   };
 
   return {
-    getText,
+    getText, // Get actual filled in text that is ready for sending
   };
 };

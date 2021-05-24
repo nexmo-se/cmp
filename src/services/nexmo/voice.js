@@ -1,3 +1,8 @@
+/**
+ * Voice
+ * Make voice call with NCCO (TTS only at the moment)
+ */
+
 export default (container) => {
   const { L } = container.defaultLogger('Nexmo Voice Service');
 
@@ -95,9 +100,9 @@ export default (container) => {
   };
 
   return {
-    sendTts,
-    sendStream,
+    sendTts, // Make TTS Voice call
+    sendStream, // Make AudioStream (URL) Voice call (not tested)
 
-    sendNcco,
+    sendNcco, // Make Voice call with NCCO
   };
 };

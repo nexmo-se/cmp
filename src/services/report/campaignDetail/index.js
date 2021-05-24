@@ -1,3 +1,8 @@
+/**
+ * Campaign Detail Report Service
+ * Create detailed campaign report - Record Level
+ */
+
 export default (container) => {
   const { L } = container.defaultLogger('Report Service - Campaign Detail');
 

@@ -1,3 +1,9 @@
+/**
+ * Queue Service
+ * In-memory queue to allow bulk insert/update to database periodically
+ * This allows for less number of DB connection required (reduce congestion)
+ */
+
 export default (container) => {
   const { L } = container.defaultLogger('Queue Service');
 
@@ -10,6 +16,8 @@ export default (container) => {
     niEventAudits: [],
   };
 
+  // Hierarchy of the different statuses
+  // Only status of a higher hierarchy can replace the ones at a lower hierarchy as the newer status, preventing race condition
   const StatusHierarchy = {
     error: -1,
     unknown: -1,
@@ -57,6 +65,7 @@ export default (container) => {
     "Facility Not Allowed": 4,
   };
 
+  // Get Statuses that can be overwritable by current status
   const getOverwritableStatuses = (status) => {
     const keys = Object.keys(StatusHierarchy);
     const overwritableStatuses = [];
@@ -75,6 +84,8 @@ export default (container) => {
     return overwritableStatuses;
   };
 
+
+  // Initialize the queue and setTimeout
   const initialize = () => {
     const { queueDelay } = container.config.webhook;
     L.trace('Initialize Queue Service');
@@ -98,6 +109,7 @@ export default (container) => {
     setTimeout(saveNiEventAudit, queueDelay * 1000);
   };
 
+  // Get RecordMessage ID map based on MessageIds (SMS) / MessageUuids (MAPI) / CallUuid (VAPI) / RequestId (NI)
   const getRecordMessageIdMap = async (messageIds) => {
     try {
       const { CmpRecordMessage } = container.persistenceService;
@@ -117,6 +129,7 @@ export default (container) => {
     }
   };
 
+  // Convert recordmessages to map
   const createRecordMessageIdMap = (recordMessages) => {
     const startTime = new Date().getTime();
 
@@ -132,6 +145,7 @@ export default (container) => {
     return map;
   };
 
+  // Save updated Price to RecordMessage
   const saveRecordMessagePriceUpdates = async () => {
     try {
       const { CmpRecordMessage } = container.persistenceService;
@@ -235,6 +249,7 @@ export default (container) => {
     }
   };
 
+  // Save updated Status for RecordMessage
   const saveRecordMessageStatusUpdates = async () => {
     try {
       const { CmpRecordMessage } = container.persistenceService;
@@ -352,6 +367,7 @@ export default (container) => {
     }
   };
 
+  // Save MAPI Status Webhook Data
   const saveMapiStatusAudit = async () => {
     try {
       const { CmpRecordMessageStatusAudit } = container.persistenceService;
@@ -404,6 +420,7 @@ export default (container) => {
     }
   };
 
+  // Save SMS Status Webhook Data
   const saveSmsStatusAudit = async () => {
     try {
       const { CmpRecordMessageStatusAudit } = container.persistenceService;
@@ -456,6 +473,7 @@ export default (container) => {
     }
   };
 
+  // Save VAPI Event Webhook data
   const saveVapiEventAudit = async () => {
     try {
       const { CmpRecordMessageStatusAudit } = container.persistenceService;
@@ -508,6 +526,7 @@ export default (container) => {
     }
   };
 
+  // Save NI Results Webhook Data
   const saveNiEventAudit = async () => {
     try {
       const { CmpRecordMessageStatusAudit } = container.persistenceService;
@@ -591,12 +610,12 @@ export default (container) => {
 
 
   return {
-    initialize,
+    initialize, // Initializes the queues and timer (setTimeout) to save data in the queue to the database
 
-    pushRecordMessageUpdate,
-    pushMapiStatusAudit,
-    pushSmsStatusAudit,
-    pushVapiEventAudit,
-    pushNiEventAudit,
+    pushRecordMessageUpdate, // Add RecordMessage updates to the queue
+    pushMapiStatusAudit, // Add MAPI status webhook data to the queue
+    pushSmsStatusAudit, // Add SMS status webhook data to the queue
+    pushVapiEventAudit, // Add VAPI event webhook data to the queue
+    pushNiEventAudit, // Add NI result webhook data to the queue
   };
 };

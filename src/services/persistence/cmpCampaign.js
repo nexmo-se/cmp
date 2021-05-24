@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP Campaigns
+ * Create, Read, Update, Delete and List Campaigns
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Campaign Persistence Accessor');
 
   const listCampaigns = async (options = {}) => {

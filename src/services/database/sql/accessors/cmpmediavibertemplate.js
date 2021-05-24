@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Media (Viber Template)
+ * Create, Read, Update, Delete and List Viber Template Media
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Media ViberTemplate Model Accessor');
 
   const getById = async (cmpMediaViberTemplateId, excludeDeleted = true) => {

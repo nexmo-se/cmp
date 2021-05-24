@@ -1,3 +1,8 @@
+/**
+ * Facebook Messenger
+ * Send Message to Facebook Messenger
+ */
+
 import windows1252 from 'windows-1252';
 import utf8 from 'utf8';
 
@@ -11,6 +16,7 @@ export default (container) => {
     return url;
   };
 
+  // Convert encoding to UTF-8
   const convertToUtf8 = (text) => {
     if (text == null) {
       return null;
@@ -141,7 +147,7 @@ export default (container) => {
   };
 
   return {
-    sendText,
-    sendMedia,
+    sendText, // Send Text-only message
+    sendMedia, // Send Media message
   };
 };

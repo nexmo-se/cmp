@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Reports (Overall Summary)
+ * Create, Read, Update, Delete and List Reports (Overall Summary)
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp RMS Audit Mapi Model Accessor');
 
   const getById = async (cmpReportOverallSummaryId, excludeDeleted = true) => {

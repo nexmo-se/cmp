@@ -1,4 +1,8 @@
-  
+/**
+ * Hash Service
+ * Generate Salt and Hash of a plaintext
+ */
+
 export default (container) => {
   const generateSalt = async () => {
     try {
@@ -20,7 +24,7 @@ export default (container) => {
   };
 
   return {
-    hash,
-    generateSalt,
+    hash, // Hash a given plaintext
+    generateSalt, // Generate a salt for hashing purposes
   };
 };

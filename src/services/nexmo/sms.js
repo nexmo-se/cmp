@@ -1,3 +1,8 @@
+/**
+ * SMS
+ * Send SMS message
+ */
+
 import windows1252 from 'windows-1252';
 import utf8 from 'utf8';
 
@@ -18,6 +23,7 @@ export default (container) => {
   // eslint-disable-next-line no-control-regex
   const isUnicode = text => /[^\u0000-\u00ff]/.test(text);
 
+  // Convert encoding to UTF-8
   const convertToUtf8 = (text) => {
     if (text == null) {
       return null;
@@ -64,6 +70,6 @@ export default (container) => {
   };
 
   return {
-    sendText,
+    sendText, // Send Text SMS
   };
 };

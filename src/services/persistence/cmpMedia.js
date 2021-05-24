@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP Media (Whatsapp/Viber/Facebook Messenger)
+ * Create, Read, Delete and List Media (Whatsapp/Viber/Facebook Messenger)
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Media Persistence Accessor');
 
   const mapMedia = (media) => {

@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Persistence Service for CMP RecordMessage Status Audits
+ * Create, Read, Delete and List RecordMessage Status Audits
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp RMS Audit Persistence Accessor');
 
   const mapRecordMessageStatusAudit = (rmsAudit) => {

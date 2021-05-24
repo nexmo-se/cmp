@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Media (Whatsapp / Viber / Facebook Messenger)
+ * Create, Read, Update, Delete and List Media (Whatsapp / Viber / Facebook Messenger)
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Media Model Accessor');
 
   const getById = async (cmpMediaId, excludeDeleted = true) => {

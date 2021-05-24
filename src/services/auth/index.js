@@ -1,3 +1,8 @@
+/**
+ * Authentication Token Checker Service
+ * To actually check the provided JWT token against database
+ */
+
 export default (container) => {
   const { L } = container.defaultLogger('AuthService');
 
@@ -53,7 +58,7 @@ export default (container) => {
   };
 
   return {
-    authenticateBearer,
-    authenticateBasic,
+    authenticateBearer, // Check Bearer token against database
+    authenticateBasic, // Check Basic token against database
   };
 };

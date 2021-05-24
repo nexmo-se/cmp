@@ -1,4 +1,9 @@
-export default (container) => {
+/**
+ * Accessor Service for CMP Media (Header Text)
+ * Create, Read, Update, Delete and List Header Text Media
+ */
+
+ export default (container) => {
   const { L } = container.defaultLogger('Cmp Media Text Model Accessor');
 
   const getById = async (cmpMediaTextId, excludeDeleted = true) => {

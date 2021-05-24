@@ -1,3 +1,10 @@
+/**
+ * Persistence Service for CMP Records
+ * Create, Read, Update, Delete and List Records
+ * Get Active Records (waiting to be sent)
+ */
+
+
 export default (container) => {
   const { L } = container.defaultLogger('Cmp Record Persistence Accessor');
 
