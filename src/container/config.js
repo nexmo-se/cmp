@@ -51,18 +51,27 @@ export default {
     saveCampaignAudits: (process.env.SAVE_CAMPAIGNS_AUDITS || 'true').toLowerCase() === 'true', // whether to save detailed campaign audit trail
   },
   nexmo: {
+    // Nexmo Endpoints
     host: process.env.NEXMO_API, // Nexmo API Endpoint Host
     restHost: process.env.NEXMO_REST_API, // Nexmo SMS API Endpoint Host
+
+    // Mock Endpoints
     mockSmsUrl: process.env.MOCK_SMS_URL, // Mock SMS Endpoint URL (mockymocky)
     mockWhatsappUrl: process.env.MOCK_WHATSAPP_URL, // Mock Whatsapp Endpoint URL (mockymocky)
     mockViberUrl: process.env.MOCK_VIBER_URL, // Mock Viber Endpoint URL (mockymocky)
     mockVoiceUrl: process.env.MOCK_VOICE_URL, // Mock Voice Endpoint URL (mockymocky)
+    mockNumberInsightUrl: process.env.MOCK_NUMBER_INSIGHT_URL, // Mock Number Insight Endpoint URL (mockymocky)
+
+    // Use Sandbox
     useWhatsappSandbox: (process.env.USE_SANDBOX_WHATSAPP || 'false').toLowerCase() === 'true', // Whether to use whatsapp APAC sandbox
     useViberSandbox: (process.env.USE_SANDBOX_VIBER || 'false').toLowerCase() === 'true', // Whether to use viber APAC sandbox
+
+    // Use Mock
     useMockSms: (process.env.USE_MOCK_SMS || 'false').toLowerCase() === 'true', // Whether to use Mock SMS Endpoint
     useMockWhatsapp: (process.env.USE_MOCK_WHATSAPP || 'false').toLowerCase() === 'true', // Whether to use Mock Whatsapp Endpoint
     useMockViber: (process.env.USE_MOCK_VIBER || 'false').toLowerCase() === 'true', // Whether to use Mock Viber Endpoint
     useMockVoice: (process.env.USE_MOCK_VOICE || 'false').toLowerCase() === 'true', // Whether to use Mock Voice Endpoint
+    useMockNumberInsight: (process.env.USE_MOCK_NUMBER_INSIGHT || 'false').toLowerCase() === 'true', // Whether to use Mock Number Insight Endpoint
   },
   database: {
     name: process.env.DATABASE_NAME || '', // Database Name/Schema
